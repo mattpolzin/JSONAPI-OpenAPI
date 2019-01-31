@@ -14,6 +14,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.1.0"),
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "1.0.0"),
+        .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", from: "1.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "0.18.0"),
     ],
     targets: [
@@ -24,6 +25,6 @@ let package = Package(
             dependencies: ["JSONAPI", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]),
             .testTarget(
                 name: "JSONAPIOpenAPITests",
-                dependencies: ["JSONAPI", "JSONAPIOpenAPI"])
+                dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"])
     ]
 )
