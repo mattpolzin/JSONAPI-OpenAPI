@@ -720,37 +720,37 @@ public enum OpenAPIPathItem: Equatable {
 
 		public typealias ParameterArray = [Either<Parameter, JSONReference<OpenAPIComponents, Parameter>>]
 
-		public struct Parameter: Equatable, Encodable {
-			private enum CodingKeys: String, CodingKey {
-				case name
-//				case parameterLocation = "in"
-				case description
-				case deprecated
-			}
-
+		public struct Parameter: Equatable {
 			public let name: String
-//			public let parameterLocation: Location
+			public let parameterLocation: Location
 			public let description: String?
 			public let deprecated: Bool // default is false
+			public let schemaOrContent: Either<SchemaProperty, Operation.ContentMap>
 			// TODO: serialization rules
 			/*
 			Serialization Rules
 			*/
 
+			public typealias SchemaProperty = Either<JSONNode, JSONReference<OpenAPIComponents, JSONNode>>
+
 			public init(name: String,
+						parameterLocation: Location,
+						schemaOrContent: Either<SchemaProperty, Operation.ContentMap>,
 						description: String? = nil,
 						deprecated: Bool = false) {
 				self.name = name
+				self.parameterLocation = parameterLocation
+				self.schemaOrContent = schemaOrContent
 				self.description = description
 				self.deprecated = deprecated
 			}
 
-//			public enum Location: Encodable {
-//				case query(required: Bool?)
-//				case header(required: Bool?)
-//				case path
-//				case cookie(required: Bool?)
-//			}
+			public enum Location: Equatable {
+				case query(required: Bool?)
+				case header(required: Bool?)
+				case path
+				case cookie(required: Bool?)
+			}
 		}
 
 		public struct Operation: Equatable {

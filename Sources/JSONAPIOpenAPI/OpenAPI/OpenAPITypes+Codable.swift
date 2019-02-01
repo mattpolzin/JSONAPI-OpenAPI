@@ -321,6 +321,65 @@ extension OpenAPIPathItem.PathProperties.Operation: Encodable {
 	}
 }
 
+extension OpenAPIPathItem.PathProperties.Parameter: Encodable {
+	private enum CodingKeys: String, CodingKey {
+		case name
+		case parameterLocation = "in"
+		case description
+		case required
+		case deprecated
+
+		// the following are alternatives
+		case content
+		case schema
+	}
+
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.container(keyedBy: CodingKeys.self)
+
+		try container.encode(name, forKey: .name)
+
+		let required: Bool?
+		let location: String
+		switch parameterLocation {
+		case .query(required: let req):
+			required = req
+			location = "query"
+		case .header(required: let req):
+			required = req
+			location = "header"
+		case .path:
+			required = true
+			location = "path"
+		case .cookie(required: let req):
+			required = req
+			location = "cookie"
+		}
+		try container.encode(location, forKey: .parameterLocation)
+
+		try container.encode(required, forKey: .required)
+
+		switch schemaOrContent {
+		case .a(let schema):
+			try container.encode(schema, forKey: .schema)
+		case .b(let contentMap):
+			// Hack to work around Dictionary encoding
+			// itself as an array in this case:
+			let stringKeyedDict = Dictionary(
+				contentMap.map { ($0.key.rawValue, $0.value) },
+				uniquingKeysWith: { $1 }
+			)
+			try container.encode(stringKeyedDict, forKey: .content)
+		}
+
+		if description != nil {
+			try container.encode(description, forKey: .description)
+		}
+
+		try container.encode(deprecated, forKey: .deprecated)
+	}
+}
+
 extension OpenAPIPathItem.PathProperties: Encodable {
 	private enum CodingKeys: String, CodingKey {
 		case summary
