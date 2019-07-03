@@ -84,7 +84,7 @@ extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: S
 
 		let typeNode = JSONNode.string(.init(format: .generic,
 											 required: true,
-											 allowedValues: [.init(Self.jsonType)]),
+											 allowedValues: [.init(ResourceObject.jsonType)]),
 									   .init())
 		let typeProperty = ("type", typeNode)
 
