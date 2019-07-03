@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/Flight-School/AnyCodable.git",
         "state": {
           "branch": null,
-          "revision": "396ccc3dba5bdee04c1e742e7fab40582861401e",
-          "version": "0.1.0"
+          "revision": "1f5d3f1e1bee336190754dfcb5e8120b767ab361",
+          "version": "0.2.2"
         }
       },
       {
@@ -15,8 +15,8 @@
         "repositoryURL": "https://github.com/llvm-swift/FileCheck.git",
         "state": {
           "branch": null,
-          "revision": "89b8480055f9adf8ce2f9ad5e2fac7ac1076242e",
-          "version": "0.0.8"
+          "revision": "00945abac615e5203701be0f090ed0e2d2ff15bf",
+          "version": "0.2.0"
         }
       },
       {
@@ -24,8 +24,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
           "branch": null,
-          "revision": "a88bb77bd0d2cf9bc493bc21839c98fd5962f772",
-          "version": "0.18.0"
+          "revision": "099d17aa5803a64d62904f265144b795c38b6db5",
+          "version": "0.31.0"
         }
       },
       {
@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI-Arbitrary.git",
         "state": {
           "branch": null,
-          "revision": "9288859189cf868f49fd2662d605db998886757f",
-          "version": "1.0.0"
+          "revision": "b5f1e09ffc6f69e2e07ea4466028ce9087d26a10",
+          "version": "3.0.0"
         }
       },
       {
@@ -42,8 +42,17 @@
         "repositoryURL": "https://github.com/mattpolzin/Poly.git",
         "state": {
           "branch": null,
-          "revision": "77f45b8963a51c02d71fc4075eba5cff47ff0d07",
-          "version": "1.0.0"
+          "revision": "38051821d7ef49e590e26e819a2fe447e50be9ff",
+          "version": "2.0.1"
+        }
+      },
+      {
+        "package": "Rainbow",
+        "repositoryURL": "https://github.com/onevcat/Rainbow.git",
+        "state": {
+          "branch": null,
+          "revision": "9c52c1952e9b2305d4507cf473392ac2d7c9b155",
+          "version": "3.1.5"
         }
       },
       {
@@ -51,8 +60,26 @@
         "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
         "state": {
           "branch": null,
-          "revision": "6572998ac30685d8bb73e6b725596d07d891a75a",
-          "version": "1.0.0"
+          "revision": "8a88ca056a58587daa99c33a04c63c9d59429932",
+          "version": "2.0.0"
+        }
+      },
+      {
+        "package": "llbuild",
+        "repositoryURL": "https://github.com/apple/swift-llbuild.git",
+        "state": {
+          "branch": null,
+          "revision": "f1c9ad9a253cdf1aa89a7f5c99c30b4513b06ddb",
+          "version": "0.1.1"
+        }
+      },
+      {
+        "package": "SwiftPM",
+        "repositoryURL": "https://github.com/apple/swift-package-manager.git",
+        "state": {
+          "branch": null,
+          "revision": "8656a25cb906c1896339f950ac960ee1b4fe8034",
+          "version": "0.4.0"
         }
       },
       {
@@ -60,8 +87,8 @@
         "repositoryURL": "https://github.com/typelift/SwiftCheck.git",
         "state": {
           "branch": null,
-          "revision": "cf9958085b2ee1643e541e407c3233d1b76c18ff",
-          "version": "0.11.0"
+          "revision": "077c096c3ddfc38db223ac8e525ad16ffb987138",
+          "version": "0.12.0"
         }
       }
     ]

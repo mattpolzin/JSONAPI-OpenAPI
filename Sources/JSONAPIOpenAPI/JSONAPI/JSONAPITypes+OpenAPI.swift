@@ -68,7 +68,7 @@ extension ToManyRelationship: OpenAPINodeType {
 	}
 }
 
-extension Entity: OpenAPIEncodedNodeType where Description.Attributes: Sampleable, Description.Relationships: Sampleable {
+extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: Sampleable, Description.Relationships: Sampleable {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONNode {
 		// NOTE: const for json `type` not supported by OpenAPI 3.0
 		//		Will use "enum" with one possible value for now.
@@ -84,7 +84,7 @@ extension Entity: OpenAPIEncodedNodeType where Description.Attributes: Sampleabl
 
 		let typeNode = JSONNode.string(.init(format: .generic,
 											 required: true,
-											 allowedValues: [.init(Entity.jsonType)]),
+											 allowedValues: [.init(Self.jsonType)]),
 									   .init())
 		let typeProperty = ("type", typeNode)
 

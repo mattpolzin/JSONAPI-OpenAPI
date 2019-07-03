@@ -313,7 +313,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 
 // MARK: - Test Types
 extension JSONAPIDocumentOpenAPITests {
-	enum TestEntityDescription: EntityDescription {
+	enum TestEntityDescription: ResourceObjectDescription {
 		static var jsonType: String { return "test" }
 
 		struct Attributes: JSONAPI.Attributes, Sampleable {
@@ -337,7 +337,7 @@ extension JSONAPIDocumentOpenAPITests {
 
 	typealias DocumentWithIncludes = Document<SingleResourceBody<TestEntity>, NoMetadata, NoLinks, Include1<TestEntity>, NoAPIDescription, UnknownJSONAPIError>
 
-	enum TestEntityDescription2: EntityDescription {
+	enum TestEntityDescription2: ResourceObjectDescription {
 		static var jsonType: String { return "test2" }
 
 		typealias Attributes = NoAttributes
@@ -356,13 +356,13 @@ extension Id: Sampleable where RawType == String {
 	}
 }
 
-extension JSONAPI.Entity: Sampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
-	public static var sample: JSONAPI.Entity<Description, MetaType, LinksType, EntityRawIdType> {
-		return JSONAPI.Entity(id: .sample,
-							  attributes: .sample,
-							  relationships: .sample,
-							  meta: .sample,
-							  links: .sample)
+extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
+	public static var sample: JSONAPI.ResourceObject<Description, MetaType, LinksType, EntityRawIdType> {
+		return JSONAPI.ResourceObject(id: .sample,
+                                      attributes: .sample,
+                                      relationships: .sample,
+                                      meta: .sample,
+                                      links: .sample)
 	}
 }
 

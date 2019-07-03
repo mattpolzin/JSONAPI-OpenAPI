@@ -234,7 +234,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 // MARK: Test Types
 extension JSONAPIRelationshipsOpenAPITests {
-	enum TestEntityType1: EntityDescription {
+	enum TestEntityType1: ResourceObjectDescription {
 		static var jsonType: String { return "test_entities"}
 
 		typealias Attributes = NoAttributes
@@ -243,7 +243,7 @@ extension JSONAPIRelationshipsOpenAPITests {
 
 	typealias TestEntity1 = BasicEntity<TestEntityType1>
 
-	enum TestEntityType2: EntityDescription {
+	enum TestEntityType2: ResourceObjectDescription {
 		static var jsonType: String { return "second_test_entities"}
 
 		typealias Attributes = NoAttributes

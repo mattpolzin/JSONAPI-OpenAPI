@@ -695,7 +695,7 @@ public enum OpenAPIPathItem: Equatable {
 
 		public init(summary: String? = nil,
 					description: String? = nil,
-					parameters: ParameterArray,
+					parameters: ParameterArray = [],
 					get: Operation? = nil,
 					put: Operation? = nil,
 					post: Operation? = nil,

@@ -12,10 +12,10 @@ let package = Package(
             targets: ["JSONAPIOpenAPI"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/Flight-School/AnyCodable.git", from: "0.1.0"),
-        .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "1.0.0"),
-        .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", from: "1.0.0"),
-        .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "0.18.0"),
+        .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
+        .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", .upToNextMajor(from: "3.0.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMinor(from: "0.31.0")),
     ],
     targets: [
         // Targets are the basic building blocks of a package. A target can define a module or a test suite.

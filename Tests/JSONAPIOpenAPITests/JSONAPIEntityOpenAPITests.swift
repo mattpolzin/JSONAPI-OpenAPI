@@ -289,7 +289,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 
 // MARK: Test Types
 extension JSONAPIEntityOpenAPITests {
-	enum TestType1Description: EntityDescription {
+	enum TestType1Description: ResourceObjectDescription {
 		public static var jsonType: String { return "test1" }
 
 		public typealias Attributes = NoAttributes
@@ -298,9 +298,9 @@ extension JSONAPIEntityOpenAPITests {
 	}
 
 	typealias TestType1 = BasicEntity<TestType1Description>
-	typealias UnidentifiedTestType1 = JSONAPI.Entity<TestType1Description, NoMetadata, NoLinks, Unidentified>
+	typealias UnidentifiedTestType1 = JSONAPI.ResourceObject<TestType1Description, NoMetadata, NoLinks, Unidentified>
 
-	enum TestType2Description: EntityDescription {
+	enum TestType2Description: ResourceObjectDescription {
 		public static var jsonType: String { return "test2" }
 
 		public enum EnumType: String, CaseIterable, Codable, Equatable {
@@ -334,7 +334,7 @@ extension JSONAPIEntityOpenAPITests {
 
 	typealias TestType2 = BasicEntity<TestType2Description>
 
-	enum TestType3Description: EntityDescription {
+	enum TestType3Description: ResourceObjectDescription {
 		public static var jsonType: String { return "test3" }
 
 		public typealias Attributes = NoAttributes
