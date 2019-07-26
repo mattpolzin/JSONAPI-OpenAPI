@@ -38,6 +38,15 @@
         }
       },
       {
+        "package": "OpenAPIKit",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
+        "state": {
+          "branch": null,
+          "revision": "f6134b5ee105f13070add232304804a2fe012f02",
+          "version": "0.2.0"
+        }
+      },
+      {
         "package": "Poly",
         "repositoryURL": "https://github.com/mattpolzin/Poly.git",
         "state": {

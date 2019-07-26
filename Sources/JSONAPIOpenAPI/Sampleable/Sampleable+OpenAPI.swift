@@ -6,13 +6,14 @@
 //
 
 import Foundation
+import OpenAPIKit
 import AnyCodable
 import Sampleable
 
 public typealias SampleableOpenAPIType = Sampleable & GenericOpenAPINodeType
 
 extension Sampleable where Self: Encodable {
-	public static func genericOpenAPINode(using encoder: JSONEncoder) throws -> JSONNode {
+	public static func genericOpenAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
 
 		// short circuit for dates
 		if let dateType = self as? Date.Type,
@@ -21,7 +22,7 @@ extension Sampleable where Self: Encodable {
 		}
 
 		let mirror = Mirror(reflecting: Self.sample)
-		let properties: [(String, JSONNode)] = try mirror.children.compactMap { child in
+		let properties: [(String, JSONSchema)] = try mirror.children.compactMap { child in
 
 			// see if we can enumerate the possible values
 			let maybeAllCases: [AnyCodable]? = {
@@ -36,7 +37,7 @@ extension Sampleable where Self: Encodable {
 			}()
 
 			// try to snag an OpenAPI Node
-			let maybeOpenAPINode: JSONNode? = try {
+			let maybeOpenAPINode: JSONSchema? = try {
 				switch type(of: child.value) {
 				case let valType as OpenAPINodeType.Type:
 					return try valType.openAPINode()
@@ -63,10 +64,10 @@ extension Sampleable where Self: Encodable {
 				}()
 
 			// put it all together
-			let newNode: JSONNode?
+			let newNode: JSONSchema?
 			if let allCases = maybeAllCases,
 				let openAPINode = maybeOpenAPINode {
-				newNode = try openAPINode.with(allowedValues: allCases)
+				newNode = openAPINode.with(allowedValues: allCases)
 			} else {
 				newNode = maybeOpenAPINode
 			}
@@ -91,7 +92,7 @@ extension Sampleable where Self: Encodable {
 					   .init(properties: propertiesDict))
 	}
 
-	private static func primitiveGuess(using encoder: JSONEncoder) throws -> JSONNode? {
+	private static func primitiveGuess(using encoder: JSONEncoder) throws -> JSONSchema? {
 
 		let data = try encoder.encode(PrimitiveWrapper(primitive: Self.sample))
 		let wrappedValue = try JSONSerialization.jsonObject(with: data, options: [.allowFragments])

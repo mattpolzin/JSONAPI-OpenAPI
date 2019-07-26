@@ -8,6 +8,7 @@
 import Foundation
 import XCTest
 import JSONAPI
+import OpenAPIKit
 import JSONAPITesting
 import JSONAPIOpenAPI
 
@@ -174,7 +175,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 									   nullable: false,
 									   allowedValues: nil))
 
-		guard case .object(let contextC, let objectContext2) = arrayContext.items else {
+		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
 			XCTFail("Expected object node within items")
 			return
 		}
@@ -217,7 +218,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 									   nullable: false,
 									   allowedValues: nil))
 
-		guard case .object(let contextC, let objectContext2) = arrayContext.items else {
+		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
 			XCTFail("Expected object node within items")
 			return
 		}

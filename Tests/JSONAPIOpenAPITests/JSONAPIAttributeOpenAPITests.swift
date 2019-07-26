@@ -7,6 +7,7 @@
 
 import XCTest
 import JSONAPI
+import OpenAPIKit
 import JSONAPIOpenAPI
 import SwiftCheck
 import AnyCodable
@@ -103,7 +104,7 @@ extension JSONAPIAttributeOpenAPITests {
 									   nullable: false,
 									   allowedValues: nil))
 
-		let stringNode = JSONNode.string(.init(format: .generic,
+		let stringNode = JSONSchema.string(.init(format: .generic,
 											   required: true),
 										 .init())
 
@@ -126,7 +127,7 @@ extension JSONAPIAttributeOpenAPITests {
 									   nullable: true,
 									   allowedValues: nil))
 
-		let stringNode = JSONNode.string(.init(format: .generic,
+		let stringNode = JSONSchema.string(.init(format: .generic,
 											   required: true),
 										 .init())
 
@@ -149,7 +150,7 @@ extension JSONAPIAttributeOpenAPITests {
 									   nullable: false,
 									   allowedValues: nil))
 
-		let stringNode = JSONNode.string(.init(format: .generic,
+		let stringNode = JSONSchema.string(.init(format: .generic,
 											   required: true),
 										 .init())
 
@@ -172,7 +173,7 @@ extension JSONAPIAttributeOpenAPITests {
 									   nullable: true,
 									   allowedValues: nil))
 
-		let stringNode = JSONNode.string(.init(format: .generic,
+		let stringNode = JSONSchema.string(.init(format: .generic,
 											   required: true),
 										 .init())
 

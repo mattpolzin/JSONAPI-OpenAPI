@@ -6,7 +6,6 @@ import PackageDescription
 let package = Package(
     name: "JSONAPIOpenAPI",
     products: [
-        // Products define the executables and libraries produced by a package, and make them visible to other packages.
         .library(
             name: "JSONAPIOpenAPI",
             targets: ["JSONAPIOpenAPI"]),
@@ -16,13 +15,12 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMinor(from: "0.31.0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.2.0"))
     ],
     targets: [
-        // Targets are the basic building blocks of a package. A target can define a module or a test suite.
-        // Targets can depend on other targets in this package, and on products in packages which this package depends on.
         .target(
             name: "JSONAPIOpenAPI",
-            dependencies: ["JSONAPI", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]),
+            dependencies: ["JSONAPI", "OpenAPIKit", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]),
             .testTarget(
                 name: "JSONAPIOpenAPITests",
                 dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"])

@@ -8,6 +8,7 @@
 import XCTest
 import SwiftCheck
 import JSONAPI
+import OpenAPIKit
 import JSONAPIOpenAPI
 import Sampleable
 
@@ -56,7 +57,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext2.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -104,7 +105,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertFalse(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .object(contextC, objectContext2) = arrayContext.items else {
+		guard case let .object(contextC, objectContext2)? = arrayContext.items else {
 			XCTFail("Expected Items of Array under Data to be an Object Node")
 			return
 		}
@@ -118,7 +119,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext2.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -167,7 +168,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext2.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -184,7 +185,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertTrue(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .object(contextD, objectContext3) = arrayContext.items else {
+        guard case let .object(contextD, objectContext3)? = arrayContext.items else {
 			XCTFail("Expected Items of Array under Data to be an Object Node")
 			return
 		}
@@ -198,7 +199,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext3.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext3.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -247,7 +248,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext2.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -264,7 +265,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertTrue(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .one(of: includeNodes) = arrayContext.items else {
+		guard case let .one(of: includeNodes)? = arrayContext.items else {
 			XCTFail("Expected Included to contain multiple types of items.")
 			return
 		}
@@ -285,7 +286,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext3.properties.keys), Set(["id", "attributes", "type"]))
 
 		XCTAssertEqual(objectContext3.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test")]),
 									   .init()))
@@ -304,7 +305,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext4.properties.keys), Set(["id", "type"]))
 
 		XCTAssertEqual(objectContext4.properties["type"],
-					   JSONNode.string(.init(format: .generic,
+					   JSONSchema.string(.init(format: .generic,
 											 required: true,
 											 allowedValues: [.init("test2")]),
 									   .init()))

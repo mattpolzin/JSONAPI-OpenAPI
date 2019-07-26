@@ -7,6 +7,7 @@
 
 import XCTest
 import JSONAPI
+import OpenAPIKit
 import JSONAPIOpenAPI
 import AnyCodable
 import Sampleable
@@ -211,7 +212,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(relationshipsContext.requiredProperties), Set(["toOne", "nullableToOne", "toMany"]))
 		XCTAssertEqual(Set(relationshipsContext.properties.keys), Set(["toOne", "optionalTooOne", "nullableToOne", "nullableOptionalToOne", "toMany", "optionalToMany"]))
 
-		let pointerDataContext = JSONNode.ObjectContext(properties: ["id": .string(.init(format: .generic,
+		let pointerDataContext = JSONSchema.ObjectContext(properties: ["id": .string(.init(format: .generic,
 																						 required: true),
 																				   .init()),
 																	 "type": .string(.init(format: .generic,
@@ -219,16 +220,16 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 																						   allowedValues: [.init(TestType1.jsonType)]),
 																					 .init())])
 
-		let pointerContext = JSONNode.ObjectContext(properties: ["data": .object(.init(format: .generic,
+		let pointerContext = JSONSchema.ObjectContext(properties: ["data": .object(.init(format: .generic,
 																					   required: true),
 																				 pointerDataContext)])
 
-		let nullablePointerContext = JSONNode.ObjectContext(properties: ["data": .object(.init(format: .generic,
+		let nullablePointerContext = JSONSchema.ObjectContext(properties: ["data": .object(.init(format: .generic,
 																							   required: true,
 																							   nullable: true),
 																						 pointerDataContext)])
 
-		let manyPointerContext = JSONNode.ObjectContext(properties: ["data": .array(.init(format: .generic,
+		let manyPointerContext = JSONSchema.ObjectContext(properties: ["data": .array(.init(format: .generic,
 																						  required: true),
 																					.init(items: .object(.init(format: .generic,
 																											   required: true),

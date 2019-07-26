@@ -15,16 +15,16 @@ Please enjoy these examples, but allow me the forced casting and the lack of err
 ********/
 
 // MARK: - String as CreatableRawIdType
-var GlobalStringId: Int = 0
+var globalStringId: Int = 0
 extension String: CreatableRawIdType {
 	public static func unique() -> String {
-		GlobalStringId += 1
-		return String(GlobalStringId)
+		globalStringId += 1
+		return String(globalStringId)
 	}
 }
 
 // MARK: - typealiases for convenience
-public typealias ExampleEntity<Description: EntityDescription> = Entity<Description, NoMetadata, NoLinks, String>
+public typealias ExampleEntity<Description: ResourceObjectDescription> = ResourceObject<Description, NoMetadata, NoLinks, String>
 public typealias ToOne<E: Identifiable> = ToOneRelationship<E, NoMetadata, NoLinks>
 public typealias ToMany<E: Relatable> = ToManyRelationship<E, NoMetadata, NoLinks>
 
