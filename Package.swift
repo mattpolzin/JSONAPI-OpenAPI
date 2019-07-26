@@ -21,9 +21,9 @@ let package = Package(
         .target(
             name: "JSONAPIOpenAPI",
             dependencies: ["JSONAPI", "OpenAPIKit", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]),
-            .testTarget(
-                name: "JSONAPIOpenAPITests",
-                dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"])
+        .testTarget(
+            name: "JSONAPIOpenAPITests",
+            dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"])
     ],
     swiftLanguageVersions: [.v5]
 )

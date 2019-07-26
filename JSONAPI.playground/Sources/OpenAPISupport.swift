@@ -41,7 +41,7 @@ extension DogDescription.Attributes: Arbitrary, Sampleable {
 	}
 
 	public static var sample: DogDescription.Attributes {
-		return DogDescription.Attributes.arbitrary.generate
+        return DogDescription.Attributes(name: "Sparky")
 	}
 }
 
@@ -53,7 +53,7 @@ extension DogDescription.Relationships: Arbitrary, Sampleable {
 	}
 
 	public static var sample: DogDescription.Relationships {
-		return DogDescription.Relationships.arbitrary.generate
+        return DogDescription.Relationships(owner: "1")
 	}
 }
 

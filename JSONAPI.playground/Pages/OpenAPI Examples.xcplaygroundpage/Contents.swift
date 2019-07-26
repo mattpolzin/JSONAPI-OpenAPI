@@ -2,6 +2,7 @@
 
 import Foundation
 import JSONAPI
+import OpenAPIKit
 import JSONAPIOpenAPI
 import Poly
 
@@ -30,15 +31,15 @@ print("====")
 print(batchPersonSchemaData.map { String(data: $0, encoding: .utf8)! } ?? "Schema Construction Failed")
 print("====")
 
-let tmp: [String: JSONNode] = [
+let tmp: [String: JSONSchema] = [
 	"BatchPerson": try! BatchPeopleDocument.openAPINodeWithExample(using: encoder)
 ]
 
-let components = OpenAPIComponents(schemas: tmp, parameters: [:])
+let components = OpenAPI.Components(schemas: tmp, parameters: [:])
 
-let batchPeopleRef = JSONReference.node(.init(type: \OpenAPIComponents.schemas, selector: "BatchPerson"))
+let batchPeopleRef = JSONReference.node(.init(type: \OpenAPI.Components.schemas, selector: "BatchPerson"))
 
-let tmp2 = JSONNode.reference(batchPeopleRef)
+let tmp2 = JSONSchema.reference(batchPeopleRef)
 
 print("====")
 print("====")
