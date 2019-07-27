@@ -15,15 +15,26 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMinor(from: "0.31.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.2.0"))
+        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.24.0"))
     ],
     targets: [
         .target(
             name: "JSONAPIOpenAPI",
-            dependencies: ["JSONAPI", "OpenAPIKit", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]),
+            dependencies: ["JSONAPI", "OpenAPIKit", "AnyCodable", "JSONAPIArbitrary", "Sampleable"]
+        ),
         .testTarget(
             name: "JSONAPIOpenAPITests",
-            dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"])
+            dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI"]
+        ),
+        .target(
+            name: "JSONAPISwiftGen",
+            dependencies: ["JSONAPI", "OpenAPIKit", "SourceKittenFramework"]
+        ),
+        .testTarget(
+            name: "JSONAPISwiftGenTests",
+            dependencies: ["JSONAPISwiftGen"]
+        )
     ],
     swiftLanguageVersions: [.v5]
 )
