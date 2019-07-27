@@ -9,6 +9,9 @@ let package = Package(
         .library(
             name: "JSONAPIOpenAPI",
             targets: ["JSONAPIOpenAPI"]),
+        .library(
+            name: "JSONAPISwiftGen",
+            targets: ["JSONAPISwiftGen"])
     ],
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
