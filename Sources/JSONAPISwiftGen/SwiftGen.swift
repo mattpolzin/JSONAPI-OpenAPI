@@ -204,7 +204,7 @@ public struct ResourceObjectSwiftGen: SwiftCodeRepresentable {
     }
 
     private static func typeCased(_ name: String) -> String {
-        let words = name.split(separator: "_")
+        let words = name.split(whereSeparator: "_-".contains)
         let casedWords = words.map { word -> String in
             let firstChar = word.first?.uppercased() ?? ""
             return String(firstChar + word.dropFirst())
