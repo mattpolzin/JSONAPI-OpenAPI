@@ -3,7 +3,9 @@
 
 See parent project: https://github.com/mattpolzin/JSONAPI
 
-The `JSONAPIOpenAPI` framework adds the ability to generate OpenAPI compliant JSON documentation of a JSONAPI Document.
+The `JSONAPIOpenAPI` framework adds the ability to generate OpenAPI compliant JSON Schema documentation of a JSONAPI Document.
+
+There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation on the `feature/gen-swift` branch.
 
 See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md
 
