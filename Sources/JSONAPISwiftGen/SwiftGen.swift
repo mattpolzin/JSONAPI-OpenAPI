@@ -11,15 +11,23 @@ import JSONAPI
 
 public struct ResourceObjectSwiftGen: SwiftCodeRepresentable {
     public let structure: JSONSchema
+    public let decls: [Decl]
     public let swiftCode: String
+    public let swiftTypeName: String
 
     public init(structure: JSONSchema) throws {
-        swiftCode = try ResourceObjectSwiftGen.resourceObjectSwiftCode(from: structure)
+        decls = try ResourceObjectSwiftGen.resourceObjectSwiftDecls(from: structure)
+        swiftCode = ResourceObjectSwiftGen.resourceObjectSwiftCode(from: decls)
+        swiftTypeName = decls.compactMap { $0 as? Typealias }.first!.alias.swiftCode
 
         self.structure = structure
     }
 
-    public static func resourceObjectSwiftCode(from structure: JSONSchema) throws -> String {
+    public static func resourceObjectSwiftCode(from decls: [Decl]) -> String {
+        return decls.map { $0.swiftCode }.joined(separator: "\n")
+    }
+
+    public static func resourceObjectSwiftDecls(from structure: JSONSchema)  throws -> [Decl] {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -32,14 +40,14 @@ public struct ResourceObjectSwiftGen: SwiftCodeRepresentable {
 
         let descriptionTypeName = "\(typeName)Description"
 
-        let decls: [Decl] = [
+        return [
             BlockTypeDecl.enum(typeName: descriptionTypeName,
-                conformances: ["JSONAPI.ResourceObjectDescription"],
-                [
-                    typeNameDecl,
-                    attributesDecl,
-                    relationshipsDecl
-                ]),
+                               conformances: ["JSONAPI.ResourceObjectDescription"],
+                               [
+                                typeNameDecl,
+                                attributesDecl,
+                                relationshipsDecl
+            ]),
             Typealias(alias: .init(typeName),
                       existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
                                                        specializationReps: [
@@ -47,10 +55,8 @@ public struct ResourceObjectSwiftGen: SwiftCodeRepresentable {
                                                         .init(NoMetadata.self),
                                                         .init(NoLinks.self),
                                                         .init(String.self)
-                        ])))
+                      ])))
         ]
-
-        return decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.

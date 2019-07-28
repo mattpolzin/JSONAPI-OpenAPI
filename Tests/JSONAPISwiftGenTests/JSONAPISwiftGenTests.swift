@@ -51,12 +51,14 @@ class JSONAPISwiftGenTests: XCTestCase {
 
         let testPersonSwiftGen = try! ResourceObjectSwiftGen(structure: openAPIStructure)
 
+        XCTAssertEqual(testPersonSwiftGen.swiftTypeName, "TestPerson")
+
         print(try! testPersonSwiftGen.formattedSwiftCode())
     }
 }
 
 enum TestPersonDescription: JSONAPI.ResourceObjectDescription {
-    static var jsonType: String = "test_type"
+    static var jsonType: String = "test_person"
 
     struct Attributes: JSONAPI.Attributes {
         let firstName: Attribute<String>
