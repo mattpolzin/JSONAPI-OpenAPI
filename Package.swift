@@ -11,7 +11,11 @@ let package = Package(
             targets: ["JSONAPIOpenAPI"]),
         .library(
             name: "JSONAPISwiftGen",
-            targets: ["JSONAPISwiftGen"])
+            targets: ["JSONAPISwiftGen"]),
+        .executable(
+          name: "openapi_2_jsonapi_swift",
+          targets: ["openapi_2_jsonapi_swift"]
+        )
     ],
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
@@ -37,6 +41,10 @@ let package = Package(
         .testTarget(
             name: "JSONAPISwiftGenTests",
             dependencies: ["JSONAPISwiftGen"]
+        ),
+        .target(
+          name: "openapi_2_jsonapi_swift",
+          dependencies: ["JSONAPISwiftGen", "OpenAPIKit"]
         )
     ],
     swiftLanguageVersions: [.v5]
