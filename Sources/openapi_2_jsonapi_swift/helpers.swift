@@ -33,7 +33,7 @@ func produceSwiftForResponsesAndIncludes(in pathItems: OpenAPI.PathItem.Map) {
             }
 
             let resourceObjectSchema: JSONSchema
-            if case let .array(_, c4) = c2.properties["data"],
+            if case let .array(_, c4) = rootData,
                 let items = c4.items,
                 case .object = items {
                 resourceObjectSchema = items
