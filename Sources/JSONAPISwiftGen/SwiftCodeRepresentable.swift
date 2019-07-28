@@ -14,8 +14,20 @@ public protocol SwiftCodeRepresentable {
 
 public extension SwiftCodeRepresentable {
     func formattedSwiftCode() throws -> String {
-        return try File(contents: self.swiftCode).format(trimmingTrailingWhitespace: false,
-                                                         useTabs: true,
-                                                         indentWidth: 4)
+        // the Swift code needs to live in a file
+        // for the sourcekit daemon to refer to it.
+
+        let tmpFilename = "./tmpOut"
+        let tmpFilepath = URL(fileURLWithPath: tmpFilename)
+        try self.swiftCode.write(to: tmpFilepath, atomically: true, encoding: .utf8)
+        try File(path: tmpFilename)!
+            .format(trimmingTrailingWhitespace: true,
+                    useTabs: false,
+                    indentWidth: 4)
+            .write(to: tmpFilepath, atomically: true, encoding: .utf8)
+
+        let readBack = try String(contentsOf: tmpFilepath)
+        try FileManager.default.removeItem(at: tmpFilepath)
+        return readBack
     }
 }
