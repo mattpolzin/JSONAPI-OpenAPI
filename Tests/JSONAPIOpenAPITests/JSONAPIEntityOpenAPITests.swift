@@ -132,7 +132,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 					   .string(.init(format: .generic,
 									 required: true,
 									 nullable: false,
-									 allowedValues: ["one", "two"].map(AnyCodable.init)),
+                                     allowedValues: ["one", "two"].map(AnyCodable.init(stringLiteral:))),
 							   .init()))
 
 		XCTAssertEqual(attributesContext.properties["dateProperty"],
