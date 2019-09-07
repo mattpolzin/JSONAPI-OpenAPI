@@ -487,7 +487,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableEnumAttribute() {
-		let node = try! Attribute<EnumAttribute?>?.wrappedOpenAPINode()
+		let node = try! Attribute<EnumAttribute?>?.doubleWrappedOpenAPINode()
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))

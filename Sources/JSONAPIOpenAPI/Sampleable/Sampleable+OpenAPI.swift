@@ -49,7 +49,7 @@ extension Sampleable where Self: Encodable {
 					return try valType.wrappedOpenAPINode()
 
 				case let valType as DoubleWrappedRawOpenAPIType.Type:
-					return try valType.wrappedOpenAPINode()
+					return try valType.doubleWrappedOpenAPINode()
 
 				case let valType as GenericOpenAPINodeType.Type:
 					return try valType.genericOpenAPINode(using: encoder)
@@ -116,7 +116,7 @@ extension Sampleable where Self: Encodable {
 				return try valType.wrappedOpenAPINode()
 
 			case let valType as DoubleWrappedRawOpenAPIType.Type:
-				return try valType.wrappedOpenAPINode()
+				return try valType.doubleWrappedOpenAPINode()
 
 			case let valType as GenericOpenAPINodeType.Type:
 				return try valType.genericOpenAPINode(using: encoder)

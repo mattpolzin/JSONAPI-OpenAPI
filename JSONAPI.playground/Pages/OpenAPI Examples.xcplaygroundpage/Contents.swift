@@ -35,9 +35,11 @@ let tmp: [String: JSONSchema] = [
 	"BatchPerson": try! BatchPeopleDocument.openAPINodeWithExample(using: encoder)
 ]
 
-let components = OpenAPI.Components(schemas: tmp, parameters: [:])
+let components = OpenAPI.Components(schemas: tmp,
+                                    parameters: [:],
+                                    headers: [:])
 
-let batchPeopleRef = JSONReference.node(.init(type: \OpenAPI.Components.schemas, selector: "BatchPerson"))
+let batchPeopleRef = JSONReference.internal(.node(.init(type: \OpenAPI.Components.schemas, selector: "BatchPerson")))
 
 let tmp2 = JSONSchema.reference(batchPeopleRef)
 

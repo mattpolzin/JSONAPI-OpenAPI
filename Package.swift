@@ -15,7 +15,7 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI-Arbitrary.git", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "1.0.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.2.0"))
+        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.4.0"))
     ],
     targets: [
         .target(
