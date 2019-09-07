@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
         "state": {
           "branch": null,
-          "revision": "f6134b5ee105f13070add232304804a2fe012f02",
-          "version": "0.2.0"
+          "revision": "2a1fb044872bcc499c705d7f84cb3900ce09eac2",
+          "version": "0.4.0"
         }
       },
       {

@@ -489,7 +489,7 @@ extension JSONAPITransformedAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableEnumAttribute() {
-		let node = try! IdentityAttribute<EnumAttribute?>?.wrappedOpenAPINode()
+		let node = try! IdentityAttribute<EnumAttribute?>?.doubleWrappedOpenAPINode()
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
