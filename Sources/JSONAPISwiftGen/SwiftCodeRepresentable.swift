@@ -19,7 +19,7 @@ public extension SwiftCodeRepresentable {
 
         let tmpFilename = "./tmpOut"
         let tmpFilepath = URL(fileURLWithPath: tmpFilename)
-        try self.swiftCode.write(to: tmpFilepath, atomically: true, encoding: .utf8)
+        try swiftCode.write(to: tmpFilepath, atomically: true, encoding: .utf8)
         try File(path: tmpFilename)!
             .format(trimmingTrailingWhitespace: true,
                     useTabs: false,
