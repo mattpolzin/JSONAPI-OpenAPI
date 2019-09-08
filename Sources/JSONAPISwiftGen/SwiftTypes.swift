@@ -221,7 +221,7 @@ extension NoResourceBody: SwiftType, SwiftCodeRepresentable {
 
 extension NoAPIDescription: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoAPIDecsription",
+        return .init(name: "NoAPIDescription",
                      specializations: [])
     }
 }
@@ -267,5 +267,80 @@ extension Include3: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: Swi
                      specializations: [A.self,
                                        B.self,
                                        C.self])
+    }
+}
+
+extension Include4: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include4",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self])
+    }
+}
+
+extension Include5: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType, E: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include5",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self,
+                                       E.self])
+    }
+}
+
+extension Include6: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType, E: SwiftType, F: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include6",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self,
+                                       E.self,
+                                       F.self])
+    }
+}
+
+extension Include7: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType, E: SwiftType, F: SwiftType, G: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include7",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self,
+                                       E.self,
+                                       F.self,
+                                       G.self])
+    }
+}
+
+extension Include8: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType, E: SwiftType, F: SwiftType, G: SwiftType, H: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include8",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self,
+                                       E.self,
+                                       F.self,
+                                       G.self,
+                                       H.self])
+    }
+}
+
+extension Include9: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType, D: SwiftType, E: SwiftType, F: SwiftType, G: SwiftType, H: SwiftType, I: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include9",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self,
+                                       D.self,
+                                       E.self,
+                                       F.self,
+                                       G.self,
+                                       H.self,
+                                       I.self])
     }
 }

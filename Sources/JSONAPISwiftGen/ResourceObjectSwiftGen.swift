@@ -222,3 +222,13 @@ public extension ResourceObjectSwiftGen {
         case relationshipDataMissingType
     }
 }
+
+extension ResourceObjectSwiftGen: Hashable {
+    public static func == (lhs: ResourceObjectSwiftGen, rhs: ResourceObjectSwiftGen) -> Bool {
+        return lhs.swiftTypeName == rhs.swiftTypeName
+    }
+
+    public func hash(into hasher: inout Hasher) {
+        hasher.combine(swiftTypeName)
+    }
+}
