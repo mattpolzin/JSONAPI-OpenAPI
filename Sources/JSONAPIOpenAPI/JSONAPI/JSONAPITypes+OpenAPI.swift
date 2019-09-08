@@ -114,6 +114,12 @@ extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: S
 	}
 }
 
+extension Optional: OpenAPIEncodedNodeType where Wrapped: OpenAPIEncodedNodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        return try Wrapped.openAPINode(using: encoder).nullableSchemaObject()
+    }
+}
+
 extension SingleResourceBody: OpenAPIEncodedNodeType where Entity: OpenAPIEncodedNodeType {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try Entity.openAPINode(using: encoder)

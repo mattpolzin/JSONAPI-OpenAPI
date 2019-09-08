@@ -7,6 +7,7 @@
 
 import Foundation
 import JSONAPI
+import Poly
 
 public protocol SwiftType: SwiftCodeRepresentable {
     static var swiftTypeDef: SwiftTypeDef { get }
@@ -139,6 +140,8 @@ extension Array: SwiftType, SwiftCodeRepresentable where Element: SwiftType {
     }
 }
 
+// MARK: JSONAPI
+
 extension Attribute: SwiftType, SwiftCodeRepresentable where RawValue: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "Attribute",
@@ -167,6 +170,20 @@ extension ToManyRelationship: SwiftType, SwiftCodeRepresentable where Relatable:
     }
 }
 
+extension SingleResourceBody: SwiftType, SwiftCodeRepresentable where Entity: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "SingleResourceBody",
+                     specializations: [Entity.self])
+    }
+}
+
+extension ManyResourceBody: SwiftType, SwiftCodeRepresentable where Entity: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "ManyResourceBody",
+                     specializations: [Entity.self])
+    }
+}
+
 extension NoMetadata: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "NoMetadata",
@@ -192,5 +209,63 @@ extension NoAttributes: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "NoAttributes",
                      specializations: [])
+    }
+}
+
+extension NoResourceBody: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "NoResourceBody",
+                     specializations: [])
+    }
+}
+
+extension NoAPIDescription: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "NoAPIDecsription",
+                     specializations: [])
+    }
+}
+
+extension UnknownJSONAPIError: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "UnknownJSONAPIError",
+                     specializations: [])
+    }
+}
+
+extension NoIncludes: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "NoIncludes",
+                     specializations: [])
+    }
+}
+
+extension Includes: SwiftType, SwiftCodeRepresentable where I: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Includes",
+                     specializations: [I.self])
+    }
+}
+
+extension Include1: SwiftType, SwiftCodeRepresentable where A: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include1",
+                     specializations: [A.self])
+    }
+}
+
+extension Include2: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include2",
+                     specializations: [A.self, B.self])
+    }
+}
+
+extension Include3: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType, C: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Include3",
+                     specializations: [A.self,
+                                       B.self,
+                                       C.self])
     }
 }

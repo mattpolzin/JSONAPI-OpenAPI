@@ -8,7 +8,7 @@ import JSONAPIOpenAPI
 
 let testEncoder = JSONEncoder()
 
-class JSONAPISwiftGenTests: XCTestCase {
+class ResourceObjectSwiftGenTests: XCTestCase {
     func test_DirectConstruction() {
         let personDescription = BlockTypeDecl.enum(typeName: "PersonDescription",
                                                        conformances: ["JSONAPI.ResourceObjectDescription"],
