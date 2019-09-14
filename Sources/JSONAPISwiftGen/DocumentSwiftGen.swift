@@ -47,7 +47,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         }
 
         guard let data = resourceObjectContextB.properties["data"] else {
-            throw Error.unhandledDocument
+            throw Error.unhandledDocument("Only handles data documents")
         }
 
         var allDecls = [Decl]()
@@ -90,7 +90,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             allResourceObjectGenerators.insert(resourceObject)
 
         default:
-            throw Error.unhandledDocument
+            throw Error.unhandledDocument("Only handles array or object at root of document")
         }
 
         let includeType: SwiftTypeRep
@@ -148,6 +148,6 @@ public extension DataDocumentSwiftGen {
         case expectedIncludedToBeArray
         case expectedIncludedArrayToDefineItems
 
-        case unhandledDocument
+        case unhandledDocument(String)
     }
 }

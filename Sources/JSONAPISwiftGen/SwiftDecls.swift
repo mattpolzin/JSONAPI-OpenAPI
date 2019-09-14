@@ -6,6 +6,11 @@ public protocol DefValue: SwiftCodeRepresentable {
     var value: String { get }
 }
 
+/// An anonymous function () -> Type such as is used
+/// to define computed properties.
+///
+/// In `var x: { return "value" }`
+/// the `DynamicValue` is `{ return "value" }`
 public struct DynamicValue: DefValue {
     public let value: String
 
@@ -90,15 +95,21 @@ public struct StaticDecl: Decl {
 public enum BlockTypeDecl: Decl {
     case `enum`(typeName: String, conformances: [String]?, [Decl])
     case `struct`(typeName: String, conformances: [String]?, [Decl])
+    case `extension`(typeName: String, conformances: [String]?, conditions: [String]?, [Decl])
 
     public var swiftCode: String {
         let declType: String
         let typeNameString: String
         let conformancesString: String
+        let conditionsString: String
         let contentString: String
 
         func conformances(from: [String]?) -> String {
             return from.map { ": " + $0.joined(separator: ", ") } ?? ""
+        }
+
+        func conditions(from: [String]?) -> String {
+            return from.map { " where " + $0.joined(separator: ", ") } ?? ""
         }
 
         switch self {
@@ -107,13 +118,50 @@ public enum BlockTypeDecl: Decl {
             typeNameString = typeName
             contentString = contents.map { $0.swiftCode }.joined(separator:"\n")
             conformancesString = conformances(from: conforms)
+            conditionsString = ""
         case .struct(let typeName, let conforms, let contents):
             declType = "struct"
             typeNameString = typeName
             contentString = contents.map { $0.swiftCode }.joined(separator:"\n")
             conformancesString = conformances(from: conforms)
+            conditionsString = ""
+        case .extension(let typeName, let conforms, let condits, let contents):
+            declType = "extension"
+            typeNameString = typeName
+            contentString = contents.map { $0.swiftCode }.joined(separator:"\n")
+            conformancesString = conformances(from: conforms)
+            conditionsString = conditions(from: condits)
         }
-        return "\(declType) \(typeNameString)\(conformancesString) {\n\(contentString)\n}"
+        return "\(declType) \(typeNameString)\(conformancesString)\(conditionsString) {\n\(contentString)\n}"
+    }
+
+    public func appending(_ decl: Decl) -> BlockTypeDecl {
+        return appending([decl])
+    }
+
+    public func appending(_ newDecls: [Decl]) -> BlockTypeDecl {
+        switch self {
+        case .enum(typeName: let typeName,
+                   conformances: let conformances,
+                   let decls):
+            return .enum(typeName: typeName,
+                         conformances: conformances,
+                         decls + newDecls)
+        case .struct(typeName: let typeName,
+                     conformances: let conformances,
+                     let decls):
+            return .struct(typeName: typeName,
+                           conformances: conformances,
+                           decls + newDecls)
+        case .extension(typeName: let typeName,
+                        conformances: let conformances,
+                        conditions: let conditions,
+                        let decls):
+            return .extension(typeName: typeName,
+                              conformances: conformances,
+                              conditions: conditions,
+                              decls + newDecls)
+        }
     }
 }
 
@@ -128,5 +176,17 @@ public struct Typealias: Decl {
 
     public var swiftCode: String {
         return "typealias \(alias.swiftCode) = \(existingType.swiftCode)"
+    }
+}
+
+public struct Import: Decl {
+    public let module: String
+
+    public init(module: String) {
+        self.module = module
+    }
+
+    public var swiftCode: String {
+        return "import \(module)"
     }
 }

@@ -13,6 +13,10 @@ public protocol SwiftGenerator: SwiftCodeRepresentable {
     var decls: [Decl] { get }
 }
 
+public protocol TypedSwiftGenerator: SwiftGenerator {
+    var swiftTypeName: String { get }
+}
+
 public protocol JSONSchemaSwiftGenerator: SwiftGenerator {
     var structure: JSONSchema { get }
 }

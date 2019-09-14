@@ -3,10 +3,10 @@ import OpenAPIKit
 import JSONAPISwiftGen
 import Foundation
 
-let filename = CommandLine.arguments[1]
+let inFile = CommandLine.arguments[1]
+let outPath = CommandLine.arguments[2]
 
-let inputFileContents = try! Data(contentsOf: URL(fileURLWithPath: filename))
-//let inputFileContents = try! String(contentsOfFile: filename)
+let inputFileContents = try! Data(contentsOf: URL(fileURLWithPath: inFile))
 
 let jsonDecoder = JSONDecoder()
 
@@ -14,6 +14,6 @@ let openAPIStructure = try! jsonDecoder.decode(OpenAPI.Document.self, from: inpu
 
 let pathItems = openAPIStructure.paths
 
-produceSwiftForResponsesAndIncludes(in: pathItems)
+produceSwiftForDocuments(in: pathItems, outputTo: outPath)
 
 print("Done.")

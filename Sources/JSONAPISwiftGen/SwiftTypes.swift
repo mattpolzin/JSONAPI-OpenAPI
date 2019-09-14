@@ -65,6 +65,16 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
         }
     }
 
+    /// Get the Type's name. This notably omits any generic parameters.
+    public var typeName: String {
+        switch self {
+        case .rep(let type):
+            return type.swiftTypeDef.name
+        case .def(let def):
+            return def.name
+        }
+    }
+
     public init(_ rep: SwiftType.Type) {
         self = .rep(rep)
     }

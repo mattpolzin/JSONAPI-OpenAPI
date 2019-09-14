@@ -9,16 +9,17 @@ import Foundation
 import OpenAPIKit
 import JSONAPI
 
-public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
+public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
     public let swiftCode: String
     public let swiftTypeName: String
+    public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
 
     public init(structure: JSONSchema) throws {
         self.structure = structure
 
-        decls = try ResourceObjectSwiftGen.swiftDecls(from: structure)
+        (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure)
         swiftCode = ResourceObjectSwiftGen.swiftCode(from: decls)
         swiftTypeName = decls.compactMap { $0 as? Typealias }.first!.alias.swiftCode
     }
@@ -27,7 +28,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
         return decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
-    static func swiftDecls(from structure: JSONSchema)  throws -> [Decl] {
+    static func swiftDecls(from structure: JSONSchema)  throws -> (decls: [Decl], relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -36,18 +37,18 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
 
         let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB)
 
-        let relationshipsDecl = try relationshipsSnippet(contextB: resourceObjectContextB)
+        let relationships = try relationshipsSnippet(contextB: resourceObjectContextB)
 
         let descriptionTypeName = "\(typeName)Description"
 
-        return [
+        return (decls: [
             BlockTypeDecl.enum(typeName: descriptionTypeName,
                                conformances: ["JSONAPI.ResourceObjectDescription"],
                                [
                                 typeNameDecl,
                                 attributesDecl,
-                                relationshipsDecl
-                ]),
+                                relationships.relationshipsDecl
+            ]),
             Typealias(alias: .init(typeName),
                       existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
                                                        specializationReps: [
@@ -55,8 +56,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
                                                         .init(NoMetadata.self),
                                                         .init(NoLinks.self),
                                                         .init(String.self)
-                        ])))
-        ]
+                      ])))
+            ],
+                relationshipStubs: try Set(relationships.relationshipJSONTypeNames.map {
+                    try ResourceObjectStubSwiftGen(jsonAPITypeName: $0)
+                }))
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
@@ -118,25 +122,30 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext) throws -> Decl {
+    private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext) throws -> (relationshipJSONTypeNames: [String], relationshipsDecl: Decl) {
 
         let newTypeName = "Relationships"
 
         guard case let .object(_, relationshipsContextB)? = contextB.properties[Key.relationships.rawValue] else {
-            return Typealias(alias: .init(newTypeName), existingType: .init(NoRelationships.self))
+            return (relationshipJSONTypeNames: [], relationshipsDecl: Typealias(alias: .init(newTypeName), existingType: .init(NoRelationships.self)))
         }
 
-        let relationshipDecls: [Decl] = try relationshipsContextB.properties.map { keyValue in
+        let relationshipDecls: [(jsonTypeName: String, decl: Decl)] = try relationshipsContextB.properties.map { keyValue in
             return try relationshipSnippet(name: keyValue.key,
                                            schema: keyValue.value)
         }
 
-        return BlockTypeDecl.struct(typeName: newTypeName,
-                                    conformances: ["JSONAPI.\(newTypeName)"],
-                                    relationshipDecls)
+        let relationshipJSONTypenames = relationshipDecls.map { $0.jsonTypeName }
+
+        let decl = BlockTypeDecl.struct(typeName: newTypeName,
+                                        conformances: ["JSONAPI.\(newTypeName)"],
+                                        relationshipDecls.map { $0.decl })
+
+        return (relationshipJSONTypeNames: relationshipJSONTypenames,
+                relationshipsDecl: decl)
     }
 
-    private static func relationshipSnippet(name: String, schema: JSONSchema) throws -> Decl {
+    private static func relationshipSnippet(name: String, schema: JSONSchema) throws -> (jsonTypeName: String, typeNameDeclCode: Decl) {
 
         guard case let .object(_, relationshipContextB) = schema,
             let dataSchema = relationshipContextB.properties[Key.data.rawValue] else {
@@ -147,6 +156,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
         let isNullable = dataSchema.nullable
 
         let oneOrManyName: String
+        let relatedJSONTypeName: String
         let relationshipTypeRep: SwiftTypeRep
         switch dataSchema {
         case .boolean,
@@ -158,7 +168,9 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
         case .object(_, let contextB):
             oneOrManyName = "ToOneRelationship"
 
-            let tmpRelTypeRep = try SwiftTypeRep(typeCased(typeName(from: contextB)))
+            relatedJSONTypeName = try typeName(from: contextB)
+
+            let tmpRelTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
 
             relationshipTypeRep = isNullable
                 ? tmpRelTypeRep.optional
@@ -174,20 +186,27 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator {
                 case let .object(_, relationshipObjectContext) = relationshipEntry else {
                     throw Error.relationshipDataMissingType
             }
-            relationshipTypeRep = try SwiftTypeRep(typeCased(typeName(from: relationshipObjectContext)))
+
+            relatedJSONTypeName = try typeName(from: relationshipObjectContext)
+
+            relationshipTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
 
         default:
             throw Error.relationshipMalformed
         }
 
-        return PropDecl.let(propName: name,
-                            swiftType: .init(SwiftTypeDef(name: oneOrManyName,
-                                                          specializationReps: [
-                                                            relationshipTypeRep,
-                                                            .init(NoMetadata.self),
-                                                            .init(NoLinks.self)
-                                ], optional: isOmittable)),
-                            nil)
+        let typeDecl = PropDecl.let(propName: name,
+                                    swiftType: .init(SwiftTypeDef(name: oneOrManyName,
+                                                                  specializationReps: [
+                                                                    relationshipTypeRep,
+                                                                    .init(NoMetadata.self),
+                                                                    .init(NoLinks.self)
+                                    ], optional: isOmittable)),
+                                    nil)
+
+        return (jsonTypeName: relatedJSONTypeName,
+                typeNameDeclCode: typeDecl)
+
     }
 
     private static func typeCased(_ name: String) -> String {
