@@ -21,6 +21,14 @@ public protocol JSONSchemaSwiftGenerator: SwiftGenerator {
     var structure: JSONSchema { get }
 }
 
+internal struct LiteralSwiftCode: SwiftCodeRepresentable, Decl, ExpressibleByStringLiteral {
+    let swiftCode: String
+
+    public init(stringLiteral value: String) {
+        swiftCode = value
+    }
+}
+
 internal func swiftPlaceholder(name: String, type: SwiftTypeRep) -> String {
     return "<#T##\(name)##"
         + type.swiftCode

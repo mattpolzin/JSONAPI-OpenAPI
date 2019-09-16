@@ -94,7 +94,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             return Typealias(alias: .init(newTypeName), existingType: .init(NoAttributes.self))
         }
 
-        let attributeDecls: [Decl] = try attributesContextB.properties.map { keyValue in
+        let attributeDecls: [Decl] = try attributesContextB
+            .properties
+            .sorted { $0.key < $1.key }
+            .map { keyValue in
             return try attributeSnippet(name: keyValue.key,
                                         schema: keyValue.value)
         }
@@ -130,9 +133,12 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             return (relationshipJSONTypeNames: [], relationshipsDecl: Typealias(alias: .init(newTypeName), existingType: .init(NoRelationships.self)))
         }
 
-        let relationshipDecls: [(jsonTypeName: String, decl: Decl)] = try relationshipsContextB.properties.map { keyValue in
-            return try relationshipSnippet(name: keyValue.key,
-                                           schema: keyValue.value)
+        let relationshipDecls: [(jsonTypeName: String, decl: Decl)] = try relationshipsContextB
+            .properties
+            .sorted { $0.key < $1.key }
+            .map { keyValue in
+                return try relationshipSnippet(name: keyValue.key,
+                                               schema: keyValue.value)
         }
 
         let relationshipJSONTypenames = relationshipDecls.map { $0.jsonTypeName }

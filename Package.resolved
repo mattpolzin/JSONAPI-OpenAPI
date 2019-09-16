@@ -59,9 +59,9 @@
         "package": "OpenAPIKit",
         "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
         "state": {
-          "branch": null,
-          "revision": "2a1fb044872bcc499c705d7f84cb3900ce09eac2",
-          "version": "0.4.0"
+          "branch": "master",
+          "revision": "0cf86fe0ec20d5a4c106bc2fd1fe289ebeff177d",
+          "version": null
         }
       },
       {

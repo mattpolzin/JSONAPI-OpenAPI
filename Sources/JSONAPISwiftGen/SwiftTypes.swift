@@ -8,6 +8,7 @@
 import Foundation
 import JSONAPI
 import Poly
+import AnyCodable
 
 public protocol SwiftType: SwiftCodeRepresentable {
     static var swiftTypeDef: SwiftTypeDef { get }
@@ -55,6 +56,14 @@ public struct SwiftTypeDef: SwiftCodeRepresentable {
 public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
     case rep(SwiftType.Type)
     case def(SwiftTypeDef)
+    case inferred
+
+    public var isInferred: Bool {
+        guard case .inferred = self else {
+            return false
+        }
+        return true
+    }
 
     public var swiftCode: String {
         switch self {
@@ -62,6 +71,8 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
             return swiftable.swiftCode
         case .def(let swiftable):
             return swiftable.swiftCode
+        case .inferred:
+            return ""
         }
     }
 
@@ -72,6 +83,8 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
             return type.swiftTypeDef.name
         case .def(let def):
             return def.name
+        case .inferred:
+            return ""
         }
     }
 
@@ -101,6 +114,8 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
             return .init(SwiftTypeDef(name: rep.swiftCode,
                                       specializationReps: [],
                                       optional: true))
+        case .inferred:
+            return self
         }
     }
 }
@@ -131,6 +146,27 @@ extension Double: SwiftType {
 extension Bool: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "Bool",
+                     specializations: [])
+    }
+}
+
+extension URL: SwiftType {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "URL",
+                     specializations: [])
+    }
+}
+
+extension URLRequest: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "URLRequest",
+                     specializations: [])
+    }
+}
+
+extension AnyCodable: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "AnyCodable",
                      specializations: [])
     }
 }

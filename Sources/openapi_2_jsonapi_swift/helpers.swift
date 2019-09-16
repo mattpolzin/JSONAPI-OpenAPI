@@ -9,7 +9,9 @@ import Foundation
 import OpenAPIKit
 import JSONAPISwiftGen
 
-func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map, outputTo outPath: String) {
+func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
+                              originatingAt server: OpenAPI.Server,
+                              outputTo outPath: String) {
 
     // create namespaces first
     struct Node: Equatable {
@@ -69,11 +71,14 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map, outputTo outPa
             continue
         }
 
+        let apiRequest = try? APIRequestSwiftGen(server: server,
+                                                 pathComponents: path,
+                                                 parameters: operations.get?.parameters.compactMap { $0.a } ?? [])
+
         var responseDocuments = [String: [DataDocumentSwiftGen]]()
         for responseSchema in responseSchemas {
             guard case .object = responseSchema else {
                 print("Found non-object response schema root (expected JSON:API 'data' object). Skipping \(String(describing: responseSchema.jsonTypeFormat?.jsonType)).")
-//                print(responseSchema)
                 continue
             }
 
@@ -118,9 +123,10 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map, outputTo outPa
                         extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb])))
             }
 
-            // write document files
+            // write API files
             writeFile(toPath: outPath + "/responses/\(pathString)_",
-                for: responseDocuments,
+                for: apiRequest,
+                and: responseDocuments, // TODO: pass APIRequestSwiftGens along here too
                 extending: namespace(for: path),
                 in: .enum(typeName: httpVerb, conformances: nil, []))
         }
@@ -177,22 +183,34 @@ func writeFile<T: TypedSwiftGenerator>(toPath path: String,
 }
 
 func writeFile(toPath path: String,
-               for documents: [DataDocumentSwiftGen],
+               for request: APIRequestSwiftGen?,
+               and documents: [DataDocumentSwiftGen],
                extending namespace: String,
                in nestedBlock: BlockTypeDecl? = nil) {
-    let outputFileContents = try! ([Import(module: "JSONAPI")] +
-        (documents.map { document in
-            BlockTypeDecl.extension(typeName: namespace,
-                                        conformances: nil,
-                                        conditions: nil,
-                                        nestedBlock.map { nb in [nb.appending(document.decls)] } ?? document.decls)
-        }) as [Decl])
-        .map { try $0.formattedSwiftCode() }
-        .joined(separator: "\n")
+
+    let decls = documents.flatMap { document in
+        document.decls
+    } + (request?.decls ?? [])
+
+    let nestedDecl = nestedBlock.map { nb in [nb.appending(decls)] } ?? decls
+
+    let contextBlock = BlockTypeDecl.extension(typeName: namespace,
+                                               conformances: nil,
+                                               conditions: nil,
+                                               nestedDecl)
+
+    let outputFileContents = try! [
+        Import(module: "Foundation") as Decl,
+        Import(module: "JSONAPI") as Decl,
+        Import(module: "AnyCodable") as Decl,
+        Import(module: "XCTest") as Decl,
+        contextBlock as Decl
+        ].map { try $0.formattedSwiftCode() }
+        .joined(separator: "")
 
     write(contents: outputFileContents,
           toFileAt: path,
-          named: "Response_Documents.swift")
+          named: "API.swift")
 }
 
 func write(contents: String, toFileAt path: String, named name: String) {

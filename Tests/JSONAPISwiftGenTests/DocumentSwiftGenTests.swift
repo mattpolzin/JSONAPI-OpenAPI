@@ -62,6 +62,9 @@ class DocumentSwiftGenTests: XCTestCase {
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())
     }
+
+    func test_tmp() {
+    }
 }
 
 typealias TestPersonSingleDocument = JSONAPI.Document<

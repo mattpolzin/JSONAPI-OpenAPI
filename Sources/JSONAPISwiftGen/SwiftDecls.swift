@@ -38,6 +38,23 @@ public struct Value: DefValue {
         self.value = value
     }
 
+    public static func placeholder(name: String, type: SwiftTypeRep) -> Value {
+        return Value(value: swiftPlaceholder(name: name,
+                                             type: type))
+    }
+
+    public static func tuple(elements: [(name: String, value: String)]) -> Value {
+        return Value(value: "("
+            + elements.map { "\($0.name): \($0.value)" }.joined(separator: ", ")
+            + ")")
+    }
+
+    public static func array(elements: [Value]) -> Value {
+        return Value(value: "["
+            + elements.map { $0.value }.joined(separator: ", ")
+            + "]")
+    }
+
     public var swiftCode: String {
         return " = \(value)"
     }
@@ -60,23 +77,27 @@ public enum PropDecl: Decl {
     public var swiftCode: String {
         let propType: String
         let propName: String
-        let swiftTypeString: String
+        let swiftType: SwiftTypeRep
         let valueString: String
 
         switch self {
         case .let(propName: let name, swiftType: let typeName, let value):
             propType = "let"
             propName = name
-            swiftTypeString = typeName.swiftCode
+            swiftType = typeName
             valueString = value.map { $0.swiftCode } ?? ""
         case .var(propName: let name, swiftType: let typeName, let value):
             propType = "var"
             propName = name
-            swiftTypeString = typeName.swiftCode
+            swiftType = typeName
             valueString = value.map { $0.swiftCode } ?? ""
         }
 
-        return "\(propType) \(propName): \(swiftTypeString)" + valueString
+        let nameAndTypeString = swiftType.isInferred
+            ? propName
+            : "\(propName): \(swiftType.swiftCode)"
+
+        return "\(propType) \(nameAndTypeString)" + valueString
     }
 }
 
@@ -162,6 +183,83 @@ public enum BlockTypeDecl: Decl {
                               conditions: conditions,
                               decls + newDecls)
         }
+    }
+}
+
+public struct Scoping: SwiftCodeRepresentable, Equatable {
+    public let `static`: Bool
+    public let privacy: Privacy
+
+    public init(static: Bool = false, privacy: Privacy = .internal) {
+        self.static = `static`
+        self.privacy = privacy
+    }
+
+    public static let `default`: Scoping = .init()
+
+    public enum Privacy: String {
+        case `public`
+        case `private`
+        case `fileprivate`
+        case `internal`
+    }
+
+    public var swiftCode: String {
+        let privacyString = privacy == .internal ? "" : " \(privacy.rawValue)"
+        return `static` ? "static\(privacyString)" : privacy.rawValue
+    }
+}
+
+public struct Function: Decl {
+    public let scoping: Scoping
+    public let name: String
+    public let specializations: [SwiftTypeDef]?
+    public let arguments: [(name: String, type: SwiftTypeRep)]
+    public let conditions: [(type: SwiftTypeDef, conformance: String)]?
+    public let body: [Decl]
+    public let returnType: SwiftTypeRep?
+
+    public init(scoping: Scoping = .default,
+                name: String,
+                specializations: [SwiftTypeDef]? = nil,
+                arguments: [(name: String, type: SwiftTypeRep)] = [],
+                conditions: [(type: SwiftTypeDef, conformance: String)]? = nil,
+                body: [Decl],
+                returnType: SwiftTypeRep? = nil) {
+        self.scoping = scoping
+        self.name = name
+        self.specializations = specializations
+        self.arguments = arguments
+        self.conditions = conditions
+        self.body = body
+        self.returnType = returnType
+    }
+
+    public var swiftCode: String {
+        let bodyString = body
+            .map { $0.swiftCode }
+            .joined(separator: "\n")
+
+        let argumentsString = arguments
+            .map { "\($0.name): \($0.type.swiftCode)" }
+            .joined(separator: ", ")
+
+        let specializationsString = specializations
+            .map { "<"
+                + $0.map { $0.swiftCode }.joined(separator: ", ")
+                + ">" }
+            ?? ""
+
+        let conditionsString = conditions
+            .map { " where "
+                + $0.map { "\($0.type.swiftCode): \($0.conformance)" }.joined(separator: ", ") }
+        ?? ""
+
+        let returnString = returnType.map { " -> \($0.swiftCode)" } ?? ""
+
+        let scopingString = scoping == .default ? "" : "\(scoping.swiftCode) "
+
+        return "\(scopingString)func \(name)\(specializationsString)(\(argumentsString))\(conditionsString)\(returnString) {\n\(bodyString)\n}"
     }
 }
 
