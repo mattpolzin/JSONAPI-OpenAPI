@@ -6,6 +6,12 @@ import Foundation
 let inFile = CommandLine.arguments[1]
 let outPath = CommandLine.arguments[2]
 
+//if !FileManager.default.fileExists(atPath: outPath + "/generated") {
+//    try! FileManager.default.createDirectory(atPath: outPath + "/generated",
+//                                             withIntermediateDirectories: false,
+//                                             attributes: nil)
+//}
+
 let inputFileContents = try! Data(contentsOf: URL(fileURLWithPath: inFile))
 
 let jsonDecoder = JSONDecoder()
@@ -19,3 +25,10 @@ produceSwiftForDocuments(in: pathItems,
                          outputTo: outPath)
 
 print("Done.")
+
+/*
+ VALIDATION IDEAS:
+ 1. When a path parameter is specified in path component but not in parameters.
+ 2. When a path parameter is specified in parameters but does not appear in path components.
+
+ */

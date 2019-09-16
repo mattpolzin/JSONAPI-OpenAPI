@@ -9,126 +9,52 @@ import Foundation
 import OpenAPIKit
 import JSONAPISwiftGen
 
+typealias HttpVerb = OpenAPI.HttpVerb
+
 func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                               originatingAt server: OpenAPI.Server,
                               outputTo outPath: String) {
 
-    // create namespaces first
-    struct Node: Equatable {
-        let name: String
-        var children: [Node]
-
-        var enumDecl: Decl {
-            return BlockTypeDecl.enum(typeName: name,
-                                      conformances: nil,
-                                      children.map { $0.enumDecl })
-        }
-    }
-    var paths = [Node]()
-    for (path, _) in pathItems {
-        var remainingPath = path.components.makeIterator()
-
-        func fillFrom(currentNode: inout Node) {
-            guard let next = remainingPath.next().map(swiftTypeName) else {
-                return
-            }
-            var newNode = Node(name: next, children: [])
-            fillFrom(currentNode: &newNode)
-
-            currentNode.children.append(newNode)
-        }
-
-        func step(currentNodes: inout [Node]) {
-
-            guard let next = remainingPath.next().map(swiftTypeName) else {
-                return
-            }
-
-            if let idx = currentNodes.firstIndex(where: { $0.name == next }) {
-                step(currentNodes: &currentNodes[idx].children)
-            } else {
-                var newNode = Node(name: next, children: [])
-                fillFrom(currentNode: &newNode)
-                currentNodes.append(newNode)
-            }
-        }
-
-        step(currentNodes: &paths)
-    }
-    let contents = try! paths
+    // generate namespaces first
+    let contents = try! namespaceDecls(for: pathItems)
         .map { try $0.enumDecl.formattedSwiftCode() }
         .joined(separator: "\n\n")
     write(contents: contents,
           toFileAt: outPath + "/" ,
           named: "Namespaces.swift")
 
-    for (path, pathItem) in pathItems {
-        guard case let .operations(operations) = pathItem else {
-            continue
-        }
+    for httpVerb in HttpVerb.allCases {
 
-        guard let responseSchemas = operations.get?.responses.values.compactMap({ $0.a?.content[.json]?.schema.b }) else {
-            continue
-        }
-
-        let apiRequest = try? APIRequestSwiftGen(server: server,
-                                                 pathComponents: path,
-                                                 parameters: operations.get?.parameters.compactMap { $0.a } ?? [])
-
-        var responseDocuments = [String: [DataDocumentSwiftGen]]()
-        for responseSchema in responseSchemas {
-            guard case .object = responseSchema else {
-                print("Found non-object response schema root (expected JSON:API 'data' object). Skipping \(String(describing: responseSchema.jsonTypeFormat?.jsonType)).")
+        for (path, pathItem) in pathItems {
+            guard case let .operations(operations) = pathItem else {
                 continue
             }
 
-            let documentFileNameString = documentTypeName(path: path, verb: "get", direction: .response)
-
-            do {
-                responseDocuments[documentFileNameString, default: []].append(try DataDocumentSwiftGen(structure: responseSchema,
-                                                                  swiftTypeName: "Response"))
-            } catch {
-                print("Failed to parse response document: ")
-                print(error)
+            guard let operation = operations.for(httpVerb) else {
                 continue
             }
-        }
 
-        for (pathString, responseDocuments) in responseDocuments {
-            let httpVerb = "Get"
+            let responses = operation.responses
+            let parameters = operation.parameters
 
-            let resourceObjectGenerators = responseDocuments
-                .flatMap { $0.resourceObjectGenerators }
+            let apiRequest = try? APIRequestSwiftGen(server: server,
+                                                     pathComponents: path,
+                                                     parameters: parameters.compactMap { $0.a })
 
-            let definedResourceObjectNames = Set(resourceObjectGenerators
-                .map { $0.swiftTypeName })
+            let documentFileNameString = documentTypeName(path: path, verb: httpVerb, direction: .response)
 
-            resourceObjectGenerators
-                .forEach { resourceObjectGen in
+            let responseDocuments = documents(from: responses)
 
-                    resourceObjectGen
-                        .relationshipStubGenerators
-                        .filter { !definedResourceObjectNames.contains($0.swiftTypeName) }
-                        .forEach { stubGen in
-
-                            // write relationship stub files
-                            writeFile(toPath: outPath + "/responses/\(pathString)_",
-                                for: stubGen,
-                                extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb])))
-                    }
-
-                    // write resource object files
-                    writeFile(toPath: outPath + "/responses/\(pathString)_",
-                        for: resourceObjectGen,
-                        extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb])))
-            }
-
-            // write API files
-            writeFile(toPath: outPath + "/responses/\(pathString)_",
+            // write API file
+            writeAPIFile(toPath: outPath + "/responses/\(documentFileNameString)_",
                 for: apiRequest,
-                and: responseDocuments, // TODO: pass APIRequestSwiftGens along here too
+                and: responseDocuments.values,
                 extending: namespace(for: path),
-                in: .enum(typeName: httpVerb, conformances: nil, []))
+                in: .enum(typeName: httpVerb.rawValue, conformances: nil, []))
+
+            writeResourceObjectFiles(toPath: outPath + "/responses/\(documentFileNameString)_",
+                                     for: responseDocuments,
+                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
         }
     }
 }
@@ -152,41 +78,51 @@ func namespace(for path: OpenAPI.PathComponents) -> String {
 }
 
 func documentTypeName(path: OpenAPI.PathComponents,
-                      verb: String,
+                      verb: HttpVerb,
                       direction: HttpDirection) -> String {
     let pathSnippet = swiftTypeName(from: path.components
         .joined(separator: "_"))
 
-    return [pathSnippet, verb, direction.rawValue].joined(separator: "_")
+    return [pathSnippet, verb.rawValue, direction.rawValue].joined(separator: "_")
 }
 
-func writeFile<T: TypedSwiftGenerator>(toPath path: String,
-               for resourceObject: T,
-               extending namespace: String,
-               in nestedBlock: BlockTypeDecl? = nil) {
+func writeResourceObjectFiles(toPath path: String,
+                              for responseDocuments: [OpenAPI.Response.StatusCode: DataDocumentSwiftGen],
+                              extending namespace: String) {
+    for (_, responseDocument) in responseDocuments {
 
-    let swiftTypeName = resourceObject.swiftTypeName
+        let resourceObjectGenerators = responseDocument.resourceObjectGenerators
 
-    let outputFileContents = try! ([
-        Import(module: "JSONAPI"),
-        BlockTypeDecl.extension(typeName: namespace,
-                                conformances: nil,
-                                conditions: nil,
-                                nestedBlock.map { nb in [nb.appending(resourceObject.decls)] } ?? resourceObject.decls)
-        ] as [Decl])
-        .map { try $0.formattedSwiftCode() }
-        .joined(separator: "\n")
+        let definedResourceObjectNames = Set(resourceObjectGenerators
+            .map { $0.swiftTypeName })
 
-    write(contents: outputFileContents,
-          toFileAt: path,
-          named: "Response_\(swiftTypeName).swift")
+        resourceObjectGenerators
+            .forEach { resourceObjectGen in
+
+                resourceObjectGen
+                    .relationshipStubGenerators
+                    .filter { !definedResourceObjectNames.contains($0.swiftTypeName) }
+                    .forEach { stubGen in
+
+                        // write relationship stub files
+                        writeFile(toPath: path,
+                                  for: stubGen,
+                                  extending: namespace)
+                }
+
+                // write resource object files
+                writeFile(toPath: path,
+                          for: resourceObjectGen,
+                          extending: namespace)
+        }
+    }
 }
 
-func writeFile(toPath path: String,
+func writeAPIFile<T: Sequence>(toPath path: String,
                for request: APIRequestSwiftGen?,
-               and documents: [DataDocumentSwiftGen],
+               and documents: T,
                extending namespace: String,
-               in nestedBlock: BlockTypeDecl? = nil) {
+               in nestedBlock: BlockTypeDecl? = nil) where T.Element == DataDocumentSwiftGen {
 
     let decls = documents.flatMap { document in
         document.decls
@@ -213,9 +149,102 @@ func writeFile(toPath path: String,
           named: "API.swift")
 }
 
+func writeFile<T: TypedSwiftGenerator>(toPath path: String,
+                                       for resourceObject: T,
+                                       extending namespace: String,
+                                       in nestedBlock: BlockTypeDecl? = nil) {
+
+    let swiftTypeName = resourceObject.swiftTypeName
+
+    let outputFileContents = try! ([
+        Import(module: "JSONAPI"),
+        BlockTypeDecl.extension(typeName: namespace,
+                                conformances: nil,
+                                conditions: nil,
+                                nestedBlock.map { nb in [nb.appending(resourceObject.decls)] } ?? resourceObject.decls)
+        ] as [Decl])
+        .map { try $0.formattedSwiftCode() }
+        .joined(separator: "\n")
+
+    write(contents: outputFileContents,
+          toFileAt: path,
+          named: "Response_\(swiftTypeName).swift")
+}
+
 func write(contents: String, toFileAt path: String, named name: String) {
     try! contents
         .write(toFile: path + name,
                atomically: true,
                encoding: .utf8)
+}
+
+struct DeclNode: Equatable {
+    let name: String
+    var children: [DeclNode]
+
+    var enumDecl: Decl {
+        return BlockTypeDecl.enum(typeName: name,
+                                  conformances: nil,
+                                  children.map { $0.enumDecl })
+    }
+}
+
+func namespaceDecls(for pathItems: OpenAPI.PathItem.Map) -> [DeclNode] {
+    var paths = [DeclNode]()
+    for (path, _) in pathItems {
+        var remainingPath = path.components.makeIterator()
+
+        func fillFrom(currentNode: inout DeclNode) {
+            guard let next = remainingPath.next().map(swiftTypeName) else {
+                return
+            }
+            var newNode = DeclNode(name: next, children: [])
+            fillFrom(currentNode: &newNode)
+
+            currentNode.children.append(newNode)
+        }
+
+        func step(currentNodes: inout [DeclNode]) {
+
+            guard let next = remainingPath.next().map(swiftTypeName) else {
+                return
+            }
+
+            if let idx = currentNodes.firstIndex(where: { $0.name == next }) {
+                step(currentNodes: &currentNodes[idx].children)
+            } else {
+                var newNode = DeclNode(name: next, children: [])
+                fillFrom(currentNode: &newNode)
+                currentNodes.append(newNode)
+            }
+        }
+
+        step(currentNodes: &paths)
+    }
+    return paths
+}
+
+func documents(from responses: OpenAPI.Response.Map) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
+    var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
+    for (statusCode, response) in responses {
+
+        guard let responseSchema = response.a?.content[.json]?.schema.b else {
+            continue
+        }
+
+        guard case .object = responseSchema else {
+            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping \(String(describing: responseSchema.jsonTypeFormat?.jsonType)).")
+            continue
+        }
+
+        do {
+            responseDocuments[statusCode] = try DataDocumentSwiftGen(structure: responseSchema,
+                                                                     swiftTypeName: "Response_\(statusCode.rawValue)")
+        } catch {
+            print("Failed to parse response document: ")
+            print(error)
+            continue
+        }
+    }
+    return responseDocuments
 }

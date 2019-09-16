@@ -25,7 +25,7 @@ public struct APIRequestSwiftGen: SwiftGenerator {
 
         let allArgs = [
             (name: "requestBody", type: .def(requestBodyTypeDef)),
-            (name: "responseBody", type: .def(responseBodyTypeDef))
+            (name: "expectedResponseBody", type: .def(responseBodyTypeDef))
         ] + parameterArgs
 
         let specializations = [
@@ -63,7 +63,7 @@ public struct APIRequestSwiftGen: SwiftGenerator {
                                                      swiftType: .rep(URLRequest.self),
                                                      "URLRequest(url: requestUrl)" as Value),
                                         PropDecl.let(propName: "headers",
-                                                     swiftType: .inferred,
+                                                     swiftType: .def(.init(name: "[(name: String, value: String)]", specializationReps: [])),
                                                      headers),
 """
 
@@ -79,12 +79,12 @@ let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
 
     let decoder = JSONDecoder()
 
-    guard let document = try! data.map({ try decoder.decode(type(of: responseBody).self, from: $0) }) else {
+    guard let document = try! data.map({ try decoder.decode(type(of: expectedResponseBody).self, from: $0) }) else {
         XCTFail("Failed to decode response document")
         return
     }
 
-    XCTAssertEqual(document, responseBody)
+    XCTAssertEqual(document, expectedResponseBody)
 
     completionExpectation.fulfill()
 }
