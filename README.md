@@ -13,7 +13,7 @@ See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/ma
 
 ## _Experimental_ Swift Code Generation
 
-The `feature/gen-swift` branch has experimental support for generating Swift code for `JSONAPI` models. You can dig into the source code or try out the included `openapi_2_jsonapi_swift` executable target. It takes 1 argument which is the file path of a complete OpenAPI Document. It runs through the document looking for response payloads that are **JSON:API** compliant and pulling out all of the Resource Objects it finds to generate Swift code that would encode/decode data fitting the schemas.
+The `feature/gen-swift` branch has experimental support for generating Swift code for `JSONAPI` models. You can dig into the source code or try out the included `openapi_2_jsonapi_swift` executable target. It takes 2 arguments; the file path of a complete OpenAPI Document and the directory to which all resulting files should be output. **IMPORTANT**: The output directory currently must contain a folder named "responses". It runs through the document looking for response payloads that are **JSON:API** compliant and pulling out all of the Resource Objects it finds to generate Swift code that would encode/decode data fitting the schemas. It also creates JSON:API Document aliases for `GET` response bodies and `test_request()` functions for `GET` requests.
 
 ## OpenAPI JSON Schema Generation
 ### Simple Example
