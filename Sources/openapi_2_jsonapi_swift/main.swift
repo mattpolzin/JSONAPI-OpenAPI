@@ -6,11 +6,11 @@ import Foundation
 let inFile = CommandLine.arguments[1]
 let outPath = CommandLine.arguments[2]
 
-//if !FileManager.default.fileExists(atPath: outPath + "/generated") {
-//    try! FileManager.default.createDirectory(atPath: outPath + "/generated",
-//                                             withIntermediateDirectories: false,
-//                                             attributes: nil)
-//}
+if !FileManager.default.fileExists(atPath: outPath + "/resourceObjects") {
+    try! FileManager.default.createDirectory(atPath: outPath + "/resourceObjects",
+                                             withIntermediateDirectories: false,
+                                             attributes: nil)
+}
 
 let inputFileContents = try! Data(contentsOf: URL(fileURLWithPath: inFile))
 

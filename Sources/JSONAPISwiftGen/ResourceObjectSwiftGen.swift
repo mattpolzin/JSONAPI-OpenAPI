@@ -102,9 +102,13 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                                         schema: keyValue.value)
         }
 
+        let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
+                                                conformances: ["CodingKey, Equatable"],
+                                                attributesContextB.properties.keys.map(BlockTypeDecl.enum(case:)))
+
         return BlockTypeDecl.struct(typeName: newTypeName,
-                                    conformances: ["JSONAPI.\(newTypeName)"],
-                                    attributeDecls)
+                                    conformances: ["JSONAPI.SparsableAttributes"],
+                                    attributeDecls + [codingKeyDecl])
     }
 
     private static func attributeSnippet(name: String, schema: JSONSchema) throws -> Decl {

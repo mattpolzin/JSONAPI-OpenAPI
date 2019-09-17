@@ -46,7 +46,9 @@ public struct SwiftTypeDef: SwiftCodeRepresentable {
         self.optional = optional
     }
 
-    public init(name: String, specializations: [SwiftType.Type], optional: Bool = false) {
+    public init(name: String,
+                specializations: [SwiftType.Type] = [],
+                optional: Bool = false) {
         self.name = name
         self.specializations = specializations.map(SwiftTypeRep.init)
         self.optional = optional
@@ -97,7 +99,7 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
     }
 
     public init(_ stringDef: String) {
-        self = .def(.init(name: stringDef, specializations: []))
+        self = .def(.init(name: stringDef))
     }
 
     public init(stringLiteral: String) {
@@ -124,65 +126,56 @@ public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {
 
 extension String: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "String",
-                     specializations: [])
+        return .init(name: "String")
     }
 }
 
 extension Int: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "Int",
-                     specializations: [])
+        return .init(name: "Int")
     }
 }
 
 extension Double: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "Double",
-                     specializations: [])
+        return .init(name: "Double")
     }
 }
 
 extension Bool: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "Bool",
-                     specializations: [])
+        return .init(name: "Bool")
     }
 }
 
 extension URL: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "URL",
-                     specializations: [])
+        return .init(name: "URL")
     }
 }
 
 extension URLRequest: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "URLRequest",
-                     specializations: [])
+        return .init(name: "URLRequest")
     }
 }
 
 extension AnyCodable: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "AnyCodable",
-                     specializations: [])
+        return .init(name: "AnyCodable")
     }
 }
 
 extension Optional: SwiftType, SwiftCodeRepresentable where Wrapped: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: Wrapped.swiftCode,
-                     specializations: [],
                      optional: true)
     }
 }
 
 extension Array: SwiftType, SwiftCodeRepresentable where Element: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "[\(Element.swiftCode)]",
-                     specializations: [])
+        return .init(name: "[\(Element.swiftCode)]")
     }
 }
 
@@ -232,57 +225,49 @@ extension ManyResourceBody: SwiftType, SwiftCodeRepresentable where Entity: Swif
 
 extension NoMetadata: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoMetadata",
-                     specializations: [])
+        return .init(name: "NoMetadata")
     }
 }
 
 extension NoLinks: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoLinks",
-                     specializations: [])
+        return .init(name: "NoLinks")
     }
 }
 
 extension NoRelationships: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoRelationships",
-                     specializations: [])
+        return .init(name: "NoRelationships")
     }
 }
 
 extension NoAttributes: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoAttributes",
-                     specializations: [])
+        return .init(name: "NoAttributes")
     }
 }
 
 extension NoResourceBody: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoResourceBody",
-                     specializations: [])
+        return .init(name: "NoResourceBody")
     }
 }
 
 extension NoAPIDescription: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoAPIDescription",
-                     specializations: [])
+        return .init(name: "NoAPIDescription")
     }
 }
 
 extension UnknownJSONAPIError: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "UnknownJSONAPIError",
-                     specializations: [])
+        return .init(name: "UnknownJSONAPIError")
     }
 }
 
 extension NoIncludes: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
-        return .init(name: "NoIncludes",
-                     specializations: [])
+        return .init(name: "NoIncludes")
     }
 }
 
@@ -303,7 +288,8 @@ extension Include1: SwiftType, SwiftCodeRepresentable where A: SwiftType {
 extension Include2: SwiftType, SwiftCodeRepresentable where A: SwiftType, B: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "Include2",
-                     specializations: [A.self, B.self])
+                     specializations: [A.self,
+                                       B.self])
     }
 }
 

@@ -184,6 +184,18 @@ public enum BlockTypeDecl: Decl {
                               decls + newDecls)
         }
     }
+
+    public static func `enum`(case: String) -> Decl {
+        return EnumCase(name: `case`)
+    }
+
+    struct EnumCase: Decl {
+        let swiftCode: String
+
+        init(name: String) {
+            swiftCode = "case \(name)"
+        }
+    }
 }
 
 public struct Scoping: SwiftCodeRepresentable, Equatable {

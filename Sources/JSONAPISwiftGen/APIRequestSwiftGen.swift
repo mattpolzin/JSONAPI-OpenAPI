@@ -63,7 +63,7 @@ public struct APIRequestSwiftGen: SwiftGenerator {
                                                      swiftType: .rep(URLRequest.self),
                                                      "URLRequest(url: requestUrl)" as Value),
                                         PropDecl.let(propName: "headers",
-                                                     swiftType: .def(.init(name: "[(name: String, value: String)]", specializationReps: [])),
+                                                     swiftType: .def(.init(name: "[(name: String, value: String)]")),
                                                      headers),
 """
 

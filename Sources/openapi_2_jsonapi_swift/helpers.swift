@@ -34,27 +34,37 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                 continue
             }
 
-            let responses = operation.responses
+            let documentFileNameString = documentTypeName(path: path, verb: httpVerb)
+
             let parameters = operation.parameters
 
             let apiRequest = try? APIRequestSwiftGen(server: server,
                                                      pathComponents: path,
                                                      parameters: parameters.compactMap { $0.a })
 
-            let documentFileNameString = documentTypeName(path: path, verb: httpVerb, direction: .response)
-
+            let responses = operation.responses
             let responseDocuments = documents(from: responses)
 
+            writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_response_",
+                                     for: responseDocuments.values,
+                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
+
+            let requestDocument = operation
+                .requestBody
+                .flatMap { document(from: $0) }
+
+//            if let reqDoc = requestDocument {
+//                writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_request_",
+//                                         for: [reqDoc],
+//                                         extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
+//            }
+
             // write API file
-            writeAPIFile(toPath: outPath + "/responses/\(documentFileNameString)_",
+            writeAPIFile(toPath: outPath + "/\(documentFileNameString)_",
                 for: apiRequest,
-                and: responseDocuments.values,
+                and: responseDocuments.values + (requestDocument.map { [$0] } ?? []),
                 extending: namespace(for: path),
                 in: .enum(typeName: httpVerb.rawValue, conformances: nil, []))
-
-            writeResourceObjectFiles(toPath: outPath + "/responses/\(documentFileNameString)_",
-                                     for: responseDocuments,
-                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
         }
     }
 }
@@ -78,20 +88,19 @@ func namespace(for path: OpenAPI.PathComponents) -> String {
 }
 
 func documentTypeName(path: OpenAPI.PathComponents,
-                      verb: HttpVerb,
-                      direction: HttpDirection) -> String {
+                      verb: HttpVerb) -> String {
     let pathSnippet = swiftTypeName(from: path.components
         .joined(separator: "_"))
 
-    return [pathSnippet, verb.rawValue, direction.rawValue].joined(separator: "_")
+    return [pathSnippet, verb.rawValue].joined(separator: "_")
 }
 
-func writeResourceObjectFiles(toPath path: String,
-                              for responseDocuments: [OpenAPI.Response.StatusCode: DataDocumentSwiftGen],
-                              extending namespace: String) {
-    for (_, responseDocument) in responseDocuments {
+func writeResourceObjectFiles<T: Sequence>(toPath path: String,
+                              for documents: T,
+                              extending namespace: String) where T.Element == DataDocumentSwiftGen {
+    for document in documents {
 
-        let resourceObjectGenerators = responseDocument.resourceObjectGenerators
+        let resourceObjectGenerators = document.resourceObjectGenerators
 
         let definedResourceObjectNames = Set(resourceObjectGenerators
             .map { $0.swiftTypeName })
@@ -247,4 +256,24 @@ func documents(from responses: OpenAPI.Response.Map) -> [OpenAPI.Response.Status
         }
     }
     return responseDocuments
+}
+
+func document(from request: OpenAPI.Request) -> DataDocumentSwiftGen? {
+    guard let requestSchema = request.content[.json]?.schema.b else {
+        return nil
+    }
+
+    guard case .object = requestSchema else {
+        print("Found non-object request schema root (expected JSON:API 'data' object). Skipping \(String(describing: requestSchema.jsonTypeFormat?.jsonType))")
+        return nil
+    }
+
+    do {
+        return try DataDocumentSwiftGen(structure: requestSchema,
+                                        swiftTypeName: "Request")
+    } catch {
+        print("Failed to parse request document: ")
+        print(error)
+        return nil
+    }
 }

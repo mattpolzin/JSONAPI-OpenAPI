@@ -115,7 +115,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                 resources = [try ResourceObjectSwiftGen(structure: items)]
             }
 
-            let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.swiftTypeName, specializations: [])) }
+            let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.swiftTypeName)) }
 
             includeType = .def(.init(name: "Include\(resourceTypes.count)",
                                       specializationReps: resourceTypes))
@@ -126,7 +126,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             includeType = .rep(NoIncludes.self)
         }
 
-        allDecls.append(Typealias(alias: .def(.init(name: swiftTypeName, specializations: [])),
+        allDecls.append(Typealias(alias: .def(.init(name: swiftTypeName)),
                                   existingType: .def(.init(name: "JSONAPI.Document",
                                                            specializationReps: [
                                                             primaryResourceBodyType,
