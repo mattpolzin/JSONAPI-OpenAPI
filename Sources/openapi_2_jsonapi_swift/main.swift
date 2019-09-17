@@ -30,5 +30,5 @@ print("Done.")
  VALIDATION IDEAS:
  1. When a path parameter is specified in path component but not in parameters.
  2. When a path parameter is specified in parameters but does not appear in path components.
-
+ 3. When different endpoints define different resources objects with the same JSON:API type.
  */
