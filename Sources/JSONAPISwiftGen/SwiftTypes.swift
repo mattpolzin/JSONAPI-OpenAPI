@@ -265,6 +265,12 @@ extension UnknownJSONAPIError: SwiftType, SwiftCodeRepresentable {
     }
 }
 
+extension Unidentified: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Unidentified")
+    }
+}
+
 extension NoIncludes: SwiftType, SwiftCodeRepresentable {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "NoIncludes")

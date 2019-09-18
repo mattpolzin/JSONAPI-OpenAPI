@@ -35,6 +35,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
         let (typeName, typeNameDecl) = try typeNameSnippet(contextB: resourceObjectContextB)
 
+        let identified = resourceObjectContextB.properties[Key.id.rawValue] != nil
+
         let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB)
 
         let relationships = try relationshipsSnippet(contextB: resourceObjectContextB)
@@ -55,7 +57,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                                                         .init(descriptionTypeName),
                                                         .init(NoMetadata.self),
                                                         .init(NoLinks.self),
-                                                        .init(String.self)
+                                                        identified ? .init(String.self) : .init(Unidentified.self)
                       ])))
             ],
                 relationshipStubs: try Set(relationships.relationshipJSONTypeNames.map {
