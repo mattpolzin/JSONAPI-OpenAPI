@@ -27,6 +27,10 @@ internal struct LiteralSwiftCode: SwiftCodeRepresentable, Decl, ExpressibleByStr
     public init(stringLiteral value: String) {
         swiftCode = value
     }
+
+    public init(_ value: String) {
+        swiftCode = value
+    }
 }
 
 internal func swiftPlaceholder(name: String, type: SwiftTypeRep) -> String {

@@ -20,8 +20,21 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
         .map { try $0.enumDecl.formattedSwiftCode() }
         .joined(separator: "\n\n")
     write(contents: contents,
-          toFileAt: outPath + "/" ,
+          toFileAt: outPath + "/",
           named: "Namespaces.swift")
+
+    // write test helper to file
+    let testHelperContents = try! [
+        Import(module: "Foundation") as Decl,
+        Import(module: "JSONAPI") as Decl,
+        Import(module: "AnyCodable") as Decl,
+        Import(module: "XCTest") as Decl,
+        APIRequestSwiftGen.testFuncDecl
+        ].map { try $0.formattedSwiftCode() }
+        .joined(separator: "")
+    write(contents: testHelperContents,
+          toFileAt: outPath + "/",
+          named: "TestHelpers.swift")
 
     for httpVerb in HttpVerb.allCases {
 

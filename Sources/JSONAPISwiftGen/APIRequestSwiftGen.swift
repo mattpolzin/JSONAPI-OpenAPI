@@ -14,6 +14,8 @@ public struct APIRequestSwiftGen: SwiftGenerator {
     public let decls: [Decl]
     public let swiftCode: String
 
+    public static var testFuncDecl: Decl { makeTestRequestFunc }
+
     public init(server: OpenAPI.Server,
                 pathComponents: OpenAPI.PathComponents,
                 parameters: [OpenAPI.PathItem.Parameter]) throws {
@@ -59,40 +61,15 @@ public struct APIRequestSwiftGen: SwiftGenerator {
                                     body: [
                                         APIRequestSwiftGen.urlSnippet(from: pathComponents,
                                                                       originatingAt: server),
-                                        PropDecl.var(propName: "request",
-                                                     swiftType: .rep(URLRequest.self),
-                                                     "URLRequest(url: requestUrl)" as Value),
                                         PropDecl.let(propName: "headers",
                                                      swiftType: .def(.init(name: "[(name: String, value: String)]")),
                                                      headers),
 """
 
-for header in headers {
-    request.setValue(header.value, forHTTPHeaderField: header.name)
-}
-
-let completionExpectation = XCTestExpectation()
-
-let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
-    XCTAssertNil(error)
-    XCTAssertNotNil(data)
-
-    let decoder = JSONDecoder()
-
-    guard let document = try! data.map({ try decoder.decode(type(of: expectedResponseBody).self, from: $0) }) else {
-        XCTFail("Failed to decode response document")
-        return
-    }
-
-    XCTAssertEqual(document, expectedResponseBody)
-
-    completionExpectation.fulfill()
-}
-
-let task = URLSession.shared.dataTask(with: request, completionHandler: taskCompletion)
-task.resume()
-
-XCTWaiter().wait(for: [completionExpectation], timeout: 5)
+makeTestRequest(requestBody: requestBody,
+                             expectedResponseBody: expectedResponseBody,
+                             requestUrl: requestUrl,
+                             headers: headers)
 """ as LiteralSwiftCode
         ])
 
@@ -173,3 +150,40 @@ XCTWaiter().wait(for: [completionExpectation], timeout: 5)
         case unsupportedParameterSchema
     }
 }
+
+private let makeTestRequestFunc = """
+
+func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
+                                                expectedResponseBody: ResponseBody,
+                                                requestUrl: URL,
+                                                headers: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
+    var request: URLRequest = URLRequest(url: requestUrl)
+
+    for header in headers {
+        request.setValue(header.value, forHTTPHeaderField: header.name)
+    }
+
+    let completionExpectation = XCTestExpectation()
+
+    let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
+        XCTAssertNil(error)
+        XCTAssertNotNil(data)
+
+        let decoder = JSONDecoder()
+
+        guard let document = try! data.map({ try decoder.decode(type(of: expectedResponseBody).self, from: $0) }) else {
+            XCTFail("Failed to decode response document")
+            return
+        }
+
+        XCTAssertEqual(document, expectedResponseBody)
+
+        completionExpectation.fulfill()
+    }
+
+    let task = URLSession.shared.dataTask(with: request, completionHandler: taskCompletion)
+    task.resume()
+
+    XCTWaiter().wait(for: [completionExpectation], timeout: 5)
+}
+""" as LiteralSwiftCode
