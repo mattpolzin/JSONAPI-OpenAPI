@@ -196,7 +196,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
             guard let relationshipEntry = contextB.items,
                 case let .object(_, relationshipObjectContext) = relationshipEntry else {
-                    throw Error.relationshipDataMissingType
+                    throw Error.toManyRelationshipNotDefined
             }
 
             relatedJSONTypeName = try typeName(from: relationshipObjectContext)
@@ -242,7 +242,7 @@ private extension ResourceObjectSwiftGen {
 }
 
 public extension ResourceObjectSwiftGen {
-    enum Error: Swift.Error {
+    enum Error: Swift.Error, CustomDebugStringConvertible {
         case rootNotJSONObject
 
         case jsonAPITypeNotFound
@@ -250,7 +250,24 @@ public extension ResourceObjectSwiftGen {
         case relationshipMalformed
         case relationshipMissingDataObject
         case toManyRelationshipCannotBeNullable
-        case relationshipDataMissingType
+        case toManyRelationshipNotDefined
+
+        public var debugDescription: String {
+            switch self {
+            case .rootNotJSONObject:
+                return "Tried to parse a JSON:API Resource Object schema that did not have a JSON Schema 'object' type at its root."
+            case .jsonAPITypeNotFound:
+                return "Tried to parse a JSON:API Resource Object schema that did not have a JSON:API 'type' property."
+            case .relationshipMalformed:
+                return "Encountered an unexpected schema when parsing a JSON:API Resource Object's Relationships Object."
+            case .relationshipMissingDataObject:
+                return "Tried to parse JSON:API a Relationship schema that did not have either a 'data' object or 'data' array."
+            case .toManyRelationshipCannotBeNullable:
+                return "Encountered a nullable to-many JSON:API Relationship in schema. This is not allowed by the spec."
+            case .toManyRelationshipNotDefined:
+                return "Tried to parse a to-many JSON:API Relationship schema and did not find an 'items' property defining the Relationship type/id."
+            }
+        }
     }
 }
 

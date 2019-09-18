@@ -43,15 +43,24 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                                                      parameters: parameters.compactMap { $0.a })
 
             let responses = operation.responses
-            let responseDocuments = documents(from: responses)
+            let responseDocuments = documents(from: responses, for: httpVerb, at: path)
 
             writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_response_",
                                      for: responseDocuments.values,
                                      extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"])))
 
-            let requestDocument = operation
-                .requestBody
-                .flatMap { document(from: $0) }
+            let requestDocument: DataDocumentSwiftGen?
+            do {
+                try requestDocument = operation
+                    .requestBody
+                    .flatMap { try document(from: $0) }
+            } catch let err {
+                print("===")
+                print("-> " + String(describing: err))
+                print("-- While parsing a request document for \(httpVerb.rawValue) at \(path.rawValue)")
+                print("===")
+                requestDocument = nil
+            }
 
             if let reqDoc = requestDocument {
                 writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_request_",
@@ -275,7 +284,7 @@ func namespaceDecls(for pathItems: OpenAPI.PathItem.Map) -> [DeclNode] {
     return paths
 }
 
-func documents(from responses: OpenAPI.Response.Map) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
+func documents(from responses: OpenAPI.Response.Map, for httpVerb: HttpVerb, at path: OpenAPI.PathComponents) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
@@ -292,15 +301,17 @@ func documents(from responses: OpenAPI.Response.Map) -> [OpenAPI.Response.Status
             responseDocuments[statusCode] = try DataDocumentSwiftGen(structure: responseSchema,
                                                                      swiftTypeName: "Document_\(statusCode.rawValue)")
         } catch {
-            print("Failed to parse response document: ")
-            print(error)
+            print("===")
+            print("-> " + String(describing: error))
+            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("===")
             continue
         }
     }
     return responseDocuments
 }
 
-func document(from request: OpenAPI.Request) -> DataDocumentSwiftGen? {
+func document(from request: OpenAPI.Request) throws -> DataDocumentSwiftGen? {
     guard let requestSchema = request.content[.json]?.schema.b else {
         return nil
     }
@@ -310,12 +321,6 @@ func document(from request: OpenAPI.Request) -> DataDocumentSwiftGen? {
         return nil
     }
 
-    do {
-        return try DataDocumentSwiftGen(structure: requestSchema,
-                                        swiftTypeName: "Document")
-    } catch {
-        print("Failed to parse request document: ")
-        print(error)
-        return nil
-    }
+    return try DataDocumentSwiftGen(structure: requestSchema,
+                                    swiftTypeName: "Document")
 }

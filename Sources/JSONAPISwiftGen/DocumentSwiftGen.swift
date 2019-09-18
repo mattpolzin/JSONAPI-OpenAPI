@@ -142,12 +142,27 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
 }
 
 public extension DataDocumentSwiftGen {
-    enum Error: Swift.Error {
+    enum Error: Swift.Error, CustomDebugStringConvertible {
         case rootNotJSONObject
         case expectedDataArrayToDefineItems
         case expectedIncludedToBeArray
         case expectedIncludedArrayToDefineItems
 
         case unhandledDocument(String)
+
+        public var debugDescription: String {
+            switch self {
+            case .rootNotJSONObject:
+                return "Tried to parse a JSON:API Document schema that did not have a JSON Schema 'object' type at its root."
+            case .expectedDataArrayToDefineItems:
+                return "Tried to parse a JSON:API Document schema that appears to represent a collection of resources but no 'items' property defined the primary resource."
+            case .expectedIncludedToBeArray:
+                return "Tried to parse the Included schema for a JSON:API Document but did not find an array definition."
+            case .expectedIncludedArrayToDefineItems:
+                return "Tried to parse the Included schema for a JSON:API Document but the 'items' property of the array definition was not found."
+            case .unhandledDocument(let description):
+                return "Could not parse JSON:API Document: \(description)"
+            }
+        }
     }
 }
