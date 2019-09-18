@@ -185,8 +185,8 @@ public enum BlockTypeDecl: Decl {
         }
     }
 
-    public static func `enum`(case: String) -> Decl {
-        return EnumCase(name: `case`)
+    public static func enumCase(_ name: String) -> Decl {
+        return EnumCase(name: name)
     }
 
     struct EnumCase: Decl {

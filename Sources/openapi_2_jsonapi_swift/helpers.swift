@@ -47,24 +47,25 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
 
             writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_response_",
                                      for: responseDocuments.values,
-                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
+                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"])))
 
             let requestDocument = operation
                 .requestBody
                 .flatMap { document(from: $0) }
 
-//            if let reqDoc = requestDocument {
-//                writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_request_",
-//                                         for: [reqDoc],
-//                                         extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue])))
-//            }
+            if let reqDoc = requestDocument {
+                writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_request_",
+                                         for: [reqDoc],
+                                         extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"])))
+            }
 
             // write API file
             writeAPIFile(toPath: outPath + "/\(documentFileNameString)_",
                 for: apiRequest,
-                and: responseDocuments.values + (requestDocument.map { [$0] } ?? []),
-                extending: namespace(for: path),
-                in: .enum(typeName: httpVerb.rawValue, conformances: nil, []))
+                reqDoc: requestDocument,
+                respDocs: responseDocuments.values,
+                httpVerb: httpVerb,
+                extending: namespace(for: path))
         }
     }
 }
@@ -127,29 +128,69 @@ func writeResourceObjectFiles<T: Sequence>(toPath path: String,
     }
 }
 
+/// Take the API request and request documents and response documents
+/// and wrap them in a nested namespace structure.
+///
+/// Example:
+/// ```
+/// enum GET {
+///     func test_request(...) { ... }
+///
+///     enum Request {
+///         typealias Document = ...
+///     }
+///     enum Response {
+///         typealias Document_200 = ...
+///         typealias Document_201 = ...
+///     }
+/// }
+/// ```
+func apiDocumentsBlock<T: Sequence>(request: APIRequestSwiftGen?,
+                                    requestDoc: DataDocumentSwiftGen?,
+                                    responseDocs: T,
+                                    httpVerb: HttpVerb) -> Decl where T.Element == DataDocumentSwiftGen {
+    let requestBlock = requestDoc.map { BlockTypeDecl.enum(typeName: "Request",
+                                                           conformances: nil,
+                                                           $0.decls) }
+    let responseBlock = BlockTypeDecl.enum(typeName: "Response",
+                                           conformances: nil,
+                                           responseDocs.flatMap { $0.decls })
+
+    let verbBlock = BlockTypeDecl.enum(typeName: httpVerb.rawValue,
+                                       conformances: nil,
+                                       [requestBlock, responseBlock].compactMap { $0 } + (request?.decls ?? []))
+
+    return verbBlock
+}
+
+extension Decl {
+    func extending(namespace: String) -> Decl {
+        return BlockTypeDecl.extension(typeName: namespace,
+                                       conformances: nil,
+                                       conditions: nil,
+                                       [self])
+    }
+}
+
 func writeAPIFile<T: Sequence>(toPath path: String,
-               for request: APIRequestSwiftGen?,
-               and documents: T,
-               extending namespace: String,
-               in nestedBlock: BlockTypeDecl? = nil) where T.Element == DataDocumentSwiftGen {
+                               for request: APIRequestSwiftGen?,
+                               reqDoc: DataDocumentSwiftGen?,
+                               respDocs: T,
+                               httpVerb: HttpVerb,
+                               extending namespace: String) where T.Element == DataDocumentSwiftGen {
 
-    let decls = documents.flatMap { document in
-        document.decls
-    } + (request?.decls ?? [])
-
-    let nestedDecl = nestedBlock.map { nb in [nb.appending(decls)] } ?? decls
-
-    let contextBlock = BlockTypeDecl.extension(typeName: namespace,
-                                               conformances: nil,
-                                               conditions: nil,
-                                               nestedDecl)
+    let apiDecl = apiDocumentsBlock(request: request,
+                                    requestDoc: reqDoc,
+                                    responseDocs: respDocs,
+                                    httpVerb: httpVerb)
+        .extending(namespace: namespace)
 
     let outputFileContents = try! [
         Import(module: "Foundation") as Decl,
         Import(module: "JSONAPI") as Decl,
         Import(module: "AnyCodable") as Decl,
         Import(module: "XCTest") as Decl,
-        contextBlock as Decl
+        apiDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
 
@@ -160,24 +201,25 @@ func writeAPIFile<T: Sequence>(toPath path: String,
 
 func writeFile<T: TypedSwiftGenerator>(toPath path: String,
                                        for resourceObject: T,
-                                       extending namespace: String,
-                                       in nestedBlock: BlockTypeDecl? = nil) {
+                                       extending namespace: String) {
 
     let swiftTypeName = resourceObject.swiftTypeName
 
+    let decl = BlockTypeDecl.extension(typeName: namespace,
+                                       conformances: nil,
+                                       conditions: nil,
+                                       resourceObject.decls)
+
     let outputFileContents = try! ([
         Import(module: "JSONAPI"),
-        BlockTypeDecl.extension(typeName: namespace,
-                                conformances: nil,
-                                conditions: nil,
-                                nestedBlock.map { nb in [nb.appending(resourceObject.decls)] } ?? resourceObject.decls)
+        decl
         ] as [Decl])
         .map { try $0.formattedSwiftCode() }
         .joined(separator: "\n")
 
     write(contents: outputFileContents,
           toFileAt: path,
-          named: "Response_\(swiftTypeName).swift")
+          named: "\(swiftTypeName).swift")
 }
 
 func write(contents: String, toFileAt path: String, named name: String) {
@@ -248,7 +290,7 @@ func documents(from responses: OpenAPI.Response.Map) -> [OpenAPI.Response.Status
 
         do {
             responseDocuments[statusCode] = try DataDocumentSwiftGen(structure: responseSchema,
-                                                                     swiftTypeName: "Response_\(statusCode.rawValue)")
+                                                                     swiftTypeName: "Document_\(statusCode.rawValue)")
         } catch {
             print("Failed to parse response document: ")
             print(error)
@@ -270,7 +312,7 @@ func document(from request: OpenAPI.Request) -> DataDocumentSwiftGen? {
 
     do {
         return try DataDocumentSwiftGen(structure: requestSchema,
-                                        swiftTypeName: "Request")
+                                        swiftTypeName: "Document")
     } catch {
         print("Failed to parse request document: ")
         print(error)
