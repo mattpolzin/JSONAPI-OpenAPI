@@ -16,8 +16,8 @@ class DocumentSwiftGenTests: XCTestCase {
     func test_singleViaOpenAPI() {
         let openAPIStructure = try! TestPersonSingleDocument.openAPINode(using: testEncoder)
 
-        let testDocumentSwiftGen = try! DataDocumentSwiftGen(structure: openAPIStructure,
-                                                             swiftTypeName: "TestPersonSingleDocument")
+        let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
+                                                             structure: openAPIStructure)
 
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())
@@ -26,8 +26,8 @@ class DocumentSwiftGenTests: XCTestCase {
     func test_singleInclude1ViaOpenAPI() {
         let openAPIStructure = try! TestPersonSingleInclude1Document.openAPINode(using: testEncoder)
 
-        let testDocumentSwiftGen = try! DataDocumentSwiftGen(structure: openAPIStructure,
-                                                             swiftTypeName: "TestPersonSingleDocument")
+        let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
+                                                             structure: openAPIStructure)
 
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())
@@ -36,8 +36,8 @@ class DocumentSwiftGenTests: XCTestCase {
     func test_singleInclude2ViaOpenAPI() {
         let openAPIStructure = try! TestPersonSingleInclude2Document.openAPINode(using: testEncoder)
 
-        let testDocumentSwiftGen = try! DataDocumentSwiftGen(structure: openAPIStructure,
-                                                             swiftTypeName: "TestPersonSingleDocument")
+        let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
+                                                             structure: openAPIStructure)
 
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())
@@ -46,8 +46,8 @@ class DocumentSwiftGenTests: XCTestCase {
     func test_nullableSingleViaOpenAPI() {
         let openAPIStructure = try! TestPersonNullableSingleDocument.openAPINode(using: testEncoder)
 
-        let testDocumentSwiftGen = try! DataDocumentSwiftGen(structure: openAPIStructure,
-                                                             swiftTypeName: "TestPersonSingleDocument")
+        let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
+                                                             structure: openAPIStructure)
 
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())
@@ -56,8 +56,8 @@ class DocumentSwiftGenTests: XCTestCase {
     func test_collectionViaOpenAPI() {
         let openAPIStructure = try! TestPersonBatchDocument.openAPINode(using: testEncoder)
 
-        let testDocumentSwiftGen = try! DataDocumentSwiftGen(structure: openAPIStructure,
-                                                             swiftTypeName: "TestPersonBatchDocument")
+        let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonBatchDocument",
+                                                             structure: openAPIStructure)
 
         print(try! testDocumentSwiftGen.resourceObjectGenerators.map { try $0.formattedSwiftCode() }.joined(separator: "\n"))
         print(try! testDocumentSwiftGen.formattedSwiftCode())

@@ -43,7 +43,8 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
         documentFileNameString: String,
         apiRequestTest: APIRequestTestSwiftGen?,
         requestDocument: DataDocumentSwiftGen?,
-        responseDocuments: [OpenAPI.Response.StatusCode : DataDocumentSwiftGen]
+        responseDocuments: [OpenAPI.Response.StatusCode : DataDocumentSwiftGen],
+        fullyQualifiedTestFuncNames: [String]
     )]
     results = HttpVerb.allCases.flatMap { httpVerb in
         return pathItems.compactMap { (path, pathItem) in
@@ -83,6 +84,16 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                 requestDocument = nil
             }
 
+            let fullyQualifiedTestFuncNames = responseDocuments
+                .values
+                .compactMap { doc in
+                    doc.testExampleFunc?
+                        .functionName
+            }.map {
+                namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"]))
+                    + $0
+            }
+
             return (
                 httpVerb: httpVerb,
                 path: path,
@@ -90,7 +101,8 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                 documentFileNameString: documentFileNameString,
                 apiRequestTest: apiRequestTest,
                 requestDocument: requestDocument,
-                responseDocuments: responseDocuments
+                responseDocuments: responseDocuments,
+                fullyQualifiedTestFuncNames: fullyQualifiedTestFuncNames
             )
         }
     }

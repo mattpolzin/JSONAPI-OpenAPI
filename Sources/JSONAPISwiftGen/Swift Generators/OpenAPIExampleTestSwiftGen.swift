@@ -18,6 +18,7 @@ public extension OpenAPI.PathItem.Parameter {
 public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
     public let decls: [Decl]
     public let swiftCode: String
+    public let functionName: String
 
     public init(server: OpenAPI.Server,
                 pathComponents: OpenAPI.PathComponents,
@@ -62,8 +63,10 @@ public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
                                         catchBody: [ "XCTFail(String(describing: error))" as LiteralSwiftCode,
                                                      "return" as LiteralSwiftCode ])
 
+        functionName = "test_example_\(expectedHttpStatus.rawValue)"
+
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
-                                    name: "test_example_\(expectedHttpStatus.rawValue)",
+                                    name: functionName,
                                     specializations: nil,
                                     arguments: [],
                                     conditions: nil,
