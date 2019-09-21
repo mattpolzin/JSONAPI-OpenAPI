@@ -166,6 +166,12 @@ extension AnyCodable: SwiftType, SwiftCodeRepresentable {
     }
 }
 
+extension Data: SwiftType, SwiftCodeRepresentable {
+    public static var swiftTypeDef: SwiftTypeDef {
+        return .init(name: "Data")
+    }
+}
+
 extension Optional: SwiftType, SwiftCodeRepresentable where Wrapped: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: Wrapped.swiftCode,

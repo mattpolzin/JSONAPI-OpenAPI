@@ -275,6 +275,36 @@ public struct Function: Decl {
     }
 }
 
+public struct DoCatchBlock: Decl {
+    public let body: [Decl]
+    public let errorName: String
+    public let catchBody: [Decl]
+
+    public init(body: [Decl], errorName: String = "error", catchBody: [Decl]) {
+        self.body = body
+        self.errorName = errorName
+        self.catchBody = catchBody
+    }
+
+    public var swiftCode: String {
+        let bodyString = body
+            .map { $0.swiftCode }
+            .joined(separator: "\n")
+
+        let catchBodyString = catchBody
+            .map { $0.swiftCode }
+            .joined(separator: "\n")
+
+        return """
+do {
+    \(bodyString)
+} catch let \(errorName) {
+    \(catchBodyString)
+}
+"""
+    }
+}
+
 public struct Typealias: Decl {
     public let alias: SwiftTypeRep
     public let existingType: SwiftTypeRep

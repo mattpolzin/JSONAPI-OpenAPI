@@ -32,3 +32,8 @@ print("Done.")
  2. When a path parameter is specified in parameters but does not appear in path components.
  3. When different endpoints define different resources objects with the same JSON:API type.
  */
+
+/*
+ IMPROVEMENTS:
+ 1. Create RawRepresentable enums for OpenAPI components that specify enumerated options (like string params or attributes)
+ */

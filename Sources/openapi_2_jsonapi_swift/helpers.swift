@@ -29,38 +29,46 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
         Import(module: "JSONAPI") as Decl,
         Import(module: "AnyCodable") as Decl,
         Import(module: "XCTest") as Decl,
-        APIRequestSwiftGen.testFuncDecl
+        APIRequestTestSwiftGen.testFuncDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
     write(contents: testHelperContents,
           toFileAt: outPath + "/",
           named: "TestHelpers.swift")
 
-    for httpVerb in HttpVerb.allCases {
-
-        for (path, pathItem) in pathItems {
+    let results: [(
+        httpVerb: HttpVerb,
+        path: OpenAPI.PathComponents,
+        pathItem: OpenAPI.PathItem,
+        documentFileNameString: String,
+        apiRequestTest: APIRequestTestSwiftGen?,
+        requestDocument: DataDocumentSwiftGen?,
+        responseDocuments: [OpenAPI.Response.StatusCode : DataDocumentSwiftGen]
+    )]
+    results = HttpVerb.allCases.flatMap { httpVerb in
+        return pathItems.compactMap { (path, pathItem) in
             guard case let .operations(operations) = pathItem else {
-                continue
+                return nil
             }
 
             guard let operation = operations.for(httpVerb) else {
-                continue
+                return nil
             }
 
             let documentFileNameString = documentTypeName(path: path, verb: httpVerb)
 
             let parameters = operation.parameters
 
-            let apiRequest = try? APIRequestSwiftGen(server: server,
-                                                     pathComponents: path,
-                                                     parameters: parameters.compactMap { $0.a })
+            let apiRequestTest = try? APIRequestTestSwiftGen(server: server,
+                                                         pathComponents: path,
+                                                         parameters: parameters.compactMap { $0.a })
 
             let responses = operation.responses
-            let responseDocuments = documents(from: responses, for: httpVerb, at: path)
-
-            writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_response_",
-                                     for: responseDocuments.values,
-                                     extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"])))
+            let responseDocuments = documents(from: responses,
+                                              for: httpVerb,
+                                              at: path,
+                                              on: server,
+                                              given: parameters.compactMap { $0.a })
 
             let requestDocument: DataDocumentSwiftGen?
             do {
@@ -75,20 +83,36 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                 requestDocument = nil
             }
 
-            if let reqDoc = requestDocument {
-                writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(documentFileNameString)_request_",
-                                         for: [reqDoc],
-                                         extending: namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"])))
-            }
-
-            // write API file
-            writeAPIFile(toPath: outPath + "/\(documentFileNameString)_",
-                for: apiRequest,
-                reqDoc: requestDocument,
-                respDocs: responseDocuments.values,
+            return (
                 httpVerb: httpVerb,
-                extending: namespace(for: path))
+                path: path,
+                pathItem: pathItem,
+                documentFileNameString: documentFileNameString,
+                apiRequestTest: apiRequestTest,
+                requestDocument: requestDocument,
+                responseDocuments: responseDocuments
+            )
         }
+    }
+
+    for result in results {
+        writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(result.documentFileNameString)_response_",
+            for: result.responseDocuments.values,
+            extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Response"])))
+
+        if let reqDoc = result.requestDocument {
+            writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(result.documentFileNameString)_request_",
+                for: [reqDoc],
+                extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Request"])))
+        }
+
+        // write API file
+        writeAPIFile(toPath: outPath + "/\(result.documentFileNameString)_",
+            for: result.apiRequestTest,
+            reqDoc: result.requestDocument,
+            respDocs: result.responseDocuments.values,
+            httpVerb: result.httpVerb,
+            extending: namespace(for: result.path))
     }
 }
 
@@ -167,16 +191,32 @@ func writeResourceObjectFiles<T: Sequence>(toPath path: String,
 ///     }
 /// }
 /// ```
-func apiDocumentsBlock<T: Sequence>(request: APIRequestSwiftGen?,
+func apiDocumentsBlock<T: Sequence>(request: APIRequestTestSwiftGen?,
                                     requestDoc: DataDocumentSwiftGen?,
                                     responseDocs: T,
                                     httpVerb: HttpVerb) -> Decl where T.Element == DataDocumentSwiftGen {
-    let requestBlock = requestDoc.map { BlockTypeDecl.enum(typeName: "Request",
-                                                           conformances: nil,
-                                                           $0.decls) }
+    let requestDocAndExample = requestDoc.map { doc in
+        doc.decls
+            + (doc.exampleGenerator?.decls ?? [])
+            + (doc.testExampleFunc?.decls ?? [])
+    }
+
+    let requestBlock = requestDocAndExample
+        .map {
+            BlockTypeDecl.enum(typeName: "Request",
+                               conformances: nil,
+                               $0)
+    }
+
+    let responseDocsAndExamples = responseDocs.flatMap { doc in
+        doc.decls
+            + (doc.exampleGenerator?.decls ?? [])
+            + (doc.testExampleFunc?.decls ?? [])
+    }
+
     let responseBlock = BlockTypeDecl.enum(typeName: "Response",
                                            conformances: nil,
-                                           responseDocs.flatMap { $0.decls })
+                                           responseDocsAndExamples)
 
     let verbBlock = BlockTypeDecl.enum(typeName: httpVerb.rawValue,
                                        conformances: nil,
@@ -184,6 +224,13 @@ func apiDocumentsBlock<T: Sequence>(request: APIRequestSwiftGen?,
 
     return verbBlock
 }
+
+/*
+ print("===")
+ print("-> " + String(describing: error))
+ print("-- While creating \(httpVerb.rawValue) example test function.")
+ print("===")
+ */
 
 extension Decl {
     func extending(namespace: String) -> Decl {
@@ -195,7 +242,7 @@ extension Decl {
 }
 
 func writeAPIFile<T: Sequence>(toPath path: String,
-                               for request: APIRequestSwiftGen?,
+                               for request: APIRequestTestSwiftGen?,
                                reqDoc: DataDocumentSwiftGen?,
                                respDocs: T,
                                httpVerb: HttpVerb,
@@ -297,12 +344,57 @@ func namespaceDecls(for pathItems: OpenAPI.PathItem.Map) -> [DeclNode] {
     return paths
 }
 
-func documents(from responses: OpenAPI.Response.Map, for httpVerb: HttpVerb, at path: OpenAPI.PathComponents) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
+func documents(from responses: OpenAPI.Response.Map,
+               for httpVerb: HttpVerb,
+               at path: OpenAPI.PathComponents,
+               on server: OpenAPI.Server,
+               given params: [OpenAPI.PathItem.Parameter]) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
-        guard let responseSchema = response.a?.content[.json]?.schema.b else {
+        guard let jsonResponse = response.a?.content[.json] else {
             continue
+        }
+
+        guard let responseSchema = jsonResponse.schema.b else {
+            continue
+        }
+
+        let responseBodyTypeName = "Document_\(statusCode.rawValue)"
+        let examplePropName = "example_\(statusCode.rawValue)"
+
+        let example: ExampleSwiftGen?
+        do {
+            example = try jsonResponse.example.map { try ExampleSwiftGen.init(openAPIExample: $0, propertyName: examplePropName) }
+        } catch let err {
+            print("===")
+            print("-> " + String(describing: err))
+            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("===")
+            example = nil
+        }
+
+        let testExampleFunc: OpenAPIExampleTestSwiftGen?
+        do {
+            if let parameterValues = jsonResponse.vendorExtensions["x-testParameters"]?.value as? OpenAPI.PathItem.Parameter.ValueMap,
+                example != nil {
+
+                testExampleFunc = try OpenAPIExampleTestSwiftGen(server: server,
+                                                                 pathComponents: path,
+                                                                 parameters: params,
+                                                                 parameterValues: parameterValues,
+                                                                 exampleResponseDataPropName: examplePropName,
+                                                                 responseBodyType: .def(.init(name: responseBodyTypeName)),
+                                                                 expectedHttpStatus: statusCode)
+            } else {
+                testExampleFunc = nil
+            }
+        } catch let err {
+            print("===")
+            print("-> " + String(describing: err))
+            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("===")
+            testExampleFunc = nil
         }
 
         guard case .object = responseSchema else {
@@ -311,11 +403,13 @@ func documents(from responses: OpenAPI.Response.Map, for httpVerb: HttpVerb, at 
         }
 
         do {
-            responseDocuments[statusCode] = try DataDocumentSwiftGen(structure: responseSchema,
-                                                                     swiftTypeName: "Document_\(statusCode.rawValue)")
-        } catch {
+            responseDocuments[statusCode] = try DataDocumentSwiftGen(swiftTypeName: responseBodyTypeName,
+                                                                     structure: responseSchema,
+                                                                     example: example,
+                                                                     testExampleFunc: testExampleFunc)
+        } catch let err {
             print("===")
-            print("-> " + String(describing: error))
+            print("-> " + String(describing: err))
             print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             continue
@@ -334,6 +428,8 @@ func document(from request: OpenAPI.Request) throws -> DataDocumentSwiftGen? {
         return nil
     }
 
-    return try DataDocumentSwiftGen(structure: requestSchema,
-                                    swiftTypeName: "Document")
+    // TODO: request examples
+
+    return try DataDocumentSwiftGen(swiftTypeName: "Document",
+                                    structure: requestSchema)
 }

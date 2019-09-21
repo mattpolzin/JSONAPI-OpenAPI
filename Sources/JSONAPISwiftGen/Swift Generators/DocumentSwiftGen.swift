@@ -19,6 +19,8 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let swiftCode: String
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
+    public let exampleGenerator: ExampleSwiftGen?
+    public let testExampleFunc: OpenAPIExampleTestSwiftGen?
 
     /// Generate Swift code not just for this Document's declaration but
     /// also for all declarations required for this Document to compile.
@@ -29,9 +31,14 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             .joined(separator: "\n")
     }
 
-    public init(structure: JSONSchema, swiftTypeName: String) throws {
+    public init(swiftTypeName: String,
+                structure: JSONSchema,
+                example: ExampleSwiftGen? = nil,
+                testExampleFunc: OpenAPIExampleTestSwiftGen? = nil) throws {
         self.swiftTypeName = swiftTypeName
         self.structure = structure
+        self.exampleGenerator = example
+        self.testExampleFunc = testExampleFunc
 
         (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure, swiftTypeName: swiftTypeName)
         swiftCode = DataDocumentSwiftGen.swiftCode(from: decls)
