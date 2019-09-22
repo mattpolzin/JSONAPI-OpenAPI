@@ -41,7 +41,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
         let identified = resourceObjectContextB.properties[Key.id.rawValue] != nil
 
-        let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB)
+        let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB,
+                                                   allowPlaceholders: allowPlaceholders)
 
         let relationships = try relationshipsSnippet(contextB: resourceObjectContextB,
                                                      allowPlaceholders: allowPlaceholders)
@@ -100,7 +101,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func attributesSnippet(contextB: JSONSchema.ObjectContext) throws -> Decl {
+    private static func attributesSnippet(contextB: JSONSchema.ObjectContext,
+                                          allowPlaceholders: Bool) throws -> Decl {
 
         let newTypeName = "Attributes"
 
@@ -113,7 +115,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             .sorted { $0.key < $1.key }
             .map { keyValue in
             return try attributeSnippet(name: keyValue.key,
-                                        schema: keyValue.value)
+                                        schema: keyValue.value,
+                                        allowPlaceholders: allowPlaceholders)
         }
 
         let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
@@ -125,12 +128,15 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                                     attributeDecls + [codingKeyDecl])
     }
 
-    private static func attributeSnippet(name: String, schema: JSONSchema) throws -> Decl {
+    private static func attributeSnippet(name: String,
+                                         schema: JSONSchema,
+                                         allowPlaceholders: Bool) throws -> Decl {
 
         let isOmittable = !schema.required
         let isNullable = schema.nullable
 
-        let attributeRawTypeRep = try swiftType(from: schema)
+        let attributeRawTypeRep = try swiftType(from: schema,
+                                                allowPlaceholders: allowPlaceholders)
 
         let finalAttributeRawTypeRep = isNullable
             ? attributeRawTypeRep.optional

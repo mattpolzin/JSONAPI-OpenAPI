@@ -66,17 +66,25 @@ internal func propertyCased(_ name: String) -> String {
 
 enum SwiftTypeError: Swift.Error {
     case typeNotFound
+    case placeholderTypeNotAllowed(for: String)
 }
 
-internal func swiftType(from schema: JSONSchema) throws -> SwiftTypeRep {
+internal func swiftType(from schema: JSONSchema,
+                        allowPlaceholders: Bool) throws -> SwiftTypeRep {
     switch schema.jsonTypeFormat {
     case nil:
         throw SwiftTypeError.typeNotFound
     case .boolean(let format)?:
         return SwiftTypeRep(type(of: format).SwiftType.self)
     case .object(_)?:
+        guard allowPlaceholders else {
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: "object")
+        }
         return SwiftTypeRep(swiftPlaceholder(name: "Swift Type", type: "Any"))
     case .array(_)?:
+        guard allowPlaceholders else {
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: "array")
+        }
         return SwiftTypeRep(swiftPlaceholder(name: "Swift Type", type: "[Any]"))
     case .number(let format)?:
         return SwiftTypeRep(type(of: format).SwiftType.self)
