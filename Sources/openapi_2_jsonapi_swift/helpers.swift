@@ -15,12 +15,15 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                               originatingAt server: OpenAPI.Server,
                               outputTo outPath: String) {
 
+    let testDir = outPath + "/Tests/GeneratedAPITests"
+    let resourceObjDir = testDir + "/resourceObjects"
+
     // generate namespaces first
     let contents = try! namespaceDecls(for: pathItems)
         .map { try $0.enumDecl.formattedSwiftCode() }
         .joined(separator: "\n\n")
     write(contents: contents,
-          toFileAt: outPath + "/",
+          toFileAt: testDir + "/",
           named: "Namespaces.swift")
 
     // write test helper to file
@@ -33,8 +36,16 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
     write(contents: testHelperContents,
-          toFileAt: outPath + "/",
+          toFileAt: testDir + "/",
           named: "TestHelpers.swift")
+
+    write(contents: packageFile,
+          toFileAt: outPath + "/",
+          named: "Package.swift")
+
+    write(contents: linuxMainFile,
+          toFileAt: outPath + "/Tests/",
+          named: "LinuxMain.swift")
 
     let results: [(
         httpVerb: HttpVerb,
@@ -91,7 +102,7 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
                         .functionName
             }.map {
                 namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"]))
-                    + $0
+                    + "." + $0
             }
 
             return (
@@ -108,24 +119,31 @@ func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
     }
 
     for result in results {
-        writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(result.documentFileNameString)_response_",
+        writeResourceObjectFiles(toPath: resourceObjDir + "/\(result.documentFileNameString)_response_",
             for: result.responseDocuments.values,
             extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Response"])))
 
         if let reqDoc = result.requestDocument {
-            writeResourceObjectFiles(toPath: outPath + "/resourceObjects/\(result.documentFileNameString)_request_",
+            writeResourceObjectFiles(toPath: resourceObjDir + "/\(result.documentFileNameString)_request_",
                 for: [reqDoc],
                 extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Request"])))
         }
 
         // write API file
-        writeAPIFile(toPath: outPath + "/\(result.documentFileNameString)_",
+        writeAPIFile(toPath: testDir + "/\(result.documentFileNameString)_",
             for: result.apiRequestTest,
             reqDoc: result.requestDocument,
             respDocs: result.responseDocuments.values,
             httpVerb: result.httpVerb,
             extending: namespace(for: result.path))
     }
+
+    let testClassFileContents = XCTestClassSwiftGen(className: "GeneratedTests",
+                                                    importNames: [],
+                                                    forwardingFullyQualifiedTestNames: results.flatMap { $0.fullyQualifiedTestFuncNames })
+    write(contents: try! testClassFileContents.formattedSwiftCode(),
+          toFileAt: testDir + "/",
+          named: "GeneratedTests.swift")
 }
 
 enum HttpDirection: String {
@@ -445,3 +463,34 @@ func document(from request: OpenAPI.Request) throws -> DataDocumentSwiftGen? {
     return try DataDocumentSwiftGen(swiftTypeName: "Document",
                                     structure: requestSchema)
 }
+
+let packageFile: String = """
+// swift-tools-version:5.1
+
+import PackageDescription
+
+let package = Package(
+    name: "GeneratedAPITests",
+    products: [],
+    dependencies: [
+        .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
+            .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "1.0.0"))
+    ],
+    targets: [
+        .testTarget(
+            name: "GeneratedAPITests",
+            dependencies: ["JSONAPI", "AnyCodable"]
+        )
+    ]
+)
+"""
+
+let linuxMainFile: String = """
+import XCTest
+
+import GeneratedAPITests
+
+XCTMain([
+    testCase(GeneratedTests.allTests)
+])
+"""

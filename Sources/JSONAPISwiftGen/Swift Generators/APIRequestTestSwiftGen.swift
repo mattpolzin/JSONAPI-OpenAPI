@@ -20,7 +20,6 @@ import Poly
 ///     type.
 public struct APIRequestTestSwiftGen: SwiftGenerator {
     public let decls: [Decl]
-    public let swiftCode: String
 
     public static var testFuncDecl: Decl { makeTestRequestFunc }
 
@@ -57,7 +56,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                     (name: "name",
                      value: "\"\($0.name)\""),
                     (name: "value",
-                     value: "\(APIRequestTestSwiftGen.propertyCased($0.name))")
+                     value: "\(propertyCased($0.name))")
                 ])
         })
 
@@ -78,12 +77,6 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         decls = [
             functionDecl
         ]
-        
-        swiftCode = APIRequestTestSwiftGen.swiftCode(from: decls)
-    }
-
-    static func swiftCode(from decls: [Decl]) -> String {
-        return decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     static var requestFuncCallSnippet: Decl {
@@ -107,7 +100,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                     return component
             }
             return "\\("
-                + APIRequestTestSwiftGen.propertyCased(String(component.dropFirst().dropLast()))
+                + propertyCased(String(component.dropFirst().dropLast()))
                 + ")"
         }.joined(separator: "/")
 
@@ -144,16 +137,6 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         default:
             throw Error.parameterSchemaByReferenceNotSupported
         }
-    }
-
-    private static func propertyCased(_ name: String) -> String {
-        let words = name.split(whereSeparator: "_-".contains)
-        let first = words.first.map { [String($0).lowercased()] } ?? []
-        let casedWords = first + words.dropFirst().map { (word) -> String in
-            let firstChar = word.first?.uppercased() ?? ""
-            return String(firstChar + word.dropFirst())
-        }
-        return casedWords.joined()
     }
 
     public enum Error: Swift.Error {

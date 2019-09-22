@@ -13,6 +13,12 @@ public protocol SwiftGenerator: SwiftCodeRepresentable {
     var decls: [Decl] { get }
 }
 
+extension SwiftGenerator {
+    public var swiftCode: String {
+        return decls.map { $0.swiftCode }.joined(separator: "\n")
+    }
+}
+
 public protocol TypedSwiftGenerator: SwiftGenerator {
     var swiftTypeName: String { get }
 }
@@ -37,6 +43,25 @@ internal func swiftPlaceholder(name: String, type: SwiftTypeRep) -> String {
     return "<#T##\(name)##"
         + type.swiftCode
         + "#>"
+}
+
+internal func typeCased(_ name: String) -> String {
+    let words = name.split(whereSeparator: "_-".contains)
+    let casedWords = words.map { word -> String in
+        let firstChar = word.first?.uppercased() ?? ""
+        return String(firstChar + word.dropFirst())
+    }
+    return casedWords.joined()
+}
+
+internal func propertyCased(_ name: String) -> String {
+    let words = name.split(whereSeparator: "_-".contains)
+    let first = words.first.map { [String($0).lowercased()] } ?? []
+    let casedWords = first + words.dropFirst().map { (word) -> String in
+        let firstChar = word.first?.uppercased() ?? ""
+        return String(firstChar + word.dropFirst())
+    }
+    return casedWords.joined()
 }
 
 enum SwiftTypeError: Swift.Error {

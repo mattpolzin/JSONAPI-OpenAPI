@@ -116,6 +116,7 @@ public struct StaticDecl: Decl {
 public enum BlockTypeDecl: Decl {
     case `enum`(typeName: String, conformances: [String]?, [Decl])
     case `struct`(typeName: String, conformances: [String]?, [Decl])
+    case `class`(typeName: String, parent: String? = nil, conformances: [String]?, [Decl])
     case `extension`(typeName: String, conformances: [String]?, conditions: [String]?, [Decl])
 
     public var swiftCode: String {
@@ -126,7 +127,11 @@ public enum BlockTypeDecl: Decl {
         let contentString: String
 
         func conformances(from: [String]?) -> String {
-            return from.map { ": " + $0.joined(separator: ", ") } ?? ""
+            guard let conformances = from,
+                conformances.count > 0 else {
+                    return ""
+            }
+            return ": " + conformances.joined(separator: ", ")
         }
 
         func conditions(from: [String]?) -> String {
@@ -145,6 +150,16 @@ public enum BlockTypeDecl: Decl {
             typeNameString = typeName
             contentString = contents.map { $0.swiftCode }.joined(separator:"\n")
             conformancesString = conformances(from: conforms)
+            conditionsString = ""
+        case .class(let typeName, let parent, let conf, let contents):
+            declType = "class"
+            typeNameString = typeName
+            contentString = contents.map { $0.swiftCode }.joined(separator: "\n")
+
+            let parentAndConf = (parent.map { [$0] } ?? [])
+                + (conf ?? [])
+
+            conformancesString = conformances(from: parentAndConf)
             conditionsString = ""
         case .extension(let typeName, let conforms, let condits, let contents):
             declType = "extension"
@@ -174,6 +189,11 @@ public enum BlockTypeDecl: Decl {
             return .struct(typeName: typeName,
                            conformances: conformances,
                            decls + newDecls)
+        case .class(let typeName, let parent, let conf, let contents):
+            return .class(typeName: typeName,
+                          parent: parent,
+                          conformances: conf,
+                          contents + newDecls)
         case .extension(typeName: let typeName,
                         conformances: let conformances,
                         conditions: let conditions,

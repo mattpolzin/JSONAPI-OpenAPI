@@ -13,7 +13,6 @@ import JSONAPI
 /// request/response body as a constant `Data`.
 public struct ExampleSwiftGen: SwiftGenerator {
     public let decls: [Decl]
-    public let swiftCode: String
 
     private let exampleAsDataSwiftString: String
 
@@ -47,7 +46,6 @@ public struct ExampleSwiftGen: SwiftGenerator {
                                 DynamicValue(value: exampleAsDataSwiftString)))
 
         decls = [decl]
-        swiftCode = decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     public enum Error: Swift.Error {

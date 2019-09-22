@@ -17,7 +17,6 @@ public extension OpenAPI.PathItem.Parameter {
 /// based on a provided OpenAPI example and some API parameters.
 public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
     public let decls: [Decl]
-    public let swiftCode: String
     public let functionName: String
 
     public init(server: OpenAPI.Server,
@@ -79,8 +78,6 @@ public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
         decls = [
             functionDecl
         ]
-
-        swiftCode = decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap) throws -> Decl {

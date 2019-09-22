@@ -12,7 +12,6 @@ import JSONAPI
 public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
-    public let swiftCode: String
     public let swiftTypeName: String
     public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
 
@@ -20,12 +19,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
         self.structure = structure
 
         (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure)
-        swiftCode = ResourceObjectSwiftGen.swiftCode(from: decls)
         swiftTypeName = decls.compactMap { $0 as? Typealias }.first!.alias.swiftCode
-    }
-
-    static func swiftCode(from decls: [Decl]) -> String {
-        return decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     static func swiftDecls(from structure: JSONSchema)  throws -> (decls: [Decl], relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
@@ -219,15 +213,6 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
         return (jsonTypeName: relatedJSONTypeName,
                 typeNameDeclCode: typeDecl)
 
-    }
-
-    private static func typeCased(_ name: String) -> String {
-        let words = name.split(whereSeparator: "_-".contains)
-        let casedWords = words.map { word -> String in
-            let firstChar = word.first?.uppercased() ?? ""
-            return String(firstChar + word.dropFirst())
-        }
-        return casedWords.joined()
     }
 }
 

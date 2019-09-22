@@ -11,11 +11,10 @@ import JSONAPI
 
 public struct ResourceObjectStubSwiftGen: TypedSwiftGenerator {
     public let decls: [Decl]
-    public let swiftCode: String
     public let swiftTypeName: String
 
     public init(jsonAPITypeName: String) throws {
-        self.swiftTypeName = ResourceObjectStubSwiftGen.typeCased(jsonAPITypeName)
+        self.swiftTypeName = typeCased(jsonAPITypeName)
 
         let descriptionTypeName = "\(swiftTypeName)Description"
         decls = [
@@ -35,21 +34,6 @@ public struct ResourceObjectStubSwiftGen: TypedSwiftGenerator {
                                                         .init(String.self)
                       ])))
         ]
-
-        swiftCode = ResourceObjectStubSwiftGen.swiftCode(from: decls)
-    }
-
-    static func swiftCode(from decls: [Decl]) -> String {
-        return decls.map { $0.swiftCode }.joined(separator: "\n")
-    }
-
-    private static func typeCased(_ name: String) -> String {
-        let words = name.split(whereSeparator: "_-".contains)
-        let casedWords = words.map { word -> String in
-            let firstChar = word.first?.uppercased() ?? ""
-            return String(firstChar + word.dropFirst())
-        }
-        return casedWords.joined()
     }
 }
 

@@ -16,7 +16,6 @@ import JSONAPI
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
-    public let swiftCode: String
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
     public let exampleGenerator: ExampleSwiftGen?
@@ -41,11 +40,6 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         self.testExampleFunc = testExampleFunc
 
         (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure, swiftTypeName: swiftTypeName)
-        swiftCode = DataDocumentSwiftGen.swiftCode(from: decls)
-    }
-
-    static func swiftCode(from decls: [Decl]) -> String {
-        return decls.map { $0.swiftCode }.joined(separator: "\n")
     }
 
     static func swiftDecls(from structure: JSONSchema, swiftTypeName: String) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {

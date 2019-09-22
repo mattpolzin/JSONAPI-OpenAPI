@@ -6,9 +6,9 @@ import Foundation
 let inFile = CommandLine.arguments[1]
 let outPath = CommandLine.arguments[2]
 
-if !FileManager.default.fileExists(atPath: outPath + "/resourceObjects") {
-    try! FileManager.default.createDirectory(atPath: outPath + "/resourceObjects",
-                                             withIntermediateDirectories: false,
+if !FileManager.default.fileExists(atPath: outPath + "/Tests/GeneratedAPITests/resourceObjects") {
+    try! FileManager.default.createDirectory(atPath: outPath + "/Tests/GeneratedAPITests/resourceObjects",
+                                             withIntermediateDirectories: true,
                                              attributes: nil)
 }
 
