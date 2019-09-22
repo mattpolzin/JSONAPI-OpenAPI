@@ -20,9 +20,9 @@ let openAPIStructure = try! jsonDecoder.decode(OpenAPI.Document.self, from: inpu
 
 let pathItems = openAPIStructure.paths
 
-produceSwiftForDocuments(in: pathItems,
-                         originatingAt: openAPIStructure.servers.first!,
-                         outputTo: outPath)
+produceAPITestPackage(for: pathItems,
+                      originatingAt: openAPIStructure.servers.first!,
+                      outputTo: outPath)
 
 print("Done.")
 

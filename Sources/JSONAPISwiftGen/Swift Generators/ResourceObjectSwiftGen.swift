@@ -15,25 +15,36 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
     public let swiftTypeName: String
     public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
 
-    public init(structure: JSONSchema) throws {
+    /// A Generator that produces Swift code for a JSONAPI Resource Object type.
+    /// - parameters:
+    ///     - structure: a JSONSchema describing the entire JSON:API Resource Object.
+    ///     - allowPlaceholders: If true (default) then placeholders will be used for the Swift
+    ///         types of things the generator cannot determine the type or structure of. If false, the
+    ///         generator will throw an error in those situations.
+    public init(structure: JSONSchema,
+                allowPlaceholders: Bool = true) throws {
         self.structure = structure
 
-        (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure)
+        (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure,
+                                                                                    allowPlaceholders: allowPlaceholders)
         swiftTypeName = decls.compactMap { $0 as? Typealias }.first!.alias.swiftCode
     }
 
-    static func swiftDecls(from structure: JSONSchema)  throws -> (decls: [Decl], relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
+    static func swiftDecls(from structure: JSONSchema,
+                           allowPlaceholders: Bool)  throws -> (decls: [Decl], relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
 
-        let (typeName, typeNameDecl) = try typeNameSnippet(contextB: resourceObjectContextB)
+        let (typeName, typeNameDecl) = try typeNameSnippet(contextB: resourceObjectContextB,
+                                                           allowPlaceholders: allowPlaceholders)
 
         let identified = resourceObjectContextB.properties[Key.id.rawValue] != nil
 
         let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB)
 
-        let relationships = try relationshipsSnippet(contextB: resourceObjectContextB)
+        let relationships = try relationshipsSnippet(contextB: resourceObjectContextB,
+                                                     allowPlaceholders: allowPlaceholders)
 
         let descriptionTypeName = "\(typeName)Description"
 
@@ -60,14 +71,17 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func typeNameSnippet(contextB: JSONSchema.ObjectContext) throws -> (typeName: String, typeNameDeclCode: Decl) {
-        let typeNameString = try typeName(from: contextB)
+    private static func typeNameSnippet(contextB: JSONSchema.ObjectContext,
+                                        allowPlaceholders: Bool) throws -> (typeName: String, typeNameDeclCode: Decl) {
+        let typeNameString = try typeName(from: contextB,
+                                          allowPlaceholders: allowPlaceholders)
 
         return (typeName: typeCased(typeNameString),
                 typeNameDeclCode: StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(typeNameString)\""))))
     }
 
-    private static func typeName(from resourceIdentifierContext: JSONSchema.ObjectContext) throws -> String {
+    private static func typeName(from resourceIdentifierContext: JSONSchema.ObjectContext,
+                                 allowPlaceholders: Bool) throws -> String {
         guard case let .string(typeNameContextA, _)? = resourceIdentifierContext.properties[Key.type.rawValue] else {
             throw Error.jsonAPITypeNotFound
         }
@@ -77,7 +91,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             let typeNameString = possibleTypeNames.first.flatMap({ $0.value as? String }) {
             return typeNameString
         } else {
-            return swiftPlaceholder(name: "JSON:API type", type: .init(String.self))
+            let placeholder = swiftPlaceholder(name: "JSON:API type", type: .init(String.self))
+            guard allowPlaceholders else {
+                throw Error.typeCouldNotBeDetermined(placeholder: placeholder)
+            }
+            return placeholder
         }
     }
 
@@ -125,7 +143,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext) throws -> (relationshipJSONTypeNames: [String], relationshipsDecl: Decl) {
+    private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext,
+                                             allowPlaceholders: Bool) throws -> (relationshipJSONTypeNames: [String], relationshipsDecl: Decl) {
 
         let newTypeName = "Relationships"
 
@@ -138,7 +157,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             .sorted { $0.key < $1.key }
             .map { keyValue in
                 return try relationshipSnippet(name: keyValue.key,
-                                               schema: keyValue.value)
+                                               schema: keyValue.value,
+                                               allowPlaceholders: allowPlaceholders)
         }
 
         let relationshipJSONTypenames = relationshipDecls.map { $0.jsonTypeName }
@@ -151,7 +171,9 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                 relationshipsDecl: decl)
     }
 
-    private static func relationshipSnippet(name: String, schema: JSONSchema) throws -> (jsonTypeName: String, typeNameDeclCode: Decl) {
+    private static func relationshipSnippet(name: String,
+                                            schema: JSONSchema,
+                                            allowPlaceholders: Bool) throws -> (jsonTypeName: String, typeNameDeclCode: Decl) {
 
         guard case let .object(_, relationshipContextB) = schema,
             let dataSchema = relationshipContextB.properties[Key.data.rawValue] else {
@@ -174,7 +196,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
         case .object(_, let contextB):
             oneOrManyName = "ToOneRelationship"
 
-            relatedJSONTypeName = try typeName(from: contextB)
+            relatedJSONTypeName = try typeName(from: contextB,
+                                               allowPlaceholders: allowPlaceholders)
 
             let tmpRelTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
 
@@ -193,7 +216,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                     throw Error.toManyRelationshipNotDefined
             }
 
-            relatedJSONTypeName = try typeName(from: relationshipObjectContext)
+            relatedJSONTypeName = try typeName(from: relationshipObjectContext,
+                                               allowPlaceholders: allowPlaceholders)
 
             relationshipTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
 
@@ -237,6 +261,8 @@ public extension ResourceObjectSwiftGen {
         case toManyRelationshipCannotBeNullable
         case toManyRelationshipNotDefined
 
+        case typeCouldNotBeDetermined(placeholder: String)
+
         public var debugDescription: String {
             switch self {
             case .rootNotJSONObject:
@@ -251,6 +277,8 @@ public extension ResourceObjectSwiftGen {
                 return "Encountered a nullable to-many JSON:API Relationship in schema. This is not allowed by the spec."
             case .toManyRelationshipNotDefined:
                 return "Tried to parse a to-many JSON:API Relationship schema and did not find an 'items' property defining the Relationship type/id."
+            case .typeCouldNotBeDetermined(placeholder: let placeholder):
+                return "Encountered a type that could not be determined. This may have been a type with no easy Swift analog or a structure that could not be turned into a Swift type. With `allowPlaceholders: true`, this type would have been: \(placeholder)"
             }
         }
     }

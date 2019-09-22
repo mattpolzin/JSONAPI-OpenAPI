@@ -11,9 +11,9 @@ import JSONAPISwiftGen
 
 typealias HttpVerb = OpenAPI.HttpVerb
 
-func produceSwiftForDocuments(in pathItems: OpenAPI.PathItem.Map,
-                              originatingAt server: OpenAPI.Server,
-                              outputTo outPath: String) {
+func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
+                           originatingAt server: OpenAPI.Server,
+                           outputTo outPath: String) {
 
     let testDir = outPath + "/Tests/GeneratedAPITests"
     let resourceObjDir = testDir + "/resourceObjects"
