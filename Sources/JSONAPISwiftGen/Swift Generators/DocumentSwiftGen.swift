@@ -32,6 +32,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
 
     public init(swiftTypeName: String,
                 structure: JSONSchema,
+                allowPlaceholders: Bool = true,
                 example: ExampleSwiftGen? = nil,
                 testExampleFunc: OpenAPIExampleTestSwiftGen? = nil) throws {
         self.swiftTypeName = swiftTypeName
@@ -39,10 +40,14 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         self.exampleGenerator = example
         self.testExampleFunc = testExampleFunc
 
-        (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure, swiftTypeName: swiftTypeName)
+        (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure,
+                                                                                swiftTypeName: swiftTypeName,
+                                                                                allowPlaceholders: allowPlaceholders)
     }
 
-    static func swiftDecls(from structure: JSONSchema, swiftTypeName: String) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {
+    static func swiftDecls(from structure: JSONSchema,
+                           swiftTypeName: String,
+                           allowPlaceholders: Bool) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -58,7 +63,8 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         let primaryResourceTypeName: String
         switch data {
         case .object:
-            let resourceObject = try ResourceObjectSwiftGen(structure: data)
+            let resourceObject = try ResourceObjectSwiftGen(structure: data,
+                                                            allowPlaceholders: allowPlaceholders)
             primaryResourceTypeName = resourceObject.swiftTypeName
 
             let isNullablePrimaryResource = data.nullable
@@ -79,7 +85,8 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                     throw Error.expectedDataArrayToDefineItems
             }
 
-            let resourceObject = try ResourceObjectSwiftGen(structure: dataItem)
+            let resourceObject = try ResourceObjectSwiftGen(structure: dataItem,
+                                                            allowPlaceholders: allowPlaceholders)
             primaryResourceTypeName = resourceObject.swiftTypeName
 
             primaryResourceBodyType = .def(.init(name: "ManyResourceBody",
@@ -110,10 +117,12 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             switch items {
             case .one(of: let resourceTypeSchemas):
                 resources = try Array(Set(resourceTypeSchemas.map {
-                    try ResourceObjectSwiftGen(structure: $0)
+                    try ResourceObjectSwiftGen(structure: $0,
+                                               allowPlaceholders: allowPlaceholders)
                 })).sorted { $0.swiftTypeName < $1.swiftTypeName }
             default:
-                resources = [try ResourceObjectSwiftGen(structure: items)]
+                resources = [try ResourceObjectSwiftGen(structure: items,
+                                                        allowPlaceholders: allowPlaceholders)]
             }
 
             let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.swiftTypeName)) }
