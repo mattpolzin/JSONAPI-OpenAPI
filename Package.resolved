@@ -56,15 +56,6 @@
         }
       },
       {
-        "package": "JSONAPIArbitrary",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPI-Arbitrary.git",
-        "state": {
-          "branch": null,
-          "revision": "36ac50389400d32fe060fcb538a8cd0afcaea9a5",
-          "version": "3.0.1"
-        }
-      },
-      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
