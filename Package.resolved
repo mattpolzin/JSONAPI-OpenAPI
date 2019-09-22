@@ -29,21 +29,12 @@
         }
       },
       {
-        "package": "JSONAPIArbitrary",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPI-Arbitrary.git",
-        "state": {
-          "branch": null,
-          "revision": "36ac50389400d32fe060fcb538a8cd0afcaea9a5",
-          "version": "3.0.1"
-        }
-      },
-      {
         "package": "OpenAPIKit",
         "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
         "state": {
           "branch": null,
-          "revision": "2a1fb044872bcc499c705d7f84cb3900ce09eac2",
-          "version": "0.4.0"
+          "revision": "dacfb9a6a6752e501a6c47969c49d20f0bf004fd",
+          "version": "0.4.1"
         }
       },
       {
@@ -51,8 +42,8 @@
         "repositoryURL": "https://github.com/mattpolzin/Poly.git",
         "state": {
           "branch": null,
-          "revision": "38051821d7ef49e590e26e819a2fe447e50be9ff",
-          "version": "2.0.1"
+          "revision": "4a08517b24f8e9f6dd8c02ec7da316aac5c00e2e",
+          "version": "2.1.0"
         }
       },
       {
