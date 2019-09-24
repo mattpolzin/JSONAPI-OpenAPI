@@ -10,6 +10,10 @@ import JSONAPI
 import Poly
 import AnyCodable
 
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 public protocol SwiftType: SwiftCodeRepresentable {
     static var swiftTypeDef: SwiftTypeDef { get }
 }
