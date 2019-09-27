@@ -37,6 +37,12 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             (name: "expectedResponseBody", type: .def(responseBodyTypeDef))
         ] + parameterArgs
 
+        // might be a clever way to deal with this, for now just avoid the
+        // code that cannot be compiled due to duplicate argument names
+        guard Set(allArgs.map { $0.name }).count == allArgs.count else {
+            throw Error.duplicateFunctionArgumentDetected
+        }
+
         let specializations = [
             SwiftTypeDef(name: "RequestBody", specializationReps: []),
             SwiftTypeDef(name: "ResponseBody", specializationReps: [])
@@ -143,6 +149,8 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         case parameterContentMapNotSupported
         case parameterSchemaByReferenceNotSupported
         case unsupportedParameterSchema
+
+        case duplicateFunctionArgumentDetected
     }
 }
 

@@ -349,4 +349,15 @@ public struct Import: Decl {
     public var swiftCode: String {
         return "import \(module)"
     }
+
+    public static let Foundation: Import = .init(module: "Foundation")
+    public static let XCTest: Import = .init(module: "XCTest")
+    public static let AnyCodable: Import = .init(module: "AnyCodable")
+    public static let JSONAPI: Import = .init(module: "JSONAPI")
+
+    public static let FoundationNetworking: Decl = """
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+""" as LiteralSwiftCode
 }

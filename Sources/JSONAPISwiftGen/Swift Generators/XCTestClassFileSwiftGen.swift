@@ -41,8 +41,8 @@ public struct XCTestClassSwiftGen: SwiftGenerator {
                 tests: [(name: String, body: [Decl])]) {
 
         let imports = (importNames
-            + ["XCTest"])
-            .map(Import.init(module:))
+            .map(Import.init(module:)))
+            + [Import.XCTest]
 
         func testName(_ str: String) -> String {
             return "test_\(propertyCased(str))"

@@ -28,10 +28,10 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
 
     // write test helper to file
     let testHelperContents = try! [
-        Import(module: "Foundation") as Decl,
-        Import(module: "JSONAPI") as Decl,
-        Import(module: "AnyCodable") as Decl,
-        Import(module: "XCTest") as Decl,
+        Import.Foundation as Decl,
+        Import.JSONAPI as Decl,
+        Import.AnyCodable as Decl,
+        Import.XCTest as Decl,
         APIRequestTestSwiftGen.testFuncDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
@@ -285,10 +285,10 @@ func writeAPIFile<T: Sequence>(toPath path: String,
         .extending(namespace: namespace)
 
     let outputFileContents = try! [
-        Import(module: "Foundation") as Decl,
-        Import(module: "JSONAPI") as Decl,
-        Import(module: "AnyCodable") as Decl,
-        Import(module: "XCTest") as Decl,
+        Import.Foundation as Decl,
+        Import.JSONAPI as Decl,
+        Import.AnyCodable as Decl,
+        Import.XCTest as Decl,
         apiDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
@@ -310,7 +310,7 @@ func writeFile<T: TypedSwiftGenerator>(toPath path: String,
                                        resourceObject.decls)
 
     let outputFileContents = try! ([
-        Import(module: "JSONAPI"),
+        Import.JSONAPI,
         decl
         ] as [Decl])
         .map { try $0.formattedSwiftCode() }
