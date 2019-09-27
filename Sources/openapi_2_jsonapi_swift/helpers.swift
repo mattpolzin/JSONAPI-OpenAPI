@@ -32,7 +32,8 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
         Import.JSONAPI as Decl,
         Import.AnyCodable as Decl,
         Import.XCTest as Decl,
-        APIRequestTestSwiftGen.testFuncDecl
+        APIRequestTestSwiftGen.testFuncDecl,
+        DataDocumentSwiftGen.defaultErrorDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
     write(contents: testHelperContents,
@@ -474,7 +475,7 @@ let package = Package(
     products: [],
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
-            .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "1.0.0"))
+            .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "2.0.0"))
     ],
     targets: [
         .testTarget(

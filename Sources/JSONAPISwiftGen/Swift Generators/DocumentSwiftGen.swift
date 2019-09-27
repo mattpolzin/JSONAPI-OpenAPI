@@ -13,6 +13,9 @@ import JSONAPI
 /// Eventually I would like to expand this to read through multiple OpenAPI responses
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
+/// - Important: You must also expose the `defaultErrorDecl`
+///     included as a static var on this type somewhere it is
+///     accessible. It is used for creating error response documents.
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
@@ -30,6 +33,8 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             .joined(separator: "\n")
     }
 
+    public static var defaultErrorDecl: Decl { makeDefaultErrorType }
+
     public init(swiftTypeName: String,
                 structure: JSONSchema,
                 allowPlaceholders: Bool = true,
@@ -45,6 +50,45 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                                                                                 allowPlaceholders: allowPlaceholders)
     }
 
+    static func swiftDeclsForErrorDocument(from resourceObjectContext: JSONSchema.ObjectContext,
+                                           swiftTypeName: String) throws -> [Decl] {
+        guard let errorsSchema = resourceObjectContext.properties["errors"],
+            case .array(_, let arrayContext) = errorsSchema,
+            let errorsItems = arrayContext.items else {
+                throw Error.unhandledDocument("Expected errors array but did not find one")
+        }
+
+        let errorTypeName = swiftTypeName + "_Error"
+        let errorPayloadTypeName = errorTypeName + "Payload"
+
+        let errorsItemsDecls: [Decl]
+        do { //DefaultTestError<ErrorPayload>
+            let errorTypealias = Typealias(alias: .def(.init(name: errorTypeName)),
+                                           existingType: .def(.init(name: "DefaultTestError",
+                                                                    specializationReps: [.def(.init(name: errorPayloadTypeName))])))
+
+            errorsItemsDecls = try StructureSwiftGen(swiftTypeName: errorPayloadTypeName,
+                                                     structure: errorsItems,
+                                                     cascadingConformances: ["Codable", "Equatable"]).decls
+                + [errorTypealias]
+        } catch let error {
+            throw Error.failedToCreateErrorsStructure(underlyingError: error)
+        }
+
+        let documentTypealiasDecl = Typealias(alias: .def(.init(name: swiftTypeName)),
+                                              existingType: .def(.init(name: "JSONAPI.Document",
+                                                                       specializationReps: [
+                                                                        .init(NoResourceBody.self),
+                                                                        .init(NoMetadata.self),
+                                                                        .init(NoLinks.self),
+                                                                        .init(NoIncludes.self),
+                                                                        .init(NoAPIDescription.self),
+                                                                        .def(.init(name: errorTypeName))
+                                              ])))
+
+        return errorsItemsDecls + [documentTypealiasDecl]
+    }
+
     static func swiftDecls(from structure: JSONSchema,
                            swiftTypeName: String,
                            allowPlaceholders: Bool) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {
@@ -53,7 +97,14 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         }
 
         guard let data = resourceObjectContextB.properties["data"] else {
-            throw Error.unhandledDocument("Only handles data documents")
+            if resourceObjectContextB.properties["errors"] != nil {
+                return (
+                    try swiftDeclsForErrorDocument(from: resourceObjectContextB, swiftTypeName: swiftTypeName),
+                    Set()
+                )
+            }
+
+            throw Error.unhandledDocument("Only handles data and error documents")
         }
 
         var allDecls = [Decl]()
@@ -160,6 +211,8 @@ public extension DataDocumentSwiftGen {
 
         case unhandledDocument(String)
 
+        case failedToCreateErrorsStructure(underlyingError: Swift.Error)
+
         public var debugDescription: String {
             switch self {
             case .rootNotJSONObject:
@@ -172,7 +225,39 @@ public extension DataDocumentSwiftGen {
                 return "Tried to parse the Included schema for a JSON:API Document but the 'items' property of the array definition was not found."
             case .unhandledDocument(let description):
                 return "Could not parse JSON:API Document: \(description)"
+
+            case .failedToCreateErrorsStructure(underlyingError: let underlyingError):
+                return "Tried to parse error JSON:API Document but failed to generate structure to parse errors schema. Underlying error: \(String(describing: underlyingError))"
             }
         }
     }
 }
+
+private var makeDefaultErrorType = """
+public enum DefaultTestError<ErrorPayload>: JSONAPIError where ErrorPayload: Codable, ErrorPayload: Equatable {
+    case unknownError
+    case error(ErrorPayload)
+
+    public static var unknown: DefaultTestError { return .unknownError }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        switch self {
+        case .unknownError:
+            try container.encode("unknown")
+        case .error(let payload):
+            try container.encode(payload)
+        }
+    }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+
+        do {
+            self = .error(try container.decode(ErrorPayload.self))
+        } catch {
+            self = .unknownError
+        }
+    }
+}
+""" as LiteralSwiftCode

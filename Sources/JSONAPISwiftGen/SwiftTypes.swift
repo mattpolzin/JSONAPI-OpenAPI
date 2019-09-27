@@ -57,6 +57,10 @@ public struct SwiftTypeDef: SwiftCodeRepresentable {
         self.specializations = specializations.map(SwiftTypeRep.init)
         self.optional = optional
     }
+
+    public var array: SwiftTypeDef {
+        return .init(name: "[" + swiftCode + "]")
+    }
 }
 
 public enum SwiftTypeRep: SwiftCodeRepresentable, ExpressibleByStringLiteral {

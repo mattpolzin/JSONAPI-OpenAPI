@@ -70,37 +70,48 @@ enum SwiftTypeError: Swift.Error {
 }
 
 internal func swiftType(from schema: JSONSchema,
-                        allowPlaceholders: Bool) throws -> SwiftTypeRep {
+                        allowPlaceholders: Bool,
+                        handleOptionality: Bool = true) throws -> SwiftTypeRep {
+
+    let optional = handleOptionality
+        ? !schema.required || schema.nullable
+        : false
+
+    let typeRep: SwiftTypeRep
     switch schema.jsonTypeFormat {
     case nil:
         throw SwiftTypeError.typeNotFound
     case .boolean(let format)?:
-        return SwiftTypeRep(type(of: format).SwiftType.self)
+        typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     case .object(_)?:
         guard allowPlaceholders else {
             throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "object")
         }
-        return .placeholder(name: "Swift Type", typeHint: "Any")
+        typeRep = .placeholder(name: "Swift Type", typeHint: "Any")
     case .array(_)?:
         // try to pull type out of array items def but if not
         // then bail to general placeholder functionalty
         if case .array(_, let arrayContext) = schema,
             let items = arrayContext.items {
             do {
-                let itemsType = try swiftType(from: items, allowPlaceholders: allowPlaceholders)
-                return .def(.init(name: "[\(itemsType.swiftCode)]"))
+                let itemsType = try swiftType(from: items,
+                                              allowPlaceholders: allowPlaceholders,
+                                              handleOptionality: handleOptionality)
+                typeRep = .def(.init(name: "[\(itemsType.swiftCode)]"))
+                break
             } catch {}
         }
 
         guard allowPlaceholders else {
             throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "array")
         }
-        return .placeholder(name: "Swift Type", typeHint: "[Any]")
+        typeRep = .placeholder(name: "Swift Type", typeHint: "[Any]")
     case .number(let format)?:
-        return SwiftTypeRep(type(of: format).SwiftType.self)
+        typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     case .integer(let format)?:
-        return SwiftTypeRep(type(of: format).SwiftType.self)
+        typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     case .string(let format)?:
-        return SwiftTypeRep(type(of: format).SwiftType.self)
+        typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     }
+    return optional ? typeRep.optional : typeRep
 }

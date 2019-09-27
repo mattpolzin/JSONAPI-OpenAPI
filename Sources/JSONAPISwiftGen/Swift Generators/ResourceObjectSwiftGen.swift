@@ -148,7 +148,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
         let isNullable = schema.nullable
 
         let attributeRawTypeRep = try swiftType(from: schema,
-                                                allowPlaceholders: allowPlaceholders)
+                                                allowPlaceholders: allowPlaceholders,
+                                                handleOptionality: false)
 
         let finalAttributeRawTypeRep = isNullable
             ? attributeRawTypeRep.optional
