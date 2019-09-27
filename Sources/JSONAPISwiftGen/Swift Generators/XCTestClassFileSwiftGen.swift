@@ -50,7 +50,9 @@ public struct XCTestClassSwiftGen: SwiftGenerator {
 
         let testFuncDecls: [Function] = tests.map { (name, body) in
             let funcName = testName(name)
-            return Function(name: funcName, body: body)
+            return Function(scoping: .init(static: false, privacy: .public),
+                            name: funcName,
+                            body: body)
         }
 
         let allTestsValueString = "[\n" + tests
@@ -58,9 +60,9 @@ public struct XCTestClassSwiftGen: SwiftGenerator {
             .map { "(\"\($0)\", \($0))" }
             .joined(separator: ", \n")
             + "\n]"
-        let allTestsVar = StaticDecl(PropDecl.var(propName: "allTests",
-                                                  swiftType: .def(.init(name: "[(String, (\(className)) -> () -> Void)]")),
-                                                  Value(value: allTestsValueString)))
+        let allTestsVar = PublicDecl(StaticDecl(PropDecl.var(propName: "allTests",
+                                                             swiftType: .def(.init(name: "[(String, (\(className)) -> () -> Void)]")),
+                                                             Value(value: allTestsValueString))))
 
         let classDecl = PublicDecl(BlockTypeDecl.class(typeName: className,
                                                        parent: "XCTestCase",
