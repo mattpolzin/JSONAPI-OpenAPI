@@ -49,6 +49,24 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
         let descriptionTypeName = "\(typeName)Description"
 
+        let identifiedTypealias = Typealias(alias: .init(typeName),
+                                            existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
+                                                                             specializationReps: [
+                                                                                .init(descriptionTypeName),
+                                                                                .init(NoMetadata.self),
+                                                                                .init(NoLinks.self),
+                                                                                .init(String.self)
+                                            ])))
+
+        let unidenfitiedTypealias = Typealias(alias: .init("New" + typeName),
+                                              existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
+                                                                               specializationReps: [
+                                                                                .init(descriptionTypeName),
+                                                                                .init(NoMetadata.self),
+                                                                                .init(NoLinks.self),
+                                                                                .init(Unidentified.self)
+                                              ])))
+
         return (decls: [
             BlockTypeDecl.enum(typeName: descriptionTypeName,
                                conformances: ["JSONAPI.ResourceObjectDescription"],
@@ -57,15 +75,9 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                                 attributesDecl,
                                 relationships.relationshipsDecl
             ]),
-            Typealias(alias: .init(typeName),
-                      existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
-                                                       specializationReps: [
-                                                        .init(descriptionTypeName),
-                                                        .init(NoMetadata.self),
-                                                        .init(NoLinks.self),
-                                                        identified ? .init(String.self) : .init(Unidentified.self)
-                      ])))
-            ],
+            identifiedTypealias,
+            (identified ? nil : unidenfitiedTypealias) as Decl?, // only include unidentified typealias if identified is false
+            ].compactMap { $0 },
                 relationshipStubs: try Set(relationships.relationshipJSONTypeNames.map {
                     try ResourceObjectStubSwiftGen(jsonAPITypeName: $0)
                 }))
