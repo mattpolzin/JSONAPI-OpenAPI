@@ -66,7 +66,7 @@ internal func propertyCased(_ name: String) -> String {
 
 enum SwiftTypeError: Swift.Error {
     case typeNotFound
-    case placeholderTypeNotAllowed(for: String)
+    case placeholderTypeNotAllowed(for: JSONSchema, hint: String)
 }
 
 internal func swiftType(from schema: JSONSchema,
@@ -78,14 +78,24 @@ internal func swiftType(from schema: JSONSchema,
         return SwiftTypeRep(type(of: format).SwiftType.self)
     case .object(_)?:
         guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: "object")
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "object")
         }
-        return SwiftTypeRep(swiftPlaceholder(name: "Swift Type", type: "Any"))
+        return .placeholder(name: "Swift Type", typeHint: "Any")
     case .array(_)?:
-        guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: "array")
+        // try to pull type out of array items def but if not
+        // then bail to general placeholder functionalty
+        if case .array(_, let arrayContext) = schema,
+            let items = arrayContext.items {
+            do {
+                let itemsType = try swiftType(from: items, allowPlaceholders: allowPlaceholders)
+                return .def(.init(name: "[\(itemsType.swiftCode)]"))
+            } catch {}
         }
-        return SwiftTypeRep(swiftPlaceholder(name: "Swift Type", type: "[Any]"))
+
+        guard allowPlaceholders else {
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "array")
+        }
+        return .placeholder(name: "Swift Type", typeHint: "[Any]")
     case .number(let format)?:
         return SwiftTypeRep(type(of: format).SwiftType.self)
     case .integer(let format)?:
