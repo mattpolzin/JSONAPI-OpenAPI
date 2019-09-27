@@ -39,7 +39,7 @@ public struct ExampleSwiftGen: SwiftGenerator {
             throw Error.failureParsingExampleAsUTF8
         }
 
-        exampleAsDataSwiftString = "#\"\(exampleString)\"#.data(using: .utf8)!"
+        exampleAsDataSwiftString = "###\"\(exampleString)\"###.data(using: .utf8)!"
 
         let decl = StaticDecl(PropDecl.var(propName: propertyName,
                                 swiftType: .rep(Data.self),
