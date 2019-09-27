@@ -62,10 +62,10 @@ public struct XCTestClassSwiftGen: SwiftGenerator {
                                                   swiftType: .def(.init(name: "[(String, (\(className)) -> () -> Void)]")),
                                                   Value(value: allTestsValueString)))
 
-        let classDecl = BlockTypeDecl.class(typeName: className,
-                                            parent: "XCTestCase",
-                                            conformances: nil,
-                                            [allTestsVar] + testFuncDecls)
+        let classDecl = PublicDecl(BlockTypeDecl.class(typeName: className,
+                                                       parent: "XCTestCase",
+                                                       conformances: nil,
+                                                       [allTestsVar] + testFuncDecls))
 
         decls = imports
             + [classDecl]

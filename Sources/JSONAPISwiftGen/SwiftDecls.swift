@@ -101,6 +101,18 @@ public enum PropDecl: Decl {
     }
 }
 
+public struct PublicDecl: Decl {
+    public let decl: Decl
+
+    public init(_ decl: Decl) {
+        self.decl = decl
+    }
+
+    public var swiftCode: String {
+        return "public \(decl.swiftCode)"
+    }
+}
+
 public struct StaticDecl: Decl {
     public let decl: PropDecl
 
