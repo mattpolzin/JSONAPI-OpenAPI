@@ -57,6 +57,7 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
 """
     guard let err = error as? DecodingError else {
         XCTFail(String(describing: error))
+        return
     }
     func pathString(context: DecodingError.Context) -> String {
         return context.codingPath.map {
