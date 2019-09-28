@@ -104,17 +104,27 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             throw Error.jsonAPITypeNotFound
         }
 
-        if let possibleTypeNames = typeNameContextA.allowedValues,
-            possibleTypeNames.count == 1,
-            let typeNameString = possibleTypeNames.first.flatMap({ $0.value as? String }) {
-            return typeNameString
-        } else {
+        guard let possibleTypeNames = typeNameContextA.allowedValues else {
             let placeholder = swiftPlaceholder(name: "JSON:API type", type: .init(String.self))
             guard allowPlaceholders else {
-                throw Error.typeCouldNotBeDetermined(placeholder: placeholder)
+                throw Error.attributeTypeUnspecified(placeholder: placeholder)
             }
             return placeholder
         }
+
+        guard possibleTypeNames.count == 1,
+            let typeNameString = possibleTypeNames.first.flatMap({ $0.value as? String }) else {
+                let typeNames = possibleTypeNames.compactMap { $0.value as? String }.joined(separator: ", ")
+                let placeholder = swiftPlaceholder(name: typeNames, type: .def(.init(name: "Either<\(typeNames)>")))
+
+                guard allowPlaceholders else {
+                    throw Error.attributeTypePolymorphismUnsupported(placeholder: placeholder)
+                }
+
+                return placeholder
+        }
+
+        return typeNameString
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
@@ -303,7 +313,8 @@ public extension ResourceObjectSwiftGen {
         case toManyRelationshipCannotBeNullable
         case toManyRelationshipNotDefined
 
-        case typeCouldNotBeDetermined(placeholder: String)
+        case attributeTypeUnspecified(placeholder: String)
+        case attributeTypePolymorphismUnsupported(placeholder: String)
 
         public var debugDescription: String {
             switch self {
@@ -319,8 +330,10 @@ public extension ResourceObjectSwiftGen {
                 return "Encountered a nullable to-many JSON:API Relationship in schema. This is not allowed by the spec."
             case .toManyRelationshipNotDefined:
                 return "Tried to parse a to-many JSON:API Relationship schema and did not find an 'items' property defining the Relationship type/id."
-            case .typeCouldNotBeDetermined(placeholder: let placeholder):
-                return "Encountered a type that could not be determined. This may have been a type with no easy Swift analog or a structure that could not be turned into a Swift type. With `allowPlaceholders: true`, this type would have been: \(placeholder)"
+            case .attributeTypeUnspecified(placeholder: let placeholder):
+                return "Encountered an Attribute type that was not specified (no enumerated list of allowed values). With `allowPlaceholders: true`, this type would have been: \(placeholder)."
+            case .attributeTypePolymorphismUnsupported(placeholder: let placeholder):
+                return "Encountered an Attribute with a polymorphic type. Generation on polymorphic types is not supported. With `allowPlaceholders: true`, this type would have been: \(placeholder)."
             }
         }
     }

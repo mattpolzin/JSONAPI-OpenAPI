@@ -431,7 +431,7 @@ func documents(from responses: OpenAPI.Response.Map,
         }
 
         guard case .object = responseSchema else {
-            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping \(String(describing: responseSchema.jsonTypeFormat?.jsonType)).")
+            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: responseSchema.jsonTypeFormat?.jsonType))'.")
             continue
         }
 

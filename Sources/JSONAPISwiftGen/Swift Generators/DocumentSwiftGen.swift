@@ -98,15 +98,21 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             throw Error.rootNotJSONObject
         }
 
-        guard let data = resourceObjectContextB.properties["data"] else {
-            if resourceObjectContextB.properties["errors"] != nil {
+        let rootProperties = resourceObjectContextB.properties
+
+        guard let data = rootProperties["data"] else {
+            if rootProperties["errors"] != nil {
                 return (
                     try swiftDeclsForErrorDocument(from: resourceObjectContextB, swiftTypeName: swiftTypeName),
                     Set()
                 )
             }
 
-            throw Error.unhandledDocument("Only handles data and error documents")
+            let rootPropertyKeys = rootProperties.keys
+            let rootPropertyKeysString = rootPropertyKeys.count > 0
+                ? rootPropertyKeys.map { "'\($0)'" }.joined(separator: ", ")
+                : "no keys"
+            throw Error.unhandledDocument("Only handles data and error documents. Root keys found (\(rootPropertyKeysString)) did not match 'errors' or 'data'")
         }
 
         var allDecls = [Decl]()
