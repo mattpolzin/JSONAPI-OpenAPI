@@ -88,7 +88,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
             do {
                 try requestDocument = operation
                     .requestBody
-                    .flatMap { try document(from: $0) }
+                    .flatMap { try document(from: $0, at: path) }
             } catch let err {
                 print("===")
                 print("-> " + String(describing: err))
@@ -313,6 +313,7 @@ func writeFile<T: TypedSwiftGenerator>(toPath path: String,
 
     let outputFileContents = try! ([
         Import.JSONAPI,
+        Import.AnyCodable,
         decl
         ] as [Decl])
         .map { try $0.formattedSwiftCode() }
@@ -401,7 +402,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             example = nil
         }
@@ -424,7 +425,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             testExampleFunc = nil
         }
@@ -442,7 +443,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing a response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             continue
         }
@@ -450,13 +451,14 @@ func documents(from responses: OpenAPI.Response.Map,
     return responseDocuments
 }
 
-func document(from request: OpenAPI.Request) throws -> DataDocumentSwiftGen? {
+func document(from request: OpenAPI.Request,
+              at path: OpenAPI.PathComponents) throws -> DataDocumentSwiftGen? {
     guard let requestSchema = request.content[.json]?.schema.b else {
         return nil
     }
 
     guard case .object = requestSchema else {
-        print("Found non-object request schema root (expected JSON:API 'data' object). Skipping \(String(describing: requestSchema.jsonTypeFormat?.jsonType))")
+        print("Found non-object request schema root (expected JSON:API 'data' object) at \(path.rawValue). Skipping \(String(describing: requestSchema.jsonTypeFormat?.jsonType))")
         return nil
     }
 
