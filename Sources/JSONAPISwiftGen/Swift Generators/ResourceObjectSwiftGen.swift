@@ -114,7 +114,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
         guard possibleTypeNames.count == 1,
             let typeNameString = possibleTypeNames.first.flatMap({ $0.value as? String }) else {
-                let typeNames = possibleTypeNames.compactMap { $0.value as? String }.joined(separator: ", ")
+                let typeNames = possibleTypeNames
+                    .compactMap { $0.value as? String }
+                    .map(typeCased)
+                    .joined(separator: ", ")
                 let placeholder = swiftPlaceholder(name: typeNames, type: .def(.init(name: "Either<\(typeNames)>")))
 
                 guard allowPlaceholders else {
