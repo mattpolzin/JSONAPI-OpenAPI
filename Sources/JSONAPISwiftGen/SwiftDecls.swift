@@ -9,7 +9,7 @@ public protocol DefValue: SwiftCodeRepresentable {
 /// An anonymous function () -> Type such as is used
 /// to define computed properties.
 ///
-/// In `var x: { return "value" }`
+/// In `var x: String { return "value" }`
 /// the `DynamicValue` is `{ return "value" }`
 public struct DynamicValue: DefValue {
     public let value: String
@@ -19,7 +19,7 @@ public struct DynamicValue: DefValue {
     }
 
     public var swiftCode: String {
-        return "{ return \(value) }"
+        return " { return \(value) }"
     }
 }
 

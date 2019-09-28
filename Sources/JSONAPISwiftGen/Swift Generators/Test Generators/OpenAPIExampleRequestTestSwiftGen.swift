@@ -59,10 +59,9 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                                 responseBodyTryDecl,
                                                 APIRequestTestSwiftGen.requestFuncCallSnippet ],
                                         errorName: "error",
-                                        catchBody: [ "XCTFail(String(describing: error))" as LiteralSwiftCode,
-                                                     "return" as LiteralSwiftCode ])
+                                        catchBody: [ OpenAPIExampleParseTestSwiftGen.catchBodyDecl ])
 
-        functionName = "test_example_request_\(expectedHttpStatus.rawValue)"
+        functionName = "test_example_request__\(expectedHttpStatus.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,

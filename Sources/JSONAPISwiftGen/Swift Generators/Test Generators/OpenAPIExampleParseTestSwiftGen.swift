@@ -37,10 +37,9 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
         let doCatchBlock = DoCatchBlock(body: [ requestBodyDecl,
                                                 responseBodyTryDecl ],
                                         errorName: "error",
-                                        catchBody: [ "XCTFail(String(describing: error))" as LiteralSwiftCode,
-                                                     "return" as LiteralSwiftCode ])
+                                        catchBody: [ Self.catchBodyDecl ])
 
-        functionName = "test_example_parse_\(exampleHttpStatusCode.rawValue)"
+        functionName = "test_example_parse__\(exampleHttpStatusCode.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,
@@ -53,4 +52,37 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
             functionDecl
         ]
     }
+
+    static let catchBodyDecl: Decl =
+"""
+    guard let err = error as? DecodingError else {
+        XCTFail(String(describing: error))
+    }
+    func pathString(context: DecodingError.Context) -> String {
+        return context.codingPath.map {
+            let intIdxString = $0.intValue.map { "[\\($0)]" }
+            let namedKeyString = "/\\($0.stringValue)"
+            return intIdxString ?? namedKeyString
+        }.joined()
+    }
+    switch err {
+    case .keyNotFound(let key, let context):
+        let intIdxString = key.intValue.map { "at index \\($0)" }
+        let namedKeyString = "named '\\(key.stringValue)'"
+        let path = pathString(context: context)
+        XCTFail("Missing key \\(intIdxString ?? namedKeyString) at \\(path)")
+    case .typeMismatch(let expectedType, let context):
+        let expectedTypString = String(describing: expectedType)
+        let path = pathString(context: context)
+        XCTFail("Did not find expected type (\\(expectedTypString)) at \\(path)")
+    case .valueNotFound(let expectedType, let context):
+        let expectedTypeString = String(describing: expectedType)
+        let path = pathString(context: context)
+        XCTFail("Expected to find \\(expectedTypeString) but found null instead at \\(path)")
+    default:
+        XCTFail(String(describing: err))
+    }
+
+    return
+""" as LiteralSwiftCode
 }
