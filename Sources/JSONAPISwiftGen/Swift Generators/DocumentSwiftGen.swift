@@ -308,7 +308,7 @@ public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
     public var debugDescription: String {
         return ErrorKey
             .allCases
-            .compactMap { key in errorDict[key].map { "\\(key): \\($0)" } }
+            .compactMap { key in errorDict[key].map { "\\(key.rawValue): \\($0)" } }
             .joined(separator: ", ")
     }
 }
