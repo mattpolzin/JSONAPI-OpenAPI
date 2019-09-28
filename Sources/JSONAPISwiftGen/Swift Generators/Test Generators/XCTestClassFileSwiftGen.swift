@@ -45,7 +45,7 @@ public struct XCTestClassSwiftGen: SwiftGenerator {
             + [Import.XCTest]
 
         func testName(_ str: String) -> String {
-            return "test_\(propertyCased(str))"
+            return "test__\(str)"
         }
 
         let testFuncDecls: [Function] = tests.map { (name, body) in

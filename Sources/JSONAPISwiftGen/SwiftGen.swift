@@ -23,6 +23,10 @@ public protocol TypedSwiftGenerator: SwiftGenerator {
     var swiftTypeName: String { get }
 }
 
+public protocol SwiftFunctionGenerator: SwiftGenerator {
+    var functionName: String { get }
+}
+
 public protocol JSONSchemaSwiftGenerator: SwiftGenerator {
     var structure: JSONSchema { get }
 }

@@ -15,7 +15,7 @@ public extension OpenAPI.PathItem.Parameter {
 
 /// A Generator that produces Swift code defining a test function
 /// based on a provided OpenAPI example and some API parameters.
-public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
+public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     public let decls: [Decl]
     public let functionName: String
 
@@ -45,14 +45,14 @@ public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
         let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
                                                                originatingAt: server)
 
-        let headersDecl = try OpenAPIExampleTestSwiftGen.headersSnippet(from: parameters, values: parameterValues)
+        let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(from: parameters, values: parameterValues)
 
         let requestBodyDecl = PropDecl.let(propName: "requestBody",
                                            swiftType: .rep(String.self),
                                            "\"\"")
 
         let responseBodyTryDecl = PropDecl.let(propName: "expectedResponseBody",
-                                            swiftType: responseBodyType.optional,
+                                            swiftType: responseBodyType,
                                             Value(value: "try JSONDecoder().decode(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
 
         let doCatchBlock = DoCatchBlock(body: [ requestBodyDecl,
@@ -62,7 +62,7 @@ public struct OpenAPIExampleTestSwiftGen: SwiftGenerator {
                                         catchBody: [ "XCTFail(String(describing: error))" as LiteralSwiftCode,
                                                      "return" as LiteralSwiftCode ])
 
-        functionName = "test_example_\(expectedHttpStatus.rawValue)"
+        functionName = "test_example_request_\(expectedHttpStatus.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,

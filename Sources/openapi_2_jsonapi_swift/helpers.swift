@@ -407,18 +407,23 @@ func documents(from responses: OpenAPI.Response.Map,
             example = nil
         }
 
-        let testExampleFunc: OpenAPIExampleTestSwiftGen?
+        let testExampleFunc: SwiftFunctionGenerator?
         do {
+            let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
             if let parameterValues = jsonResponse.vendorExtensions["x-testParameters"]?.value as? OpenAPI.PathItem.Parameter.ValueMap,
                 example != nil {
 
-                testExampleFunc = try OpenAPIExampleTestSwiftGen(server: server,
-                                                                 pathComponents: path,
-                                                                 parameters: params,
-                                                                 parameterValues: parameterValues,
-                                                                 exampleResponseDataPropName: examplePropName,
-                                                                 responseBodyType: .def(.init(name: responseBodyTypeName)),
-                                                                 expectedHttpStatus: statusCode)
+                testExampleFunc = try OpenAPIExampleRequestTestSwiftGen(server: server,
+                                                                        pathComponents: path,
+                                                                        parameters: params,
+                                                                        parameterValues: parameterValues,
+                                                                        exampleResponseDataPropName: examplePropName,
+                                                                        responseBodyType: responseBodyType,
+                                                                        expectedHttpStatus: statusCode)
+            } else if example != nil {
+                testExampleFunc = try OpenAPIExampleParseTestSwiftGen(exampleResponseDataPropName: examplePropName,
+                                                                      responseBodyType: responseBodyType,
+                                                                      exampleHttpStatusCode: statusCode)
             } else {
                 testExampleFunc = nil
             }
