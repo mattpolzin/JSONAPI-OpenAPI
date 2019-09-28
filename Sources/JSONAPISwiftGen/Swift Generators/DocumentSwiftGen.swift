@@ -287,7 +287,7 @@ public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
         var dict = [ErrorKey: String]()
 
         for key in ErrorKey.allCases {
-            dict[key] = try container.decode(String.self, forKey: key)
+            dict[key] = try container.decodeIfPresent(String.self, forKey: key)
         }
 
         errorDict = dict
