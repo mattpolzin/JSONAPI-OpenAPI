@@ -39,7 +39,7 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
                                         errorName: "error",
                                         catchBody: [ Self.catchBodyDecl ])
 
-        functionName = "test_example_parse__\(exampleHttpStatusCode.rawValue)"
+        functionName = "_test_example_parse__\(exampleHttpStatusCode.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,
