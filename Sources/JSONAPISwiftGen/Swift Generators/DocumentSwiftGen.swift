@@ -14,8 +14,9 @@ import JSONAPI
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
 /// - Important: You must also expose the `defaultErrorDecl`
-///     included as a static var on this type somewhere it is
-///     accessible. It is used for creating error response documents.
+///     and `basicErrorDecl` included as a static var on this type
+///     somewhere it is accessible. They are used for creating error response
+///     documents.
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
@@ -34,6 +35,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     }
 
     public static var defaultErrorDecl: Decl { makeDefaultErrorType }
+    public static var basicErrorDecl: Decl { makeBasicErrorType }
 
     public init(swiftTypeName: String,
                 structure: JSONSchema,
@@ -195,7 +197,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                                                             .init(NoLinks.self),
                                                             includeType,
                                                             .init(NoAPIDescription.self),
-                                                            .init(UnknownJSONAPIError.self)
+                                                            "BasicError"
                                     ]))))
 
         return (allDecls, allResourceObjectGenerators)
@@ -258,6 +260,56 @@ public enum DefaultTestError<ErrorPayload>: JSONAPIError where ErrorPayload: Cod
         } catch {
             self = .unknownError
         }
+    }
+}
+""" as LiteralSwiftCode
+
+private var makeBasicErrorType = """
+public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
+    private let errorDict: [ErrorKey: String]
+
+    public enum ErrorKey: String, CodingKey, CaseIterable {
+        case id
+        case status
+        case code
+        case title
+        case detail
+        case parameter
+    }
+
+    private init() { errorDict = [:] }
+
+    public static var unknown: BasicError { return .init() }
+
+    public init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: ErrorKey.self)
+
+        var dict = [ErrorKey: String]()
+
+        for key in ErrorKey.allCases {
+            dict[key] = try container.decode(String.self, forKey: key)
+        }
+
+        errorDict = dict
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: ErrorKey.self)
+
+        for (key, value) in errorDict {
+            try container.encode(value, forKey: key)
+        }
+    }
+
+    public subscript(_ key: ErrorKey) -> String? {
+        return errorDict[key]
+    }
+
+    public var debugDescription: String {
+        return ErrorKey
+            .allCases
+            .compactMap { key in errorDict[key].map { "\\(key): \\($0)" } }
+            .joined(separator: ", ")
     }
 }
 """ as LiteralSwiftCode
