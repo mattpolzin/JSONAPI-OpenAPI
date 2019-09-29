@@ -51,7 +51,7 @@ class ResourceObjectSwiftGenTests: XCTestCase {
 
         let testPersonSwiftGen = try! ResourceObjectSwiftGen(structure: openAPIStructure)
 
-        XCTAssertEqual(testPersonSwiftGen.swiftTypeName, "TestPerson")
+        XCTAssertEqual(testPersonSwiftGen.resourceTypeName, "TestPerson")
 
         print(try! testPersonSwiftGen.formattedSwiftCode())
     }
