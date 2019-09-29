@@ -16,30 +16,27 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
     public let functionName: String
 
     /// - parameters:
-    ///     - exampleResponseDataPropName: The name of a property available in the current scope.
-    ///         This property must contain `Data` to be parsed as the given response body type.
-    ///     - responseBodyType: The response body type, which must be available in the current scope.
-    ///         This type must be Decodable. The given example response will be decoded as this type.
+    ///     - exampleDataPropName: The name of a property available in the current scope.
+    ///         This property must contain `Data` to be parsed as the given body type.
+    ///     - bodyType: The request/response body type, which must be available in the current scope.
+    ///         This type must be Decodable. The given example will be decoded as this type.
     ///     - exampleHttpStatusCode: The status code under which this example lives. This is just
     ///         used to help name the test function.
-    public init(exampleResponseDataPropName: String,
-                responseBodyType: SwiftTypeRep,
-                exampleHttpStatusCode: OpenAPI.Response.StatusCode) throws {
+    public init(exampleDataPropName: String,
+                bodyType: SwiftTypeRep,
+                exampleHttpStatusCode: OpenAPI.Response.StatusCode?) throws {
 
-        let requestBodyDecl = PropDecl.let(propName: "requestBody",
-                                           swiftType: .rep(String.self),
-                                           "\"\"")
+        let responseBodyTryDecl = PropDecl.let(propName: "expectedBody",
+                                            swiftType: bodyType,
+                                            Value(value: "try JSONDecoder().decode(\(bodyType.swiftCode).self, from: \(exampleDataPropName))"))
 
-        let responseBodyTryDecl = PropDecl.let(propName: "expectedResponseBody",
-                                            swiftType: responseBodyType.optional,
-                                            Value(value: "try JSONDecoder().decode(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
-
-        let doCatchBlock = DoCatchBlock(body: [ requestBodyDecl,
-                                                responseBodyTryDecl ],
+        let doCatchBlock = DoCatchBlock(body: [ responseBodyTryDecl ],
                                         errorName: "error",
                                         catchBody: [ Self.catchBodyDecl ])
 
-        functionName = "_test_example_parse__\(exampleHttpStatusCode.rawValue)"
+        let statusCodeNameSuffix = exampleHttpStatusCode.map { "__\($0.rawValue)" } ?? ""
+
+        functionName = "_test_example_parse\(statusCodeNameSuffix)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,

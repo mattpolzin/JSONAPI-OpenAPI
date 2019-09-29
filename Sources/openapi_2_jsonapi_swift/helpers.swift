@@ -88,7 +88,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
             do {
                 try requestDocument = operation
                     .requestBody
-                    .flatMap { try document(from: $0, at: path) }
+                    .flatMap { try document(from: $0, for: httpVerb, at: path) }
             } catch let err {
                 print("===")
                 print("-> " + String(describing: err))
@@ -97,7 +97,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 requestDocument = nil
             }
 
-            let fullyQualifiedTestFuncNames = responseDocuments
+            let fullyQualifiedResponseTestFuncNames = responseDocuments
                 .values
                 .compactMap { doc in
                     doc.testExampleFunc?
@@ -107,6 +107,16 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                     + "." + $0
             }
 
+            let fullyQualifiedRequestTestFuncNames = requestDocument
+                .flatMap {
+                    $0.testExampleFunc?
+                        .functionName
+            }.map {
+                namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"]))
+                    + "." + $0
+            }.map { [$0] } ?? []
+
+
             return (
                 httpVerb: httpVerb,
                 path: path,
@@ -115,7 +125,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 apiRequestTest: apiRequestTest,
                 requestDocument: requestDocument,
                 responseDocuments: responseDocuments,
-                fullyQualifiedTestFuncNames: fullyQualifiedTestFuncNames
+                fullyQualifiedTestFuncNames: fullyQualifiedResponseTestFuncNames + fullyQualifiedRequestTestFuncNames
             )
         }
     }
@@ -393,6 +403,11 @@ func documents(from responses: OpenAPI.Response.Map,
             continue
         }
 
+        guard case .object = responseSchema else {
+            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: responseSchema.jsonTypeFormat?.jsonType))'.")
+            continue
+        }
+
         let responseBodyTypeName = "Document_\(statusCode.rawValue)"
         let examplePropName = "example_\(statusCode.rawValue)"
 
@@ -421,8 +436,8 @@ func documents(from responses: OpenAPI.Response.Map,
                                                                         responseBodyType: responseBodyType,
                                                                         expectedHttpStatus: statusCode)
             } else if example != nil {
-                testExampleFunc = try OpenAPIExampleParseTestSwiftGen(exampleResponseDataPropName: examplePropName,
-                                                                      responseBodyType: responseBodyType,
+                testExampleFunc = try OpenAPIExampleParseTestSwiftGen(exampleDataPropName: examplePropName,
+                                                                      bodyType: responseBodyType,
                                                                       exampleHttpStatusCode: statusCode)
             } else {
                 testExampleFunc = nil
@@ -433,11 +448,6 @@ func documents(from responses: OpenAPI.Response.Map,
             print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             testExampleFunc = nil
-        }
-
-        guard case .object = responseSchema else {
-            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: responseSchema.jsonTypeFormat?.jsonType))'.")
-            continue
         }
 
         do {
@@ -457,8 +467,14 @@ func documents(from responses: OpenAPI.Response.Map,
 }
 
 func document(from request: OpenAPI.Request,
+              for httpVerb: HttpVerb,
               at path: OpenAPI.PathComponents) throws -> DataDocumentSwiftGen? {
-    guard let requestSchema = request.content[.json]?.schema.b else {
+
+    guard let jsonRequest = request.content[.json] else {
+        return nil
+    }
+
+    guard let requestSchema = jsonRequest.schema.b else {
         return nil
     }
 
@@ -467,10 +483,42 @@ func document(from request: OpenAPI.Request,
         return nil
     }
 
-    // TODO: request examples
+    let requestBodyTypeName = "Document"
+    let examplePropName = "example"
 
-    return try DataDocumentSwiftGen(swiftTypeName: "Document",
-                                    structure: requestSchema)
+    let example: ExampleSwiftGen?
+    do {
+        example = try jsonRequest.example.map { try ExampleSwiftGen.init(openAPIExample: $0, propertyName: examplePropName) }
+    } catch let err {
+        print("===")
+        print("-> " + String(describing: err))
+        print("-- While parsing the request document for \(httpVerb.rawValue) at \(path.rawValue)")
+        print("===")
+        example = nil
+    }
+
+    let testExampleFunc: SwiftFunctionGenerator?
+    do {
+        let requestBodyType = SwiftTypeRep(.init(name: requestBodyTypeName))
+        if example != nil {
+            testExampleFunc = try OpenAPIExampleParseTestSwiftGen(exampleDataPropName: examplePropName,
+                                                                  bodyType: requestBodyType,
+                                                                  exampleHttpStatusCode: nil)
+        } else {
+            testExampleFunc = nil
+        }
+    } catch let err {
+        print("===")
+        print("-> " + String(describing: err))
+        print("-- While parsing the request document for \(httpVerb.rawValue) at \(path.rawValue)")
+        print("===")
+        testExampleFunc = nil
+    }
+
+    return try DataDocumentSwiftGen(swiftTypeName: requestBodyTypeName,
+                                    structure: requestSchema,
+                                    example: example,
+                                    testExampleFunc: testExampleFunc)
 }
 
 let packageFile: String = """
