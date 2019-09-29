@@ -9,30 +9,38 @@ import Foundation
 import OpenAPIKit
 import JSONAPI
 
-public struct ResourceObjectStubSwiftGen: TypedSwiftGenerator {
+public struct ResourceObjectStubSwiftGen: ResourceTypeSwiftGenerator {
     public let decls: [Decl]
-    public let swiftTypeName: String
+    public let resourceTypeName: String
+    public let exportedSwiftTypeNames: Set<String>
 
     public init(jsonAPITypeName: String) throws {
-        self.swiftTypeName = typeCased(jsonAPITypeName)
+        self.resourceTypeName = typeCased(jsonAPITypeName)
+        self.exportedSwiftTypeNames = Set([resourceTypeName])
 
-        let descriptionTypeName = "\(swiftTypeName)Description"
+        let descriptionTypeName = "\(resourceTypeName)Description"
+
+        let descriptionBlock = BlockTypeDecl.enum(typeName: descriptionTypeName,
+                                                  conformances: ["JSONAPI.ResourceObjectDescription"],
+                                                  [
+                                                    StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(jsonAPITypeName)\""))),
+                                                    Typealias(alias: "Attributes", existingType: .init(NoAttributes.self)),
+                                                    Typealias(alias: "Relationships", existingType: .init(NoRelationships.self))
+        ])
+
+        let alias = Typealias(alias: .init(resourceTypeName),
+                              existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
+                                                               specializationReps: [
+                                                                .init(descriptionTypeName),
+                                                                .init(NoMetadata.self),
+                                                                .init(NoLinks.self),
+                                                                .init(String.self)
+                              ])))
+
+
         decls = [
-            BlockTypeDecl.enum(typeName: descriptionTypeName,
-                conformances: ["JSONAPI.ResourceObjectDescription"],
-                [
-                    StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(jsonAPITypeName)\""))),
-                    Typealias(alias: "Attributes", existingType: .init(NoAttributes.self)),
-                    Typealias(alias: "Relationships", existingType: .init(NoRelationships.self))
-            ]),
-            Typealias(alias: .init(swiftTypeName),
-                      existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
-                                                       specializationReps: [
-                                                        .init(descriptionTypeName),
-                                                        .init(NoMetadata.self),
-                                                        .init(NoLinks.self),
-                                                        .init(String.self)
-                      ])))
+            descriptionBlock,
+            alias
         ]
     }
 }
@@ -49,10 +57,10 @@ private extension ResourceObjectStubSwiftGen {
 
 extension ResourceObjectStubSwiftGen: Hashable {
     public static func == (lhs: ResourceObjectStubSwiftGen, rhs: ResourceObjectStubSwiftGen) -> Bool {
-        return lhs.swiftTypeName == rhs.swiftTypeName
+        return lhs.resourceTypeName == rhs.resourceTypeName
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(swiftTypeName)
+        hasher.combine(resourceTypeName)
     }
 }

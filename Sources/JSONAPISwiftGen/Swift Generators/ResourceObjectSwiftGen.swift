@@ -9,10 +9,23 @@ import Foundation
 import OpenAPIKit
 import JSONAPI
 
-public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenerator {
+public protocol ResourceTypeSwiftGenerator: SwiftTypeGenerator {
+    var resourceTypeName: String { get }
+}
+
+extension ResourceTypeSwiftGenerator {
+    public func defines(typeName: String) -> Bool {
+        return exportedSwiftTypeNames.contains(typeName)
+    }
+}
+
+/// A Swift generator that produces code for the types needed
+/// by a JSONAPI ResourceObject.
+public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
-    public let swiftTypeName: String
+    public let resourceTypeName: String
+    public let exportedSwiftTypeNames: Set<String>
     public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
 
     /// A Generator that produces Swift code for a JSONAPI Resource Object type.
@@ -27,7 +40,12 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
 
         (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure,
                                                                                     allowPlaceholders: allowPlaceholders)
-        swiftTypeName = decls.compactMap { $0 as? Typealias }.first!.alias.swiftCode
+
+        let typealiases = decls.compactMap { $0 as? Typealias }
+
+        resourceTypeName = typealiases.first.map { $0.alias.swiftCode }!
+
+        exportedSwiftTypeNames = Set(decls.compactMap { $0 as? Typealias }.map { $0.alias.swiftCode })
     }
 
     static func swiftDecls(from structure: JSONSchema,
@@ -361,10 +379,10 @@ public extension ResourceObjectSwiftGen {
 
 extension ResourceObjectSwiftGen: Hashable {
     public static func == (lhs: ResourceObjectSwiftGen, rhs: ResourceObjectSwiftGen) -> Bool {
-        return lhs.swiftTypeName == rhs.swiftTypeName
+        return lhs.resourceTypeName == rhs.resourceTypeName
     }
 
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(swiftTypeName)
+        hasher.combine(resourceTypeName)
     }
 }

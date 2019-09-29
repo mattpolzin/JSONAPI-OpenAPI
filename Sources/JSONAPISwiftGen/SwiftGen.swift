@@ -19,10 +19,15 @@ extension SwiftGenerator {
     }
 }
 
-public protocol TypedSwiftGenerator: SwiftGenerator {
-    var swiftTypeName: String { get }
+/// A Swift code generator that produces 1 or more Swift Types.
+public protocol SwiftTypeGenerator: SwiftGenerator {
+    /// The Type names that should be considered by outside
+    /// code. Any types not in this list are likely only used to
+    /// produce other types that do appear in this list.
+    var exportedSwiftTypeNames: Set<String> { get }
 }
 
+/// A Swift code generator that produces a Swift function.
 public protocol SwiftFunctionGenerator: SwiftGenerator {
     var functionName: String { get }
 }

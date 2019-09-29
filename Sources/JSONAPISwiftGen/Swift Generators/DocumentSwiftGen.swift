@@ -124,7 +124,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         case .object:
             let resourceObject = try ResourceObjectSwiftGen(structure: data,
                                                             allowPlaceholders: allowPlaceholders)
-            primaryResourceTypeName = resourceObject.swiftTypeName
+            primaryResourceTypeName = resourceObject.resourceTypeName
 
             let isNullablePrimaryResource = data.nullable
 
@@ -146,7 +146,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
 
             let resourceObject = try ResourceObjectSwiftGen(structure: dataItem,
                                                             allowPlaceholders: allowPlaceholders)
-            primaryResourceTypeName = resourceObject.swiftTypeName
+            primaryResourceTypeName = resourceObject.resourceTypeName
 
             primaryResourceBodyType = .def(.init(name: "ManyResourceBody",
                                              specializationReps: [
@@ -178,13 +178,13 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                 resources = try Array(Set(resourceTypeSchemas.map {
                     try ResourceObjectSwiftGen(structure: $0,
                                                allowPlaceholders: allowPlaceholders)
-                })).sorted { $0.swiftTypeName < $1.swiftTypeName }
+                })).sorted { $0.resourceTypeName < $1.resourceTypeName }
             default:
                 resources = [try ResourceObjectSwiftGen(structure: items,
                                                         allowPlaceholders: allowPlaceholders)]
             }
 
-            let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.swiftTypeName)) }
+            let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.resourceTypeName)) }
 
             includeType = .def(.init(name: "Include\(resourceTypes.count)",
                                       specializationReps: resourceTypes))

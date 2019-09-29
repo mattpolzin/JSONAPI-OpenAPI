@@ -194,14 +194,14 @@ func writeResourceObjectFiles<T: Sequence>(toPath path: String,
         let resourceObjectGenerators = document.resourceObjectGenerators
 
         let definedResourceObjectNames = Set(resourceObjectGenerators
-            .map { $0.swiftTypeName })
+            .flatMap { $0.exportedSwiftTypeNames })
 
         resourceObjectGenerators
             .forEach { resourceObjectGen in
 
                 resourceObjectGen
                     .relationshipStubGenerators
-                    .filter { !definedResourceObjectNames.contains($0.swiftTypeName) }
+                    .filter { !definedResourceObjectNames.contains($0.resourceTypeName) }
                     .forEach { stubGen in
 
                         // write relationship stub files
@@ -312,11 +312,11 @@ func writeAPIFile<T: Sequence>(toPath path: String,
           named: "API.swift")
 }
 
-func writeFile<T: TypedSwiftGenerator>(toPath path: String,
-                                       for resourceObject: T,
-                                       extending namespace: String) {
+func writeFile<T: ResourceTypeSwiftGenerator>(toPath path: String,
+                                              for resourceObject: T,
+                                              extending namespace: String) {
 
-    let swiftTypeName = resourceObject.swiftTypeName
+    let swiftTypeName = resourceObject.resourceTypeName
 
     let decl = BlockTypeDecl.extension(typeName: namespace,
                                        conformances: nil,

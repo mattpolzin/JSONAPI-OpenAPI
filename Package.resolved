@@ -137,6 +137,15 @@
         }
       },
       {
+        "package": "NonEmpty",
+        "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
+        "state": {
+          "branch": null,
+          "revision": "2051d80bcc1510f14508c942d64b5c6364ed1bdc",
+          "version": "0.2.0"
+        }
+      },
+      {
         "package": "SwiftPM",
         "repositoryURL": "https://github.com/apple/swift-package-manager.git",
         "state": {
