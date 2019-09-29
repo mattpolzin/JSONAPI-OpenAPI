@@ -145,14 +145,21 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
-            return try attributeSnippet(name: keyValue.key,
+            return try attributeSnippet(name: propertyCased(keyValue.key),
                                         schema: keyValue.value,
                                         allowPlaceholders: allowPlaceholders)
         }
 
+        let codingKeyCaseDecls = attributesContextB
+            .properties
+            .keys
+            .map{
+                BlockTypeDecl.enumCase(propertyCased($0), stringValue: $0)
+        }
+
         let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
-                                                conformances: ["CodingKey, Equatable"],
-                                                attributesContextB.properties.keys.map(BlockTypeDecl.enumCase))
+                                                conformances: ["String", "CodingKey, Equatable"],
+                                                codingKeyCaseDecls)
 
         let attributesDecl = BlockTypeDecl.struct(typeName: newTypeName,
                                                   conformances: ["JSONAPI.SparsableAttributes"],

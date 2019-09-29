@@ -217,8 +217,9 @@ public enum BlockTypeDecl: Decl {
         }
     }
 
-    public static func enumCase(_ name: String) -> Decl {
-        return EnumCase(name: name)
+    public static func enumCase(_ name: String, stringValue: String? = nil) -> Decl {
+        return stringValue.map { EnumCase(name: name, stringValue: $0) }
+            ?? EnumCase(name: name)
     }
 
     struct EnumCase: Decl {
@@ -226,6 +227,10 @@ public enum BlockTypeDecl: Decl {
 
         init(name: String) {
             swiftCode = "case \(name)"
+        }
+
+        init(name: String, stringValue: String) {
+            swiftCode = "case \(name) = \"\(stringValue)\""
         }
     }
 }
