@@ -51,15 +51,9 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                            swiftType: .rep(String.self),
                                            "\"\"")
 
-        let responseBodyTryDecl = PropDecl.let(propName: "expectedResponseBody",
-                                            swiftType: responseBodyType,
-                                            Value(value: "try JSONDecoder().decode(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
-
-        let doCatchBlock = DoCatchBlock(body: [ requestBodyDecl,
-                                                responseBodyTryDecl,
-                                                APIRequestTestSwiftGen.requestFuncCallSnippet ],
-                                        errorName: "error",
-                                        catchBody: [ OpenAPIExampleParseTestSwiftGen.catchBodyDecl ])
+        let responseBodyDecl = PropDecl.let(propName: "expectedResponseBody",
+                                            swiftType: responseBodyType.optional,
+                                            Value(value: "testDecodable(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
 
         functionName = "_test_example_request__\(expectedHttpStatus.rawValue)"
 
@@ -71,7 +65,9 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                     body: pathParamDecls + [
                                         requestUrlDecl,
                                         headersDecl,
-                                        doCatchBlock
+                                        requestBodyDecl,
+                                        responseBodyDecl,
+                                        APIRequestTestSwiftGen.requestFuncCallSnippet
         ])
 
         decls = [

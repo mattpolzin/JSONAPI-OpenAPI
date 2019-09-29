@@ -29,10 +29,12 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
     // write test helper to file
     let testHelperContents = try! [
         Import.Foundation as Decl,
+        Import.FoundationNetworking,
         Import.JSONAPI as Decl,
         Import.AnyCodable as Decl,
         Import.XCTest as Decl,
         APIRequestTestSwiftGen.testFuncDecl,
+        OpenAPIExampleParseTestSwiftGen.testFuncDecl,
         DataDocumentSwiftGen.defaultErrorDecl,
         DataDocumentSwiftGen.basicErrorDecl
         ].map { try $0.formattedSwiftCode() }
