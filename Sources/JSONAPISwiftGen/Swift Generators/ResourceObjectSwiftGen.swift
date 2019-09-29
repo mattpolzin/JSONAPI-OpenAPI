@@ -157,13 +157,23 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, TypedSwiftGenera
                 BlockTypeDecl.enumCase(propertyCased($0), stringValue: $0)
         }
 
+        let hasAttributes = codingKeyCaseDecls.count > 0
+
         let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
                                                 conformances: ["String", "CodingKey, Equatable"],
                                                 codingKeyCaseDecls)
 
+        let attributesAndCodingKeys = attributeDecls
+            .map { $0.0 }
+            + (hasAttributes ? [codingKeyDecl] : []) // only include CodingKeys if non-zero count of attributes
+
+        let conformances = hasAttributes
+            ? ["JSONAPI.SparsableAttributes"]
+            : ["JSONAPI.Attributes"] // only make sparsable if non-zero count of attributes
+
         let attributesDecl = BlockTypeDecl.struct(typeName: newTypeName,
-                                                  conformances: ["JSONAPI.SparsableAttributes"],
-                                                  attributeDecls.map { $0.0 } + [codingKeyDecl])
+                                                  conformances: conformances,
+                                                   attributesAndCodingKeys)
 
         return (attributes: attributesDecl, dependencies: attributeDecls.flatMap { $0.1 })
     }
