@@ -152,10 +152,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     private static func attributesSnippet(contextB: JSONSchema.ObjectContext,
                                           allowPlaceholders: Bool) throws -> (attributes: Decl, dependencies: [Decl]) {
 
-        let newTypeName = "Attributes"
+        let attributeTypeName = "Attributes"
 
         guard case let .object(_, attributesContextB)? = contextB.properties[Key.attributes.rawValue] else {
-            let noAttributesDecl = Typealias(alias: .init(newTypeName), existingType: .init(NoAttributes.self))
+            let noAttributesDecl = Typealias(alias: .init(attributeTypeName), existingType: .init(NoAttributes.self))
             return (attributes: noAttributesDecl, dependencies: [])
         }
 
@@ -189,7 +189,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             ? ["JSONAPI.SparsableAttributes"]
             : ["JSONAPI.Attributes"] // only make sparsable if non-zero count of attributes
 
-        let attributesDecl = BlockTypeDecl.struct(typeName: newTypeName,
+        let attributesDecl = BlockTypeDecl.struct(typeName: attributeTypeName,
                                                   conformances: conformances,
                                                    attributesAndCodingKeys)
 
@@ -236,26 +236,43 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext,
                                              allowPlaceholders: Bool) throws -> (relationshipJSONTypeNames: [String], relationshipsDecl: Decl) {
 
-        let newTypeName = "Relationships"
+        let relationshipTypeName = "Relationships"
 
         guard case let .object(_, relationshipsContextB)? = contextB.properties[Key.relationships.rawValue] else {
-            return (relationshipJSONTypeNames: [], relationshipsDecl: Typealias(alias: .init(newTypeName), existingType: .init(NoRelationships.self)))
+            return (relationshipJSONTypeNames: [], relationshipsDecl: Typealias(alias: .init(relationshipTypeName), existingType: .init(NoRelationships.self)))
         }
 
         let relationshipDecls: [(jsonTypeName: String, decl: Decl)] = try relationshipsContextB
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
-                return try relationshipSnippet(name: keyValue.key,
+                return try relationshipSnippet(name: propertyCased(keyValue.key),
                                                schema: keyValue.value,
                                                allowPlaceholders: allowPlaceholders)
         }
 
+        let codingKeyCaseDecls = relationshipsContextB
+            .properties
+            .keys
+            .map{
+                BlockTypeDecl.enumCase(propertyCased($0), stringValue: $0)
+        }
+
+        let hasRelationships = codingKeyCaseDecls.count > 0
+
+        let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
+                                               conformances: ["String", "CodingKey, Equatable"],
+                                               codingKeyCaseDecls)
+
+        let relationshipsAndCodingKeys = relationshipDecls
+            .map { $0.decl }
+            + (hasRelationships ? [codingKeyDecl] : []) // only include CodingKeys if non-zero count of relationships
+
         let relationshipJSONTypenames = relationshipDecls.map { $0.jsonTypeName }
 
-        let decl = BlockTypeDecl.struct(typeName: newTypeName,
-                                        conformances: ["JSONAPI.\(newTypeName)"],
-                                        relationshipDecls.map { $0.decl })
+        let decl = BlockTypeDecl.struct(typeName: relationshipTypeName,
+                                        conformances: ["JSONAPI.\(relationshipTypeName)"],
+                                        relationshipsAndCodingKeys)
 
         return (relationshipJSONTypeNames: relationshipJSONTypenames,
                 relationshipsDecl: decl)
