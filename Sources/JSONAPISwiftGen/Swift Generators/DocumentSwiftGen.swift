@@ -271,50 +271,36 @@ public enum DefaultTestError<ErrorPayload>: JSONAPIError where ErrorPayload: Cod
 """ as LiteralSwiftCode
 
 private var makeBasicErrorType = """
+@dynamicMemberLookup
 public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
-    private let errorDict: [ErrorKey: String]
 
-    public enum ErrorKey: String, CodingKey, CaseIterable {
-        case id
-        case status
-        case code
-        case title
-        case detail
-        case parameter
-    }
+    private typealias ErrorType = JSONAPI.BasicJSONAPIError<AnyCodable>
 
-    private init() { errorDict = [:] }
+    private let error: ErrorType
+
+    private init() { error = .unknown }
 
     public static var unknown: BasicError { return .init() }
 
     public init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: ErrorKey.self)
+        let container = try decoder.singleValueContainer()
 
-        var dict = [ErrorKey: String]()
-
-        for key in ErrorKey.allCases {
-            dict[key] = try container.decodeIfPresent(String.self, forKey: key)
-        }
-
-        errorDict = dict
+        errorDict = try container.decode(ErrorType.self)
     }
 
     public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: ErrorKey.self)
+        var container = encoder.singleValueContainer()
 
-        for (key, value) in errorDict {
-            try container.encode(value, forKey: key)
-        }
+        try container.encode(error)
     }
 
-    public subscript(_ key: ErrorKey) -> String? {
-        return errorDict[key]
+    public subscript<T>(dynamicMember path: KeyPath<BasicJSONAPIErrorPayload<AnyCodable>, T>) -> T? {
+        return error.payload?[keyPath: path]
     }
 
     public var debugDescription: String {
-        return ErrorKey
-            .allCases
-            .compactMap { key in errorDict[key].map { "\\(key.rawValue): \\($0)" } }
+        return error.definedFields
+            .map { "\\($0.key): \\($0.value)" }
             .joined(separator: ", ")
     }
 }
