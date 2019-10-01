@@ -285,7 +285,7 @@ public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
     public init(from decoder: Decoder) throws {
         let container = try decoder.singleValueContainer()
 
-        errorDict = try container.decode(ErrorType.self)
+        error = try container.decode(ErrorType.self)
     }
 
     public func encode(to encoder: Encoder) throws {
