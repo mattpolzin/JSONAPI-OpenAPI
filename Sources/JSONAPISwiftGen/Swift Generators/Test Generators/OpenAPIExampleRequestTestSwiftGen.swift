@@ -55,6 +55,10 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                             swiftType: responseBodyType.optional,
                                             Value(value: "testDecodable(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
 
+        let statusCodeDecl = PropDecl.let(propName: "expectedResponseStatusCode",
+                                          swiftType: .init(Int?.self),
+                                          Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil"))
+
         functionName = "_test_example_request__\(expectedHttpStatus.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
@@ -67,6 +71,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                         headersDecl,
                                         requestBodyDecl,
                                         responseBodyDecl,
+                                        statusCodeDecl,
                                         APIRequestTestSwiftGen.requestFuncCallSnippet
         ])
 

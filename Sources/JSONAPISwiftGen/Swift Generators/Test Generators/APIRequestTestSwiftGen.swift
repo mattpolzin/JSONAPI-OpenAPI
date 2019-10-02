@@ -34,7 +34,8 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
         let allArgs = [
             (name: "requestBody", type: .def(requestBodyTypeDef)),
-            (name: "expectedResponseBody", type: .def(responseBodyTypeDef))
+            (name: "expectedResponseBody", type: .def(responseBodyTypeDef)),
+            (name: "expectedResponseStatusCode", type: .init(Int?.self))
         ] + parameterArgs
 
         // might be a clever way to deal with this, for now just avoid the
@@ -90,6 +91,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
             makeTestRequest(requestBody: requestBody,
                                          expectedResponseBody: expectedResponseBody,
+                                         expectedResponseStatusCode: expectedResponseStatusCode,
                                          requestUrl: requestUrl,
                                          headers: headers)
             """ as LiteralSwiftCode
@@ -158,6 +160,7 @@ private let makeTestRequestFunc = """
 
 func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
                                                 expectedResponseBody: ResponseBody,
+                                                expectedResponseStatusCode: Int? = nil,
                                                 requestUrl: URL,
                                                 headers: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
     var request: URLRequest = URLRequest(url: requestUrl)
@@ -171,6 +174,11 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
     let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
         XCTAssertNil(error)
         XCTAssertNotNil(data)
+
+        if let expectedStatusCode = expectedResponseStatusCode {
+            let actualCode = (response as? HTTPURLResponse)?.statusCode
+            XCTAssertEqual(actualCode, expectedStatusCode)
+        }
 
         let decoder = JSONDecoder()
 
