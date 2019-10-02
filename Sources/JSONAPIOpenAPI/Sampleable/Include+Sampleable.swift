@@ -183,3 +183,28 @@ extension Include9: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 		return set1 + set2 + set3
 	}
 }
+
+extension Include10: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable {
+    public static var sample: Include10<A, B, C, D, E, F, G, H, I, J> {
+        let randomChoice = Int.random(in: 0..<samples.count)
+
+        return samples[randomChoice]
+    }
+
+    public static var samples: [Include10<A, B, C, D, E, F, G, H, I, J>] {
+        let set1: [Include10<A, B, C, D, E, F, G, H, I, J>] = A.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + B.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + C.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+
+        let set2: [Include10<A, B, C, D, E, F, G, H, I, J>] = D.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + E.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + F.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+
+        let set3: [Include10<A, B, C, D, E, F, G, H, I, J>] = G.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + H.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + I.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+            + J.samples.map(Include10<A, B, C, D, E, F, G, H, I, J>.init)
+
+        return set1 + set2 + set3
+    }
+}
