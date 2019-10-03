@@ -27,8 +27,6 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                 responseBodyType: SwiftTypeRep,
                 expectedHttpStatus: OpenAPI.Response.StatusCode) throws {
 
-        // TODO: assert status code as expected in generated test function
-
         let pathParamDecls: [PropDecl] = try parameters
             .filter { $0.parameterLocation == .path }
             .map { param in
@@ -42,8 +40,22 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                 Value(value: "\"\(propertyValue)\""))
         }
 
+        let hostOverride: URL?
+        if let hostOverrideParameter = parameterValues["test_host"] {
+            guard let hostOverrideUrl = URL(string: hostOverrideParameter),
+                hostOverrideUrl.host != nil else {
+                throw Error.malformedTestHostUrl(value: hostOverrideParameter)
+            }
+            guard hostOverrideUrl.scheme != nil else {
+                throw Error.testHostUrlMustContainScheme
+            }
+            hostOverride = hostOverrideUrl
+        } else {
+            hostOverride = nil
+        }
+
         let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
-                                                               originatingAt: server)
+                                                               originatingAt: hostOverride ?? server.url)
 
         let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(from: parameters, values: parameterValues)
 
@@ -80,6 +92,13 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
         ]
     }
 
+    static func hostSnippet(from server: OpenAPI.Server) -> Decl {
+        let hostUrl = server.url
+        return PropDecl.let(propName: "defaultHost",
+                            swiftType: .rep(String.self),
+                            Value(value: hostUrl.absoluteString))
+    }
+
     static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap) throws -> Decl {
 
         let headers = try Value.array(elements: parameters
@@ -104,7 +123,20 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                             headers)
     }
 
-    enum Error: Swift.Error {
+    public enum Error: Swift.Error, CustomDebugStringConvertible {
         case valueMissingForParameter(named: String)
+        case malformedTestHostUrl(value: String)
+        case testHostUrlMustContainScheme
+
+        public var debugDescription: String {
+            switch self {
+            case .valueMissingForParameter(named: let name):
+                return "x-testParameters was missing a value for the parameter named \(name)."
+            case .malformedTestHostUrl(value: let urlString):
+                return "x-testParameters contained a test host URL that could not be parsed as a URL. The string value is '\(urlString)'."
+            case .testHostUrlMustContainScheme:
+                return "x-testParameters contained a test host URL that did not specify a scheme. Please include one of 'https', 'http', etc."
+            }
+        }
     }
 }

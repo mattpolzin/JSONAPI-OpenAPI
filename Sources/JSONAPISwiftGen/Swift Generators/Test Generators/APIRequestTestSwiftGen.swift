@@ -98,10 +98,15 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     }
 
     static func urlSnippet(from path: OpenAPI.PathComponents,
-                                   originatingAt server: OpenAPI.Server) -> Decl {
+                           originatingAt server: OpenAPI.Server) -> Decl {
 
         let host = server.url
 
+        return urlSnippet(from: path, originatingAt: host)
+    }
+
+    static func urlSnippet(from path: OpenAPI.PathComponents,
+                           originatingAt hostUrl: URL) -> Decl {
         let pathString = path.components.map { component in
             guard component.first == "{",
                 component.last == "}" else {
@@ -114,7 +119,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
         return PropDecl.let(propName: "requestUrl",
                             swiftType: .rep(URL.self),
-                            .init(value: "URL(string: \"\(host.absoluteString)/\(pathString)\")!"))
+                            .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!"))
     }
 
     private static func parameterSnippet(from parameter: OpenAPI.PathItem.Parameter) throws -> Decl {
