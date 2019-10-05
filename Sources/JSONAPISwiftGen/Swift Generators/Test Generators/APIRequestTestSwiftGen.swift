@@ -182,7 +182,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
 
         if let expectedStatusCode = expectedResponseStatusCode {
             let actualCode = (response as? HTTPURLResponse)?.statusCode
-            XCTAssertEqual(actualCode, expectedStatusCode)
+            XCTAssertEqual(actualCode, expectedStatusCode, "The response HTTP status code did not match the expected status code.")
         }
 
         let decoder = JSONDecoder()
@@ -190,7 +190,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
         let document: ResponseBody
         do {
             guard let decodedDocument = try data.map({ try decoder.decode(ResponseBody.self, from: $0) }) else {
-                XCTFail("Failed to retrieve data from API")
+                XCTFail("Failed to retrieve data from API.")
                 return
             }
             document = decodedDocument
@@ -201,7 +201,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
             return
         }
 
-        XCTAssertEqual(document, expectedResponseBody)
+        XCTAssertEqual(document, expectedResponseBody, "The response body did not match the expected response body.")
 
         completionExpectation.fulfill()
     }
