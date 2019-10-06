@@ -59,7 +59,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                            "\"\"")
 
         let responseBodyDecl = Self.expectedResponseBodySnippet(responseBodyType: responseBodyType,
-                                                                exampleResponseDataPropName: testProperties.useExample ? exampleResponseDataPropName : nil)
+                                                                exampleResponseDataPropName: testProperties.skipExample ? nil : exampleResponseDataPropName)
 
         let statusCodeDecl = PropDecl.let(propName: "expectedResponseStatusCode",
                                           swiftType: .init(Int?.self),
@@ -145,7 +145,7 @@ extension OpenAPIExampleRequestTestSwiftGen {
     public struct TestProperties {
         let name: String
         let host: URL
-        let useExample: Bool
+        let skipExample: Bool
         let parameters: OpenAPI.PathItem.Parameter.ValueMap
 
         public init(name: String, server: OpenAPI.Server, props testProps: [String: Any]) throws {
@@ -158,9 +158,9 @@ extension OpenAPIExampleRequestTestSwiftGen {
                 .flatMap { try Self.hostOverride(from: $0, inTest: name) }
                 ?? server.url
 
-            useExample = testProps["use_example"]
+            skipExample = testProps["skip_example"]
                 .flatMap { $0 as? Bool }
-                ?? true
+                ?? false
 
             guard let testParams = testProps["parameters"] as? OpenAPI.PathItem.Parameter.ValueMap else {
                 throw Error.invalidTestParameters(inTest: name)
@@ -175,7 +175,7 @@ extension OpenAPIExampleRequestTestSwiftGen {
         /// {
         ///     "test_name": {
         ///         "host": "url", (optional, if omitted then default server for API will be used.
-        ///         "use_example": true | false, (optional, defaults to true)
+        ///         "skip_example": true | false, (optional, defaults to false)
         ///         "parameters": {
         ///             "path_param_name": "value",
         ///             "header_param_name": "value" (must be a string, even if the parameter type is Int or other)
