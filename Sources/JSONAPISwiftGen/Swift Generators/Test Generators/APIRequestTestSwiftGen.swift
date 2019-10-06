@@ -195,9 +195,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
             }
             document = decodedDocument
         } catch let err {
-            print("HTTP Status Code: \\((response as? HTTPURLResponse).map { String($0.statusCode) } ?? "N/A")")
-            print("Data from API: \\(data.map { String(data: $0, encoding: .utf8)! } ?? "N/A")")
-            XCTFail(String(describing: err))
+            XCTFail("Failed to parse response: " + String(describing: err))
             return
         }
 
