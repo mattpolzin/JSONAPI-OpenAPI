@@ -23,7 +23,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
     public let exampleGenerator: ExampleSwiftGen?
-    public let testExampleFunc: SwiftFunctionGenerator?
+    public let testExampleFuncs: [SwiftFunctionGenerator]
 
     /// Generate Swift code not just for this Document's declaration but
     /// also for all declarations required for this Document to compile.
@@ -41,11 +41,11 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                 structure: JSONSchema,
                 allowPlaceholders: Bool = true,
                 example: ExampleSwiftGen? = nil,
-                testExampleFunc: SwiftFunctionGenerator? = nil) throws {
+                testExampleFuncs: [SwiftFunctionGenerator] = []) throws {
         self.swiftTypeName = swiftTypeName
         self.structure = structure
         self.exampleGenerator = example
-        self.testExampleFunc = testExampleFunc
+        self.testExampleFuncs = testExampleFuncs
 
         (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure,
                                                                                 swiftTypeName: swiftTypeName,

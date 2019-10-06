@@ -164,7 +164,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 private let makeTestRequestFunc = """
 
 func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
-                                                expectedResponseBody: ResponseBody,
+                                                expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
                                                 expectedResponseStatusCode: Int? = nil,
                                                 requestUrl: URL,
                                                 headers: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
@@ -201,7 +201,9 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
             return
         }
 
-        XCTAssertEqual(document, expectedResponseBody, "The response body did not match the expected response body.")
+        if let expectedResponseBody = optionallyExpectedResponseBody {
+            XCTAssertEqual(document, expectedResponseBody, "The response body did not match the expected response body.")
+        }
 
         completionExpectation.fulfill()
     }

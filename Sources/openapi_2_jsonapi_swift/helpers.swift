@@ -99,25 +99,25 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 requestDocument = nil
             }
 
-            let fullyQualifiedResponseTestFuncNames = responseDocuments
+            let fullyQualifiedResponseTestFuncNames: [String] = responseDocuments
                 .values
-                .compactMap { doc in
-                    doc.testExampleFunc?
-                        .functionName
-            }.map {
-                namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"]))
-                    + "." + $0
-            }
+                .flatMap { doc -> [String] in
+                    doc.testExampleFuncs.map { $0.functionName }
+                }
+                .map {
+                    namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"]))
+                        + "." + $0
+                }
 
-            let fullyQualifiedRequestTestFuncNames = requestDocument
-                .flatMap {
-                    $0.testExampleFunc?
-                        .functionName
-            }.map {
-                namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"]))
-                    + "." + $0
-            }.map { [$0] } ?? []
-
+            let fullyQualifiedRequestTestFuncNames: [String] = requestDocument
+                .map { doc -> [String] in
+                    let testFuncNames = doc.testExampleFuncs.map { $0.functionName }
+                    return testFuncNames
+                        .map {
+                            namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"]))
+                                + "." + $0
+                    }
+                } ?? []
 
             return (
                 httpVerb: httpVerb,
@@ -242,7 +242,7 @@ func apiDocumentsBlock<T: Sequence>(request: APIRequestTestSwiftGen?,
     let requestDocAndExample = requestDoc.map { doc in
         doc.decls
             + (doc.exampleGenerator?.decls ?? [])
-            + (doc.testExampleFunc?.decls ?? [])
+            + (doc.testExampleFuncs.flatMap { $0.decls })
     }
 
     let requestBlock = requestDocAndExample
@@ -255,7 +255,7 @@ func apiDocumentsBlock<T: Sequence>(request: APIRequestTestSwiftGen?,
     let responseDocsAndExamples = responseDocs.flatMap { doc in
         doc.decls
             + (doc.exampleGenerator?.decls ?? [])
-            + (doc.testExampleFunc?.decls ?? [])
+            + (doc.testExampleFuncs.flatMap { $0.decls })
     }
 
     let responseBlock = BlockTypeDecl.enum(typeName: "Response",
@@ -424,39 +424,42 @@ func documents(from responses: OpenAPI.Response.Map,
             example = nil
         }
 
-        let testExampleFunc: SwiftFunctionGenerator?
+        let testExampleFuncs: [SwiftFunctionGenerator]
         do {
             let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
-            if let parameterValues = jsonResponse.vendorExtensions["x-testParameters"]?.value as? OpenAPI.PathItem.Parameter.ValueMap,
-                example != nil {
+            if let testPropertiesDict = jsonResponse.vendorExtensions["x-tests"]?.value as? [String: Any] {
 
-                testExampleFunc = try OpenAPIExampleRequestTestSwiftGen(server: server,
-                                                                        pathComponents: path,
-                                                                        parameters: params,
-                                                                        parameterValues: parameterValues,
-                                                                        exampleResponseDataPropName: examplePropName,
-                                                                        responseBodyType: responseBodyType,
-                                                                        expectedHttpStatus: statusCode)
+                testExampleFuncs = try OpenAPIExampleRequestTestSwiftGen.TestProperties
+                    .properties(for: testPropertiesDict, server: server)
+                    .map { testProps in
+                        try OpenAPIExampleRequestTestSwiftGen(server: server,
+                                                              pathComponents: path,
+                                                              parameters: params,
+                                                              testProperties: testProps,
+                                                              exampleResponseDataPropName: examplePropName,
+                                                              responseBodyType: responseBodyType,
+                                                              expectedHttpStatus: statusCode)
+                }
             } else if example != nil {
-                testExampleFunc = try OpenAPIExampleParseTestSwiftGen(exampleDataPropName: examplePropName,
-                                                                      bodyType: responseBodyType,
-                                                                      exampleHttpStatusCode: statusCode)
+                testExampleFuncs = try [OpenAPIExampleParseTestSwiftGen(exampleDataPropName: examplePropName,
+                                                                        bodyType: responseBodyType,
+                                                                        exampleHttpStatusCode: statusCode)]
             } else {
-                testExampleFunc = nil
+                testExampleFuncs = []
             }
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
             print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
-            testExampleFunc = nil
+            testExampleFuncs = []
         }
 
         do {
             responseDocuments[statusCode] = try DataDocumentSwiftGen(swiftTypeName: responseBodyTypeName,
                                                                      structure: responseSchema,
                                                                      example: example,
-                                                                     testExampleFunc: testExampleFunc)
+                                                                     testExampleFuncs: testExampleFuncs)
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
@@ -520,7 +523,7 @@ func document(from request: OpenAPI.Request,
     return try DataDocumentSwiftGen(swiftTypeName: requestBodyTypeName,
                                     structure: requestSchema,
                                     example: example,
-                                    testExampleFunc: testExampleFunc)
+                                    testExampleFuncs: testExampleFunc.map { [$0] } ?? [])
 }
 
 let packageFile: String = """

@@ -63,6 +63,8 @@ internal func typeCased(_ name: String) -> String {
     return casedWords.joined()
 }
 
+/// Takes a String and attemts to turn it into a reasonable property name
+/// using the camel-cased conventions of Swift.
 internal func propertyCased(_ name: String) -> String {
     let words = name.split(whereSeparator: "_-".contains)
     let first = words.first.map { [String($0).lowercased()] } ?? []
@@ -71,6 +73,15 @@ internal func propertyCased(_ name: String) -> String {
         return String(firstChar + word.dropFirst())
     }
     return casedWords.joined()
+}
+
+/// Takes a String and simply makes it safe for use in a property name, not
+/// transforming to camel-cased.
+internal func safeForPropertyName(_ name: String) -> String {
+    return name
+        .replacingOccurrences(of: " ", with: "_")
+        .replacingOccurrences(of: "\n", with: "_")
+        .replacingOccurrences(of: "-", with: "_")
 }
 
 enum SwiftTypeError: Swift.Error {

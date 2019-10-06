@@ -19,11 +19,18 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     public let decls: [Decl]
     public let functionName: String
 
+    /// Create a generator that creates Swift code for a test that makes an API request and
+    ///  checks that the response parses as the documented schema and that the response
+    ///  data matches the example data specified.
+    /// - parameters:
+    ///     - exampleResponseDataPropName: If `nil`, no example data will be compared to the response data for the test.
+    ///         If specified, must be the name of a property containing `Data` that will be compared to the response data.
+    ///
     public init(server: OpenAPI.Server,
                 pathComponents: OpenAPI.PathComponents,
                 parameters: [OpenAPI.PathItem.Parameter],
-                parameterValues: OpenAPI.PathItem.Parameter.ValueMap,
-                exampleResponseDataPropName: String,
+                testProperties: TestProperties,
+                exampleResponseDataPropName: String?,
                 responseBodyType: SwiftTypeRep,
                 expectedHttpStatus: OpenAPI.Response.StatusCode) throws {
 
@@ -31,8 +38,8 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             .filter { $0.parameterLocation == .path }
             .map { param in
             let (propertyName, propertyType) = try APIRequestTestSwiftGen.argument(for: param)
-            guard let propertyValue = parameterValues[param.name] else {
-                throw Error.valueMissingForParameter(named: propertyName)
+                guard let propertyValue = testProperties.parameters[param.name] else {
+                    throw Error.valueMissingForParameter(named: propertyName, inTest: testProperties.name)
             }
 
             return PropDecl.let(propName: propertyName,
@@ -40,38 +47,25 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                 Value(value: "\"\(propertyValue)\""))
         }
 
-        let hostOverride: URL?
-        if let hostOverrideParameter = parameterValues["test_host"] {
-            guard let hostOverrideUrl = URL(string: hostOverrideParameter),
-                hostOverrideUrl.host != nil else {
-                throw Error.malformedTestHostUrl(value: hostOverrideParameter)
-            }
-            guard hostOverrideUrl.scheme != nil else {
-                throw Error.testHostUrlMustContainScheme
-            }
-            hostOverride = hostOverrideUrl
-        } else {
-            hostOverride = nil
-        }
-
         let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
-                                                               originatingAt: hostOverride ?? server.url)
+                                                               originatingAt: testProperties.host)
 
-        let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(from: parameters, values: parameterValues)
+        let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(from: parameters,
+                                                                               values: testProperties.parameters,
+                                                                               inTest: testProperties.name)
 
         let requestBodyDecl = PropDecl.let(propName: "requestBody",
                                            swiftType: .rep(String.self),
                                            "\"\"")
 
-        let responseBodyDecl = PropDecl.let(propName: "expectedResponseBody",
-                                            swiftType: responseBodyType.optional,
-                                            Value(value: "testDecodable(\(responseBodyType.swiftCode).self, from: \(exampleResponseDataPropName))"))
+        let responseBodyDecl = Self.expectedResponseBodySnippet(responseBodyType: responseBodyType,
+                                                                exampleResponseDataPropName: testProperties.useExample ? exampleResponseDataPropName : nil)
 
         let statusCodeDecl = PropDecl.let(propName: "expectedResponseStatusCode",
                                           swiftType: .init(Int?.self),
                                           Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil"))
 
-        functionName = "_test_example_request__\(expectedHttpStatus.rawValue)"
+        functionName = "_test_example_request_\(safeForPropertyName(testProperties.name))__\(expectedHttpStatus.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: functionName,
@@ -92,6 +86,17 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
         ]
     }
 
+    static func expectedResponseBodySnippet(responseBodyType: SwiftTypeRep, exampleResponseDataPropName: String?) -> Decl {
+        let value = Value(value:
+            exampleResponseDataPropName
+                .map { "testDecodable(\(responseBodyType.swiftCode).self, from: \($0))" }
+                ?? "nil"
+        )
+        return PropDecl.let(propName: "expectedResponseBody",
+                            swiftType: responseBodyType.optional,
+                            value)
+    }
+
     static func hostSnippet(from server: OpenAPI.Server) -> Decl {
         let hostUrl = server.url
         return PropDecl.let(propName: "defaultHost",
@@ -99,7 +104,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                             Value(value: hostUrl.absoluteString))
     }
 
-    static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap) throws -> Decl {
+    static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap, inTest testName: String) throws -> Decl {
 
         let headers = try Value.array(elements: parameters
             .filter {
@@ -107,7 +112,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                     || $0.parameterLocation == .header(required: false) }
             .map { param in
                 guard let parameterValue = values[param.name] else {
-                    throw Error.valueMissingForParameter(named: param.name)
+                    throw Error.valueMissingForParameter(named: param.name, inTest: testName)
                 }
 
                 return Value.tuple(elements: [
@@ -124,18 +129,98 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     }
 
     public enum Error: Swift.Error, CustomDebugStringConvertible {
-        case valueMissingForParameter(named: String)
-        case malformedTestHostUrl(value: String)
-        case testHostUrlMustContainScheme
+        case valueMissingForParameter(named: String, inTest: String)
 
         public var debugDescription: String {
             switch self {
-            case .valueMissingForParameter(named: let name):
-                return "x-testParameters was missing a value for the parameter named \(name)."
-            case .malformedTestHostUrl(value: let urlString):
-                return "x-testParameters contained a test host URL that could not be parsed as a URL. The string value is '\(urlString)'."
-            case .testHostUrlMustContainScheme:
-                return "x-testParameters contained a test host URL that did not specify a scheme. Please include one of 'https', 'http', etc."
+            case .valueMissingForParameter(named: let name, inTest: let testName):
+                return "x-tests/'\(testName)'/parameters was missing a value for the parameter named \(name)."
+            }
+        }
+    }
+}
+
+extension OpenAPIExampleRequestTestSwiftGen {
+
+    public struct TestProperties {
+        let name: String
+        let host: URL
+        let useExample: Bool
+        let parameters: OpenAPI.PathItem.Parameter.ValueMap
+
+        public init(name: String, server: OpenAPI.Server, props testProps: [String: Any]) throws {
+
+            self.name = name
+
+            let hostParam = testProps["test_host"]
+                .flatMap { $0 as? String }
+            host =  try hostParam
+                .flatMap { try Self.hostOverride(from: $0, inTest: name) }
+                ?? server.url
+
+            useExample = testProps["use_example"]
+                .flatMap { $0 as? Bool }
+                ?? true
+
+            guard let testParams = testProps["parameters"] as? OpenAPI.PathItem.Parameter.ValueMap else {
+                throw Error.invalidTestParameters(inTest: name)
+            }
+            parameters = testParams
+        }
+
+        /// Create properties for each test described by the given test dictionary.
+        /// This dictionary should have the form:
+        ///
+        /// ```
+        /// {
+        ///     "test_name": {
+        ///         "host": "url", (optional, if omitted then default server for API will be used.
+        ///         "use_example": true | false, (optional, defaults to true)
+        ///         "parameters": {
+        ///             "path_param_name": "value",
+        ///             "header_param_name": "value" (must be a string, even if the parameter type is Int or other)
+        ///         }
+        ///     }
+        /// }
+        /// ```
+        public static func properties(for tests: [String: Any], server: OpenAPI.Server) throws -> [TestProperties] {
+            return try tests.map { (name, props) in
+                guard let testProps = props as? [String: Any] else {
+                    throw Error.invalidTestProperties(inTest: name)
+                }
+
+                return try TestProperties(name: name, server: server, props: testProps)
+            }
+        }
+
+        static func hostOverride(from hostOverrideParameter: String, inTest testName: String) throws -> URL? {
+            guard let hostOverrideUrl = URL(string: hostOverrideParameter),
+                hostOverrideUrl.host != nil else {
+                    throw Error.malformedTestHostUrl(value: hostOverrideParameter, inTest: testName)
+            }
+            guard hostOverrideUrl.scheme != nil else {
+                throw Error.testHostUrlMustContainScheme(inTest: testName)
+            }
+            return hostOverrideUrl
+        }
+
+        public enum Error: Swift.Error, CustomDebugStringConvertible {
+            case invalidTestProperties(inTest: String)
+            case invalidTestParameters(inTest: String)
+            case malformedTestHostUrl(value: String, inTest: String)
+            case testHostUrlMustContainScheme(inTest: String)
+
+            public var debugDescription: String {
+                switch self {
+                case .invalidTestProperties(inTest: let testName):
+                    return "x-tests/'\(testName)' be a dictionary with String keys."
+                case .invalidTestParameters(inTest: let testName):
+                    return "x-tests/'\(testName)'/parameters needs to contain only String key/value pairs."
+                case .malformedTestHostUrl(value: let urlString, inTest: let testName):
+                    return "x-tests/'\(testName)' contained a test host URL that could not be parsed as a URL. The string value is '\(urlString)'."
+                case .testHostUrlMustContainScheme(inTest: let testName):
+                    return "x-tests/'\(testName)' contained a test host URL that did not specify a scheme. Please include one of 'https', 'http', etc."
+                }
             }
         }
     }
