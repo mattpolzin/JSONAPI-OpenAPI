@@ -27,7 +27,9 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 pathComponents: OpenAPI.PathComponents,
                 parameters: [OpenAPI.PathItem.Parameter]) throws {
 
-        let parameterArgs = try parameters.map(APIRequestTestSwiftGen.argument)
+        let parameterArgs = try parameters
+            .filter { !$0.parameterLocation.isQuery } // for now these are handled as a block rather than each as separate args
+            .map(APIRequestTestSwiftGen.argument)
 
         let requestBodyTypeDef = SwiftTypeDef(name: "RequestBody", specializationReps: [])
         let responseBodyTypeDef = SwiftTypeDef(name: "ResponseBody", specializationReps: [])
@@ -36,7 +38,9 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             (name: "requestBody", type: .def(requestBodyTypeDef)),
             (name: "expectedResponseBody", type: .def(responseBodyTypeDef)),
             (name: "expectedResponseStatusCode", type: .init(Int?.self))
-        ] + parameterArgs
+        ] + parameterArgs + [
+            (name: "queryParams", type: .def(.init(name: "[(name: String, value: String)]")))
+        ]
 
         // might be a clever way to deal with this, for now just avoid the
         // code that cannot be compiled due to duplicate argument names
@@ -44,27 +48,36 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             throw Error.duplicateFunctionArgumentDetected
         }
 
-        let specializations = [
+        let genericTypes = (
             SwiftTypeDef(name: "RequestBody", specializationReps: []),
             SwiftTypeDef(name: "ResponseBody", specializationReps: [])
+        )
+
+        let specializations = [
+            genericTypes.0,
+            genericTypes.1
         ]
 
         let conditions = [
-            (type: specializations[0], conformance: "Encodable"),
-            (type: specializations[1], conformance: "Decodable & Equatable")
+            (type: genericTypes.0, conformance: "Encodable"),
+            (type: genericTypes.1, conformance: "Decodable & Equatable")
         ]
 
-        let headers = Value.array(elements: parameters
-            .filter {
-                $0.parameterLocation == .header(required: true)
-                    || $0.parameterLocation == .header(required: false) }
+        let headersValue = Value.array(elements: parameters
+            .filter { $0.parameterLocation.isHeader }
             .map {
-                Value.tuple(elements: [
+                let headerVal = Value.tuple(elements: [
                     (name: "name",
                      value: "\"\($0.name)\""),
                     (name: "value",
                      value: "\(propertyCased($0.name))")
                 ])
+
+                guard !$0.required else {
+                    return headerVal
+                }
+
+                return Value(value: "\(propertyCased($0.name)).map { \(propertyCased($0.name)) in \(headerVal.value) }")
         })
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
@@ -77,7 +90,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                                                                           originatingAt: server),
                                         PropDecl.let(propName: "headers",
                                                      swiftType: .def(.init(name: "[(name: String, value: String)]")),
-                                                     headers),
+                                                     headersValue),
                                         APIRequestTestSwiftGen.requestFuncCallSnippet
         ])
 
@@ -93,7 +106,8 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                                          expectedResponseBody: expectedResponseBody,
                                          expectedResponseStatusCode: expectedResponseStatusCode,
                                          requestUrl: requestUrl,
-                                         headers: headers)
+                                         headers: headers,
+                                         queryParams: queryParams)
             """ as LiteralSwiftCode
     }
 
@@ -132,19 +146,23 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     static func argument(for parameter: OpenAPI.PathItem.Parameter) throws -> (name: String, type: SwiftTypeRep) {
         let parameterName = propertyCased(parameter.name)
+        let isParamRequired = parameter.required
         let parameterType = try type(from: parameter.schemaOrContent)
 
-        return (name: parameterName, type: .rep(parameterType))
+        return (name: parameterName, type: isParamRequired ? parameterType : parameterType.optional)
     }
 
-    private static func type(from parameterSchemaOrContent: Either<OpenAPI.PathItem.Parameter.SchemaProperty, OpenAPI.Content.Map>) throws -> SwiftType.Type {
+    private static func type(from parameterSchemaOrContent: Either<OpenAPI.PathItem.Parameter.SchemaProperty, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
         switch parameterSchemaOrContent {
         case .a(.b(let schema)):
-            guard let paramType = schema.jsonTypeFormat?.swiftType,
-                let swiftType = paramType as? SwiftType.Type else {
+            do {
+
+                return try swiftType(from: schema,
+                                     allowPlaceholders: false,
+                                     handleOptionality: false)
+            } catch {
                 throw Error.unsupportedParameterSchema
             }
-            return swiftType
         case .b:
             throw Error.parameterContentMapNotSupported
         default:
@@ -167,8 +185,16 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
                                                 expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
                                                 expectedResponseStatusCode: Int? = nil,
                                                 requestUrl: URL,
-                                                headers: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
-    var request: URLRequest = URLRequest(url: requestUrl)
+                                                headers: [(name: String, value: String)],
+                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
+    var urlComponents = URLComponents(url: requestUrl, resolvingAgainstBaseUrl: false)!
+
+    urlComponents.queryItems = queryParams
+        .map {
+            URLQueryItem(name: $0.name, value: $0.value)
+    }
+
+    var request: URLRequest = URLRequest(url: urlComponents.url!)
 
     for header in headers {
         request.setValue(header.value, forHTTPHeaderField: header.name)

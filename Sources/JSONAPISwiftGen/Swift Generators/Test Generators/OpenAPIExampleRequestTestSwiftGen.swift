@@ -65,6 +65,15 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                           swiftType: .init(Int?.self),
                                           Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil"))
 
+//        let queryParamsValue = Value.array(elements: testProperties.queryParameters.map { (name, value) in
+            // TODO: map query params to values here
+//        })
+        let queryParamsValue = Value.array(elements: [])
+
+        let queryParamsDecl = PropDecl.let(propName: "queryParams",
+                                           swiftType: .def(.init(name: "[(name: String, value: String)]")),
+                                           queryParamsValue)
+
         functionName = "_test_example_request_\(safeForPropertyName(testProperties.name))__\(expectedHttpStatus.rawValue)"
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
@@ -78,6 +87,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                         requestBodyDecl,
                                         responseBodyDecl,
                                         statusCodeDecl,
+                                        queryParamsDecl,
                                         APIRequestTestSwiftGen.requestFuncCallSnippet
         ])
 
@@ -147,6 +157,7 @@ extension OpenAPIExampleRequestTestSwiftGen {
         let host: URL
         let skipExample: Bool
         let parameters: OpenAPI.PathItem.Parameter.ValueMap
+        let queryParameters: OpenAPI.PathItem.Parameter.ValueMap
 
         public init(name: String, server: OpenAPI.Server, props testProps: [String: Any]) throws {
 
@@ -166,6 +177,11 @@ extension OpenAPIExampleRequestTestSwiftGen {
                 throw Error.invalidTestParameters(inTest: name)
             }
             parameters = testParams
+
+            // TODO: read in query parameters
+            // IDEA: although right now everything is a string value, make a queryParams dict
+            //      containing an array of {name: "", value: ""} objects an exception to that rule.
+            queryParameters = [:]
         }
 
         /// Create properties for each test described by the given test dictionary.
