@@ -187,7 +187,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
                                                 requestUrl: URL,
                                                 headers: [(name: String, value: String)],
                                                 queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
-    var urlComponents = URLComponents(url: requestUrl, resolvingAgainstBaseUrl: false)!
+    var urlComponents = URLComponents(url: requestUrl, resolvingAgainstBaseURL: false)!
 
     urlComponents.queryItems = queryParams
         .map {
