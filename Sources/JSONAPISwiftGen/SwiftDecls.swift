@@ -49,10 +49,13 @@ public struct Value: DefValue {
             + ")")
     }
 
-    public static func array(elements: [Value]) -> Value {
+    public static func array(elements: [Value], compacted: Bool = false) -> Value {
+        let compactedString = compacted
+            ? ".compactMap { $0 }"
+            : ""
         return Value(value: "["
             + elements.map { $0.value }.joined(separator: ", ")
-            + "]")
+            + "]" + compactedString)
     }
 
     public var swiftCode: String {

@@ -78,7 +78,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 }
 
                 return Value(value: "\(propertyCased($0.name)).map { \(propertyCased($0.name)) in \(headerVal.value) }")
-        })
+        }, compacted: true)
 
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: "test_request",
