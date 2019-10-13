@@ -65,10 +65,14 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                                           swiftType: .init(Int?.self),
                                           Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil"))
 
-//        let queryParamsValue = Value.array(elements: testProperties.queryParameters.map { (name, value) in
-            // TODO: map query params to values here
-//        })
-        let queryParamsValue = Value.array(elements: [])
+        let queryParamsValue = Value.array(elements: testProperties.queryParameters.map { (name, value) in
+            return Value.tuple(elements: [
+                (name: "name",
+                 value: "\"\(name)\""),
+                (name: "value",
+                 value: "\"\(value)\"")
+            ])
+        }, compacted: true)
 
         let queryParamsDecl = PropDecl.let(propName: "queryParams",
                                            swiftType: .def(.init(name: "[(name: String, value: String)]")),
@@ -131,7 +135,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
                     (name: "value",
                      value: "\"\(parameterValue)\"")
                 ])
-        })
+        }, compacted: true)
 
         return PropDecl.let(propName: "headers",
                             swiftType: .def(.init(name: "[(name: String, value: String)]")),
@@ -178,10 +182,26 @@ extension OpenAPIExampleRequestTestSwiftGen {
             }
             parameters = testParams
 
-            // TODO: read in query parameters
-            // IDEA: although right now everything is a string value, make a queryParams dict
-            //      containing an array of {name: "", value: ""} objects an exception to that rule.
-            queryParameters = [:]
+            guard let queryParamEntries = testProps["query_parameters"] else {
+                queryParameters = [:]
+                return
+            }
+
+            guard let queryParmAnyArray = queryParamEntries as? [[String: String]] else {
+                throw Error.queryParamsNotArray(inTest: name)
+            }
+
+            let queryParamArray: [(String, String)] = try queryParmAnyArray
+                .map {
+                    guard let paramName = $0["name"] else {
+                        throw Error.queryParamMissingName(inTest: name)
+                    }
+                    guard let paramValue = $0["value"] else {
+                        throw Error.queryParamMissingValue(inTest: name)
+                    }
+                    return (paramName, paramValue)
+            }
+            queryParameters = Dictionary(queryParamArray, uniquingKeysWith: { $1 })
         }
 
         /// Create properties for each test described by the given test dictionary.
@@ -225,6 +245,9 @@ extension OpenAPIExampleRequestTestSwiftGen {
             case invalidTestParameters(inTest: String)
             case malformedTestHostUrl(value: String, inTest: String)
             case testHostUrlMustContainScheme(inTest: String)
+            case queryParamsNotArray(inTest: String)
+            case queryParamMissingName(inTest: String)
+            case queryParamMissingValue(inTest: String)
 
             public var debugDescription: String {
                 switch self {
@@ -236,6 +259,12 @@ extension OpenAPIExampleRequestTestSwiftGen {
                     return "x-tests/'\(testName)' contained a test host URL that could not be parsed as a URL. The string value is '\(urlString)'."
                 case .testHostUrlMustContainScheme(inTest: let testName):
                     return "x-tests/'\(testName)' contained a test host URL that did not specify a scheme. Please include one of 'https', 'http', etc."
+                case .queryParamsNotArray(inTest: let testName):
+                    return "x-tests/'\(testName)'/query_parameters must be an array of {'name': string, 'value': string} objects."
+                case .queryParamMissingName(inTest: let testName):
+                    return "x-tests/'\(testName)'/query_parameters contained an entry with no 'name'."
+                case .queryParamMissingValue(inTest: let testName):
+                    return "x-tests/'\(testName)'/query_parameters contained an entry with no 'value'."
                 }
             }
         }

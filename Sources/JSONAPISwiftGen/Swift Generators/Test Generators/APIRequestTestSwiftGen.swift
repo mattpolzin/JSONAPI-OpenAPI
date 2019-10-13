@@ -80,6 +80,10 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 return Value(value: "\(propertyCased($0.name)).map { \(propertyCased($0.name)) in \(headerVal.value) }")
         }, compacted: true)
 
+        let headerParamsDecl = PropDecl.let(propName: "headers",
+                                            swiftType: .def(.init(name: "[(name: String, value: String)]")),
+                                            headersValue)
+
         let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
                                     name: "test_request",
                                     specializations: specializations,
@@ -88,9 +92,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                                     body: [
                                         APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
                                                                           originatingAt: server),
-                                        PropDecl.let(propName: "headers",
-                                                     swiftType: .def(.init(name: "[(name: String, value: String)]")),
-                                                     headersValue),
+                                        headerParamsDecl,
                                         APIRequestTestSwiftGen.requestFuncCallSnippet
         ])
 
