@@ -41,7 +41,7 @@ let package = Package(
         ),
         .testTarget(
             name: "JSONAPISwiftGenTests",
-            dependencies: ["JSONAPISwiftGen"]
+            dependencies: ["JSONAPISwiftGen", "JSONAPIOpenAPI"]
         ),
         .target(
           name: "openapi_2_jsonapi_swift",
