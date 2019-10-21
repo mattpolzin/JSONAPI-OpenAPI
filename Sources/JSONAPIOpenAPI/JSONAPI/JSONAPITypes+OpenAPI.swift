@@ -139,9 +139,9 @@ extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEnc
 		// TODO: metadata, links, api description, errors
 		// TODO: represent data and errors as the two distinct possible outcomes
 
-		let primaryDataNode: JSONSchema? = try PrimaryResourceBody.openAPINode(using: encoder)
+		let primaryDataNode: JSONSchema = try PrimaryResourceBody.openAPINode(using: encoder)
 
-		let primaryDataProperty = primaryDataNode.map { ("data", $0) }
+		let primaryDataProperty = ("data", primaryDataNode)
 
 		let includeNode: JSONSchema?
 		do {
@@ -160,8 +160,57 @@ extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEnc
 			includeProperty
 			].compactMap { $0 }) { _, value in value }
 
-		return .object(.init(format: .generic,
-							 required: true),
-					   .init(properties: propertiesDict))
+        return .object(
+            properties: propertiesDict
+        )
 	}
+}
+
+extension Document.SuccessDocument: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        // TODO: metadata, links, api description
+
+        let primaryDataNode: JSONSchema = try PrimaryResourceBody.openAPINode(using: encoder)
+
+        let primaryDataProperty = ("data", primaryDataNode)
+
+        let includeNode: JSONSchema?
+        do {
+            includeNode = try Includes<IncludeType>.openAPINode(using: encoder)
+        } catch let err as OpenAPITypeError {
+            guard case .invalidNode = err else {
+                throw err
+            }
+            includeNode = nil
+        }
+
+        let includeProperty = includeNode.map { ("included", $0) }
+
+        let propertiesDict = Dictionary([
+            primaryDataProperty,
+            includeProperty
+            ].compactMap { $0 }) { _, value in value }
+
+        return .object(
+            properties: propertiesDict
+        )
+    }
+}
+
+extension Document.ErrorDocument: OpenAPIEncodedNodeType where Error: OpenAPIEncodedNodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        // TODO: metadata, links, api description
+
+        let errorNode: JSONSchema = try Error.openAPINode(using: encoder)
+
+        let errorsArray = JSONSchema.array(
+            items: errorNode
+        )
+
+        return .object(
+            properties: [
+                "errors": errorsArray
+            ]
+        )
+    }
 }
