@@ -134,6 +134,33 @@ extension ManyResourceBody: OpenAPIEncodedNodeType where Entity: OpenAPIEncodedN
 	}
 }
 
+extension BasicJSONAPIErrorPayload: OpenAPIEncodedNodeType where IdType: OpenAPINodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        return .object(
+            properties: [
+                "id": try IdType.openAPINode().optionalSchemaObject(),
+                "status": .string(required: false),
+                "code": .string(required: false),
+                "title": .string(required: false),
+                "detail": .string(required: false),
+                "source": .object(
+                    required: false,
+                    properties: [
+                        "pointer": .string(required: false),
+                        "parameter": .string(required: false)
+                    ]
+                )
+            ]
+        )
+    }
+}
+
+extension GenericJSONAPIError: OpenAPIEncodedNodeType where ErrorPayload: OpenAPIEncodedNodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        return try ErrorPayload.openAPINode(using: encoder)
+    }
+}
+
 extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
 		// TODO: metadata, links, api description, errors
