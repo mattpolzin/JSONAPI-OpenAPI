@@ -154,11 +154,13 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return (name: parameterName, type: isParamRequired ? parameterType : parameterType.optional)
     }
 
-    private static func type(from parameterSchemaOrContent: Either<OpenAPI.PathItem.Parameter.SchemaProperty, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
+    private static func type(from parameterSchemaOrContent: Either<OpenAPI.PathItem.Parameter.Schema, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
         switch parameterSchemaOrContent {
-        case .a(.b(let schema)):
+        case .a(let paramSchema):
+            guard let schema = paramSchema.schema.b else {
+                throw Error.parameterSchemaByReferenceNotSupported
+            }
             do {
-
                 return try swiftType(from: schema,
                                      allowPlaceholders: false,
                                      handleOptionality: false)
@@ -167,8 +169,6 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             }
         case .b:
             throw Error.parameterContentMapNotSupported
-        default:
-            throw Error.parameterSchemaByReferenceNotSupported
         }
     }
 

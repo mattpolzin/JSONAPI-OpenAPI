@@ -63,7 +63,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
     )]
     results = HttpVerb.allCases.flatMap { httpVerb in
         return pathItems.compactMap { (path, pathItem) in
-            guard case let .operations(operations) = pathItem else {
+            guard case let .b(operations) = pathItem else {
                 return nil
             }
 
@@ -122,7 +122,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
             return (
                 httpVerb: httpVerb,
                 path: path,
-                pathItem: pathItem,
+                pathItem: operations,
                 documentFileNameString: documentFileNameString,
                 apiRequestTest: apiRequestTest,
                 requestDocument: requestDocument,

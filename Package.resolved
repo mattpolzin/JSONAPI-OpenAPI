@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/llvm-swift/FileCheck.git",
         "state": {
           "branch": null,
-          "revision": "00945abac615e5203701be0f090ed0e2d2ff15bf",
-          "version": "0.2.0"
+          "revision": "0eb888b85ca08c7ce85c8a6a459c94d7f282c1bb",
+          "version": "0.2.1"
         }
       },
       {
@@ -51,8 +51,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
           "branch": null,
-          "revision": "eb8562037968800396d50d53e01597f8195f7783",
-          "version": "2.5.0"
+          "revision": "1a15ab6f9de9f75c4eab398f19701878ca1e70f1",
+          "version": "2.5.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
         "state": {
           "branch": null,
-          "revision": "f85d06405c8d957b3dd35b9b8064363731d81c13",
-          "version": "0.5.2"
+          "revision": "91b18ee891467db608416510601bf505460fbc34",
+          "version": "0.7.0"
         }
       },
       {

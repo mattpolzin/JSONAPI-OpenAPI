@@ -3,70 +3,68 @@ import JSONAPI
 import JSONAPITesting // for the convenience of literal initialization
 import JSONAPIOpenAPI
 import SwiftCheck
-import JSONAPIArbitrary
 import Sampleable
 
-extension PersonDescription.Attributes: Arbitrary, Sampleable {
-	public static var arbitrary: Gen<PersonDescription.Attributes> {
-		return Gen.compose { c in
-			return PersonDescription.Attributes(name: c.generate(),
-												favoriteColor: c.generate())
-		}
-	}
-
+extension PersonDescription.Attributes: Sampleable {
 	public static var sample: PersonDescription.Attributes {
 		return .init(name: ["Abbie", "Eibba"], favoriteColor: "Blue")
 	}
 }
 
-extension PersonDescription.Relationships: Arbitrary, Sampleable {
-	public static var arbitrary: Gen<PersonDescription.Relationships> {
-		return Gen.compose { c in
-			return PersonDescription.Relationships(friends: c.generate(),
-												   dogs: c.generate(),
-												   home: c.generate())
-		}
-	}
-
+extension PersonDescription.Relationships: Sampleable {
 	public static var sample: PersonDescription.Relationships {
 		return .init(friends: ["1", "2"], dogs: ["2"], home: "1")
 	}
 }
 
-extension DogDescription.Attributes: Arbitrary, Sampleable {
-	public static var arbitrary: Gen<DogDescription.Attributes> {
-		return Gen.compose { c in
-			return DogDescription.Attributes(name: c.generate())
-		}
-	}
-
+extension DogDescription.Attributes: Sampleable {
 	public static var sample: DogDescription.Attributes {
         return DogDescription.Attributes(name: "Sparky")
 	}
 }
 
-extension DogDescription.Relationships: Arbitrary, Sampleable {
-	public static var arbitrary: Gen<DogDescription.Relationships> {
-		return Gen.compose { c in
-			return DogDescription.Relationships(owner: c.generate())
-		}
-	}
-
+extension DogDescription.Relationships: Sampleable {
 	public static var sample: DogDescription.Relationships {
         return DogDescription.Relationships(owner: "1")
 	}
 }
 
-extension Document: Sampleable where PrimaryResourceBody: Arbitrary, IncludeType: Arbitrary, MetaType: Arbitrary, LinksType: Arbitrary, Error: Arbitrary, APIDescription: Arbitrary {
+private var counter = 1
+extension Id: Sampleable where RawType == String {
+    public static var sample: Id<RawType, IdentifiableType> {
+        let id = "\(counter)"
+        counter = counter + 1
+        return .init(rawValue: id)
+    }
+}
+
+extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
+    public static var sample: JSONAPI.ResourceObject<Description, MetaType, LinksType, EntityRawIdType> {
+        return JSONAPI.ResourceObject(id: .sample,
+                                      attributes: .sample,
+                                      relationships: .sample,
+                                      meta: .sample,
+                                      links: .sample)
+    }
+}
+
+extension Document: Sampleable where PrimaryResourceBody: Sampleable, IncludeType: Sampleable, MetaType: Sampleable, LinksType: Sampleable, Error: Sampleable, APIDescription: Sampleable {
 	public static var sample: Document {
-		return Document.arbitrary.generate
+        return successSample!
 	}
 
 	public static var successSample: Document? {
-		return Document.arbitraryData.generate
+        return Document(apiDescription: APIDescription.sample,
+                        body: PrimaryResourceBody.sample,
+                        includes: .init(values: IncludeType.samples),
+                        meta: MetaType.sample,
+                        links: LinksType.sample)
 	}
 
 	public static var failureSample: Document? {
-		return Document.arbitraryErrors.generate
+        return Document(apiDescription: APIDescription.sample,
+                        errors: Error.samples,
+                        meta: MetaType.sample,
+                        links: LinksType.sample)
 	}
 }
