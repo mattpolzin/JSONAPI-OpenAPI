@@ -14,7 +14,7 @@ let package = Package(
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "2.5.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.7.0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.8.0")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0"))
     ],
     targets: [
