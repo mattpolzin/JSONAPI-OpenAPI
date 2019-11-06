@@ -20,7 +20,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
-        .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "3.0.0-alpha.1"),
+        .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "3.0.0-alpha.2"),
         .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.8.0")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.26.0")),
