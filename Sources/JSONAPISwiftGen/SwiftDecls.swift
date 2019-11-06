@@ -374,6 +374,7 @@ public struct Import: Decl {
     public static let XCTest: Import = .init(module: "XCTest")
     public static let AnyCodable: Import = .init(module: "AnyCodable")
     public static let JSONAPI: Import = .init(module: "JSONAPI")
+    public static let JSONAPITesting: Import = .init(module: "JSONAPITesting")
 
     public static let FoundationNetworking: Decl = """
 #if canImport(FoundationNetworking)

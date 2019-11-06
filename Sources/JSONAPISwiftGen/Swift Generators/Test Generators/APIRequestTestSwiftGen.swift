@@ -228,7 +228,8 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
         }
 
         if let expectedResponseBody = optionallyExpectedResponseBody {
-            XCTAssertEqual(document, expectedResponseBody, "The response body did not match the expected response body.")
+            let comparison = document.compare(to: expectedResponseBody)
+            XCTAssert(comparison.isSame, comparison.rawValue)
         }
 
         completionExpectation.fulfill()
