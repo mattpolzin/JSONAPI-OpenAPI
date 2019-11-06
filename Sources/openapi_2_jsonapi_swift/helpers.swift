@@ -542,7 +542,7 @@ let package = Package(
     targets: [
         .testTarget(
             name: "GeneratedAPITests",
-            dependencies: ["JSONAPI", "AnyCodable"]
+            dependencies: ["JSONAPI", "JSONAPITesting", "AnyCodable"]
         )
     ]
 )
