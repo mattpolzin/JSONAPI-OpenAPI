@@ -183,12 +183,52 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
 private let makeTestRequestFunc = """
 
+struct DummyComparison: PropertyComparable {
+    let differences: NamedDifferences
+
+    public init(name: String, _ comparison: Comparison) {
+        switch comparison {
+        case .same:
+            differences = [:]
+        case .prebuilt,
+             .different:
+            differences = [name: comparison.rawValue]
+        }
+    }
+}
+
+func compare<T, DT: EncodableJSONAPIDocument>(_ one: DT, _ two: DT) -> PropertyComparable where DT.PrimaryResourceBody == SingleResourceBody<T>, T: ResourceObjectType, DT.Body: Equatable {
+    return one.compare(to: two)
+}
+
+func compare<T, DT: EncodableJSONAPIDocument>(_ one: DT, _ two: DT) -> PropertyComparable where DT.PrimaryResourceBody == SingleResourceBody<T?>, T: ResourceObjectType, DT.Body: Equatable {
+    return one.compare(to: two)
+}
+
+func compare<T, DT: EncodableJSONAPIDocument>(_ one: DT, _ two: DT) -> PropertyComparable where DT.PrimaryResourceBody == ManyResourceBody<T>, T: ResourceObjectType, DT.Body: Equatable {
+    return one.compare(to: two)
+}
+
+func compare<T>(_ one: T, _ two: T) -> PropertyComparable where T: Equatable {
+
+    let name = String(describing: type(of: one))
+
+    guard one == two else {
+        return DummyComparison(name: name, .different(
+            String(describing: one),
+            String(describing: two)
+            ))
+    }
+
+    return DummyComparison(name: name, .same)
+}
+
 func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
                                                 expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
                                                 expectedResponseStatusCode: Int? = nil,
                                                 requestUrl: URL,
                                                 headers: [(name: String, value: String)],
-                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.Body: Equatable {
+                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
     var urlComponents = URLComponents(url: requestUrl, resolvingAgainstBaseURL: false)!
 
     urlComponents.queryItems = queryParams
@@ -228,7 +268,7 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
         }
 
         if let expectedResponseBody = optionallyExpectedResponseBody {
-            let comparison = document.compare(to: expectedResponseBody)
+            let comparison = compare(document, expectedResponseBody)
             XCTAssert(comparison.isSame, comparison.rawValue)
         }
 
