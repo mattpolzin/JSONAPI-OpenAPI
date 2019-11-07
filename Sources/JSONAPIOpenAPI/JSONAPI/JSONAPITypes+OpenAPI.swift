@@ -120,17 +120,17 @@ extension Optional: OpenAPIEncodedNodeType where Wrapped: OpenAPIEncodedNodeType
     }
 }
 
-extension SingleResourceBody: OpenAPIEncodedNodeType where Entity: OpenAPIEncodedNodeType {
+extension SingleResourceBody: OpenAPIEncodedNodeType where PrimaryResource: OpenAPIEncodedNodeType {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		return try Entity.openAPINode(using: encoder)
+		return try PrimaryResource.openAPINode(using: encoder)
 	}
 }
 
-extension ManyResourceBody: OpenAPIEncodedNodeType where Entity: OpenAPIEncodedNodeType {
+extension ManyResourceBody: OpenAPIEncodedNodeType where PrimaryResource: OpenAPIEncodedNodeType {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
 		return .array(.init(format: .generic,
 							required: true),
-					  .init(items: try Entity.openAPINode(using: encoder)))
+					  .init(items: try PrimaryResource.openAPINode(using: encoder)))
 	}
 }
 

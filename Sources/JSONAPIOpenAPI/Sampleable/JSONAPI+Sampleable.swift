@@ -56,14 +56,14 @@ extension Attribute: Sampleable where RawValue: Sampleable {
 	}
 }
 
-extension SingleResourceBody: Sampleable where Entity: Sampleable {
-	public static var sample: SingleResourceBody<Entity> {
-		return .init(resourceObject: Entity.sample)
+extension SingleResourceBody: Sampleable where PrimaryResource: Sampleable {
+	public static var sample: SingleResourceBody<PrimaryResource> {
+		return .init(resourceObject: PrimaryResource.sample)
 	}
 }
 
-extension ManyResourceBody: Sampleable where Entity: Sampleable {
-	public static var sample: ManyResourceBody<Entity> {
-		return .init(resourceObjects: Entity.samples)
+extension ManyResourceBody: Sampleable where PrimaryResource: Sampleable {
+	public static var sample: ManyResourceBody<PrimaryResource> {
+		return .init(resourceObjects: PrimaryResource.samples)
 	}
 }

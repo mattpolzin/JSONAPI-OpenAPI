@@ -183,76 +183,13 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
 private let makeTestRequestFunc = """
 
-/// Single Response request test
-func makeTestRequest<RequestBody, ResponseBody, T>(requestBody: RequestBody,
-                                                   expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                   expectedResponseStatusCode: Int? = nil,
-                                                   requestUrl: URL,
-                                                   headers: [(name: String, value: String)],
-                                                   queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody == SingleResourceBody<T>, T: ResourceObjectType, ResponseBody.Body: Equatable {
-    let successResponseHandler = { (data: Data) in
-        let decoder = JSONDecoder()
-
-        let document: ResponseBody
-        do {
-            document = try decoder.decode(ResponseBody.self, from: data)
-        } catch let err {
-            XCTFail("Failed to parse response: " + String(describing: err))
-            return
-        }
-
-        if let expectedResponseBody = optionallyExpectedResponseBody {
-            let comparison = document.compare(to: expectedResponseBody)
-            XCTAssert(comparison.isSame, comparison.rawValue)
-        }
-    }
-
-    makeTestRequest(requestBody: requestBody,
-                    successResponseHandler: successResponseHandler,
-                    requestUrl: requestUrl,
-                    headers: headers,
-                    queryParams: queryParams)
-}
-
-/// Optional Single Response request test
-func makeTestRequest<RequestBody, ResponseBody, T>(requestBody: RequestBody,
-                                                   expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                   expectedResponseStatusCode: Int? = nil,
-                                                   requestUrl: URL,
-                                                   headers: [(name: String, value: String)],
-                                                   queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody == SingleResourceBody<T?>, T: ResourceObjectType, ResponseBody.Body: Equatable {
-    let successResponseHandler = { (data: Data) in
-        let decoder = JSONDecoder()
-
-        let document: ResponseBody
-        do {
-            document = try decoder.decode(ResponseBody.self, from: data)
-        } catch let err {
-            XCTFail("Failed to parse response: " + String(describing: err))
-            return
-        }
-
-        if let expectedResponseBody = optionallyExpectedResponseBody {
-            let comparison = document.compare(to: expectedResponseBody)
-            XCTAssert(comparison.isSame, comparison.rawValue)
-        }
-    }
-
-    makeTestRequest(requestBody: requestBody,
-                    successResponseHandler: successResponseHandler,
-                    requestUrl: requestUrl,
-                    headers: headers,
-                    queryParams: queryParams)
-}
-
-/// Many Response request test
-func makeTestRequest<RequestBody, ResponseBody, T>(requestBody: RequestBody,
-                                                   expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                   expectedResponseStatusCode: Int? = nil,
-                                                   requestUrl: URL,
-                                                   headers: [(name: String, value: String)],
-                                                   queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody == ManyResourceBody<T>, T: ResourceObjectType, ResponseBody.Body: Equatable {
-
+/// JSONAPI Document Response request test
+func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
+                                                expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
+                                                expectedResponseStatusCode: Int? = nil,
+                                                requestUrl: URL,
+                                                headers: [(name: String, value: String)],
+                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody: _OptionalResourceBody, ResponseBody.Body: Equatable {
     let successResponseHandler = { (data: Data) in
         let decoder = JSONDecoder()
 

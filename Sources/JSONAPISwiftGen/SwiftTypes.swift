@@ -236,17 +236,17 @@ extension ToManyRelationship: SwiftType, SwiftCodeRepresentable where Relatable:
     }
 }
 
-extension SingleResourceBody: SwiftType, SwiftCodeRepresentable where Entity: SwiftType {
+extension SingleResourceBody: SwiftType, SwiftCodeRepresentable where PrimaryResource: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "SingleResourceBody",
-                     specializations: [Entity.self])
+                     specializations: [PrimaryResource.self])
     }
 }
 
-extension ManyResourceBody: SwiftType, SwiftCodeRepresentable where Entity: SwiftType {
+extension ManyResourceBody: SwiftType, SwiftCodeRepresentable where PrimaryResource: SwiftType {
     public static var swiftTypeDef: SwiftTypeDef {
         return .init(name: "ManyResourceBody",
-                     specializations: [Entity.self])
+                     specializations: [PrimaryResource.self])
     }
 }
 
