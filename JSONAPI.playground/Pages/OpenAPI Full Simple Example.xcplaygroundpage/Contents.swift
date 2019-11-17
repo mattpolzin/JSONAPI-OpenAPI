@@ -53,7 +53,7 @@ let widgetJSONSchema = Widget.openAPINode(using: encoder)
 // Describe a JSON:API response body with 1 widget and
 // any number of related widgets included.
 //
-typealias SingleWidgetDocumentWithIncludes = Document<SingleResourceBody<Widget>, NoMetadata, NoLinks, Include1<Widget>, NoAPIDescription, UnknownJSONAPIError>
+typealias SingleWidgetDocumentWithIncludes = Document<SingleResourceBody<Widget>, NoMetadata, NoLinks, Include1<Widget>, NoAPIDescription, BasicJSONAPIError<String>>
 
 //
 // Finally we can create a JSON Schema for the response body

@@ -15,11 +15,11 @@ final class APIRequestTestSwiftGenTests: XCTestCase {
 // MARK: - Function written to generated test suites
 /// JSONAPI Document Response request test
 func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
-                                                   expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                   expectedResponseStatusCode: Int? = nil,
-                                                   requestUrl: URL,
-                                                   headers: [(name: String, value: String)],
-                                                   queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody: _OptionalResourceBody, ResponseBody.Body: Equatable {
+                                                expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
+                                                expectedResponseStatusCode: Int? = nil,
+                                                requestUrl: URL,
+                                                headers: [(name: String, value: String)],
+                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody: TestableResourceBody, ResponseBody.Body: Equatable {
     let successResponseHandler = { (data: Data) in
         let decoder = JSONDecoder()
 
