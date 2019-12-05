@@ -13,10 +13,6 @@ import JSONAPI
 /// Eventually I would like to expand this to read through multiple OpenAPI responses
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
-/// - Important: You must also expose the `defaultErrorDecl`
-///     and `basicErrorDecl` included as a static var on this type
-///     somewhere it is accessible. They are used for creating error response
-///     documents.
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let structure: JSONSchema
     public let decls: [Decl]
@@ -33,9 +29,6 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             + [swiftCode])
             .joined(separator: "\n")
     }
-
-    public static var defaultErrorDecl: Decl { makeDefaultErrorType }
-    public static var basicErrorDecl: Decl { makeBasicErrorType }
 
     public init(swiftTypeName: String,
                 structure: JSONSchema,
@@ -64,9 +57,9 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         let errorPayloadTypeName = errorTypeName + "Payload"
 
         let errorsItemsDecls: [Decl]
-        do { //DefaultTestError<ErrorPayload>
+        do { //GenericJSONAPIError<ErrorPayload>
             let errorTypealias = Typealias(alias: .def(.init(name: errorTypeName)),
-                                           existingType: .def(.init(name: "DefaultTestError",
+                                           existingType: .def(.init(name: "GenericJSONAPIError",
                                                                     specializationReps: [.def(.init(name: errorPayloadTypeName))])))
 
             errorsItemsDecls = try StructureSwiftGen(swiftTypeName: errorPayloadTypeName,
@@ -203,7 +196,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                                                             .init(NoLinks.self),
                                                             includeType,
                                                             .init(NoAPIDescription.self),
-                                                            "BasicError"
+                                                            "BasicJSONAPIError<AnyCodable>"
                                     ]))))
 
         return (allDecls, allResourceObjectGenerators)
@@ -240,68 +233,3 @@ public extension DataDocumentSwiftGen {
         }
     }
 }
-
-private var makeDefaultErrorType = """
-public enum DefaultTestError<ErrorPayload>: JSONAPIError where ErrorPayload: Codable, ErrorPayload: Equatable {
-    case unknownError
-    case error(ErrorPayload)
-
-    public static var unknown: DefaultTestError { return .unknownError }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-        switch self {
-        case .unknownError:
-            try container.encode("unknown")
-        case .error(let payload):
-            try container.encode(payload)
-        }
-    }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        do {
-            self = .error(try container.decode(ErrorPayload.self))
-        } catch {
-            self = .unknownError
-        }
-    }
-}
-""" as LiteralSwiftCode
-
-private var makeBasicErrorType = """
-@dynamicMemberLookup
-public struct BasicError: JSONAPIError, CustomDebugStringConvertible {
-
-    private typealias ErrorType = JSONAPI.BasicJSONAPIError<AnyCodable>
-
-    private let error: ErrorType
-
-    private init() { error = .unknown }
-
-    public static var unknown: BasicError { return .init() }
-
-    public init(from decoder: Decoder) throws {
-        let container = try decoder.singleValueContainer()
-
-        error = try container.decode(ErrorType.self)
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.singleValueContainer()
-
-        try container.encode(error)
-    }
-
-    public subscript<T>(dynamicMember path: KeyPath<BasicJSONAPIErrorPayload<AnyCodable>, T>) -> T? {
-        return error.payload?[keyPath: path]
-    }
-
-    public var debugDescription: String {
-        return error.definedFields
-            .map { "\\($0.key): \\($0.value)" }
-            .joined(separator: ", ")
-    }
-}
-""" as LiteralSwiftCode

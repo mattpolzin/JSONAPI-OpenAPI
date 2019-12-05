@@ -35,9 +35,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
         Import.AnyCodable as Decl,
         Import.XCTest as Decl,
         APIRequestTestSwiftGen.testFuncDecl,
-        OpenAPIExampleParseTestSwiftGen.testFuncDecl,
-        DataDocumentSwiftGen.defaultErrorDecl,
-        DataDocumentSwiftGen.basicErrorDecl
+        OpenAPIExampleParseTestSwiftGen.testFuncDecl
         ].map { try $0.formattedSwiftCode() }
         .joined(separator: "")
     write(contents: testHelperContents,
@@ -56,7 +54,6 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
         httpVerb: HttpVerb,
         path: OpenAPI.PathComponents,
         pathItem: OpenAPI.PathItem,
-        documentFileNameString: String,
         apiRequestTest: APIRequestTestSwiftGen?,
         requestDocument: DataDocumentSwiftGen?,
         responseDocuments: [OpenAPI.Response.StatusCode : DataDocumentSwiftGen],
@@ -72,8 +69,6 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 return nil
             }
 
-            let documentFileNameString = documentTypeName(path: path, verb: httpVerb)
-
             let parameters = operation.parameters
 
             let apiRequestTest = try? APIRequestTestSwiftGen(server: server,
@@ -81,11 +76,13 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                                                          parameters: parameters.compactMap { $0.a })
 
             let responses = operation.responses
-            let responseDocuments = documents(from: responses,
-                                              for: httpVerb,
-                                              at: path,
-                                              on: server,
-                                              given: parameters.compactMap { $0.a })
+            let responseDocuments = documents(
+                from: responses,
+                for: httpVerb,
+                at: path,
+                on: server,
+                given: parameters.compactMap { $0.a }
+            )
 
             let requestDocument: DataDocumentSwiftGen?
             do {
@@ -124,7 +121,6 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 httpVerb: httpVerb,
                 path: path,
                 pathItem: operations,
-                documentFileNameString: documentFileNameString,
                 apiRequestTest: apiRequestTest,
                 requestDocument: requestDocument,
                 responseDocuments: responseDocuments,
@@ -134,31 +130,41 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
     }
 
     for result in results {
-        writeResourceObjectFiles(toPath: resourceObjDir + "/\(result.documentFileNameString)_response_",
+        let documentFileNameString = documentTypeName(path: result.path, verb: result.httpVerb)
+
+        writeResourceObjectFiles(
+            toPath: resourceObjDir + "/\(documentFileNameString)_response_",
             for: result.responseDocuments.values,
-            extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Response"])))
+            extending: namespace(path: result.path, verb: result.httpVerb, direction: .response)
+        )
 
         if let reqDoc = result.requestDocument {
-            writeResourceObjectFiles(toPath: resourceObjDir + "/\(result.documentFileNameString)_request_",
+            writeResourceObjectFiles(
+                toPath: resourceObjDir + "/\(documentFileNameString)_request_",
                 for: [reqDoc],
-                extending: namespace(for: OpenAPI.PathComponents(result.path.components + [result.httpVerb.rawValue, "Request"])))
+                extending: namespace(path: result.path, verb: result.httpVerb, direction: .request)
+            )
         }
 
         // write API file
-        writeAPIFile(toPath: testDir + "/\(result.documentFileNameString)_",
+        writeAPIFile(
+            toPath: testDir + "/\(documentFileNameString)_",
             for: result.apiRequestTest,
             reqDoc: result.requestDocument,
             respDocs: result.responseDocuments.values,
             httpVerb: result.httpVerb,
-            extending: namespace(for: result.path))
+            extending: namespace(for: result.path)
+        )
     }
 
     let testClassFileContents = XCTestClassSwiftGen(className: "GeneratedTests",
                                                     importNames: [],
                                                     forwardingFullyQualifiedTestNames: results.flatMap { $0.fullyQualifiedTestFuncNames })
-    write(contents: try! testClassFileContents.formattedSwiftCode(),
-          toFileAt: testDir + "/",
-          named: "GeneratedTests.swift")
+    write(
+        contents: try! testClassFileContents.formattedSwiftCode(),
+        toFileAt: testDir + "/",
+        named: "GeneratedTests.swift"
+    )
 }
 
 enum HttpDirection: String {
@@ -173,29 +179,57 @@ func swiftTypeName(from string: String) -> String {
         .replacingOccurrences(of: " ", with: "_")
 }
 
+func namespace(
+    path: OpenAPI.PathComponents,
+    verb: HttpVerb,
+    direction: HttpDirection
+) -> String {
+    return namespace(for: OpenAPI.PathComponents(path.components + [verb.rawValue, direction.rawValue.uppercased()]))
+}
+
 func namespace(for path: OpenAPI.PathComponents) -> String {
     return path.components
         .map(swiftTypeName)
         .joined(separator: ".")
 }
 
-func documentTypeName(path: OpenAPI.PathComponents,
-                      verb: HttpVerb) -> String {
-    let pathSnippet = swiftTypeName(from: path.components
-        .joined(separator: "_"))
+func documentTypeName(
+    path: OpenAPI.PathComponents,
+    verb: HttpVerb
+) -> String {
+    let pathSnippet = swiftTypeName(
+        from: path.components.joined(separator: "_")
+    )
 
     return [pathSnippet, verb.rawValue].joined(separator: "_")
 }
 
-func writeResourceObjectFiles<T: Sequence>(toPath path: String,
-                              for documents: T,
-                              extending namespace: String) where T.Element == DataDocumentSwiftGen {
+/// Take in a bunch of resource objects with their associated paths
+/// and namespaces and reduce them until the namespace is gone or
+/// a conflicting resource with the same name is found.
+///
+/// - parameters:
+///     - allResourceObjects: A dictionary keyed by the file path for the resource object
+///
+//func canonicalResourceObjects<T: Sequence>(
+//    allResourceObjects: [String: T]
+//) -> T where T.Element == (path: String, namespaceComponents: [String], resourceObjects: ResourceObjectSwiftGen) {
+//
+//}
+
+func writeResourceObjectFiles<T: Sequence>(
+    toPath path: String,
+    for documents: T,
+    extending namespace: String
+) where T.Element == DataDocumentSwiftGen {
     for document in documents {
 
         let resourceObjectGenerators = document.resourceObjectGenerators
 
-        let definedResourceObjectNames = Set(resourceObjectGenerators
-            .flatMap { $0.exportedSwiftTypeNames })
+        let definedResourceObjectNames = Set(
+            resourceObjectGenerators
+                .flatMap { $0.exportedSwiftTypeNames }
+        )
 
         resourceObjectGenerators
             .forEach { resourceObjectGen in
@@ -537,7 +571,7 @@ let package = Package(
     products: [],
     dependencies: [
         .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
-            .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "3.0.0-alpha.2")
+        .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "3.0.0"))
     ],
     targets: [
         .testTarget(
