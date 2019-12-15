@@ -161,35 +161,18 @@ extension GenericJSONAPIError: OpenAPIEncodedNodeType where ErrorPayload: OpenAP
     }
 }
 
-extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType {
+extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType, Error: OpenAPIEncodedNodeType {
 	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
 		// TODO: metadata, links, api description, errors
 		// TODO: represent data and errors as the two distinct possible outcomes
 
-		let primaryDataNode: JSONSchema = try PrimaryResourceBody.openAPINode(using: encoder)
+        let success = try Self.SuccessDocument.openAPINode(using: encoder)
+        let error = try Self.ErrorDocument.openAPINode(using: encoder)
 
-		let primaryDataProperty = ("data", primaryDataNode)
-
-		let includeNode: JSONSchema?
-		do {
-			includeNode = try Includes<Include>.openAPINode(using: encoder)
-		} catch let err as OpenAPITypeError {
-			guard case .invalidNode = err else {
-				throw err
-			}
-			includeNode = nil
-		}
-
-		let includeProperty = includeNode.map { ("included", $0) }
-
-		let propertiesDict = Dictionary([
-			primaryDataProperty,
-			includeProperty
-			].compactMap { $0 }) { _, value in value }
-
-        return .object(
-            properties: propertiesDict
-        )
+        return .one(of: [
+            success,
+            error
+        ])
 	}
 }
 

@@ -148,3 +148,21 @@ extension Include10: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: 
         ])
     }
 }
+
+extension Include11: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType, H: OpenAPIEncodedNodeType, I: OpenAPIEncodedNodeType, J: OpenAPIEncodedNodeType, K: OpenAPIEncodedNodeType {
+    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+        return try .one(of: [
+            A.openAPINode(using: encoder),
+            B.openAPINode(using: encoder),
+            C.openAPINode(using: encoder),
+            D.openAPINode(using: encoder),
+            E.openAPINode(using: encoder),
+            F.openAPINode(using: encoder),
+            G.openAPINode(using: encoder),
+            H.openAPINode(using: encoder),
+            I.openAPINode(using: encoder),
+            J.openAPINode(using: encoder),
+            K.openAPINode(using: encoder)
+        ])
+    }
+}
