@@ -6,15 +6,13 @@
 //
 
 import XCTest
-import JSONAPISwiftGen
-import JSONAPI
 import Sampleable
-import OpenAPIKit
 import JSONAPIOpenAPI
+import JSONAPISwiftGen
 
 class DocumentSwiftGenTests: XCTestCase {
     func test_singleViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleDocument.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPersonSingleDocument.SuccessDocument.openAPINode(using: testEncoder)
 
         let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -24,7 +22,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_singleInclude1ViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleInclude1Document.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPersonSingleInclude1Document.SuccessDocument.openAPINode(using: testEncoder)
 
         let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -34,7 +32,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_singleInclude2ViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleInclude2Document.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPersonSingleInclude2Document.SuccessDocument.openAPINode(using: testEncoder)
 
         let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -44,7 +42,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_nullableSingleViaOpenAPI() {
-        let openAPIStructure = try! TestPersonNullableSingleDocument.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPersonNullableSingleDocument.SuccessDocument.openAPINode(using: testEncoder)
 
         let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -54,7 +52,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_collectionViaOpenAPI() {
-        let openAPIStructure = try! TestPersonBatchDocument.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPersonBatchDocument.SuccessDocument.openAPINode(using: testEncoder)
 
         let testDocumentSwiftGen = try! DataDocumentSwiftGen(swiftTypeName: "TestPersonBatchDocument",
                                                              structure: openAPIStructure)
@@ -73,7 +71,7 @@ typealias TestPersonSingleDocument = JSONAPI.Document<
     NoLinks,
     NoIncludes,
     NoAPIDescription,
-    UnknownJSONAPIError>
+    BasicJSONAPIError<String>>
 
 typealias TestPersonNullableSingleDocument = JSONAPI.Document<
     SingleResourceBody<TestPerson?>,
@@ -81,7 +79,7 @@ typealias TestPersonNullableSingleDocument = JSONAPI.Document<
     NoLinks,
     NoIncludes,
     NoAPIDescription,
-    UnknownJSONAPIError>
+    BasicJSONAPIError<String>>
 
 typealias TestPersonBatchDocument = JSONAPI.Document<
     ManyResourceBody<TestPerson>,
@@ -89,7 +87,7 @@ typealias TestPersonBatchDocument = JSONAPI.Document<
     NoLinks,
     NoIncludes,
     NoAPIDescription,
-    UnknownJSONAPIError>
+    BasicJSONAPIError<String>>
 
 typealias TestPersonSingleInclude1Document = JSONAPI.Document<
     SingleResourceBody<TestPerson>,
@@ -97,7 +95,7 @@ typealias TestPersonSingleInclude1Document = JSONAPI.Document<
     NoLinks,
     Include1<TestPerson>,
     NoAPIDescription,
-    UnknownJSONAPIError>
+    BasicJSONAPIError<String>>
 
 struct TestThingyDescription: JSONAPI.ResourceObjectDescription {
     static let jsonType: String = "test_thingy"
@@ -115,4 +113,4 @@ typealias TestPersonSingleInclude2Document = JSONAPI.Document<
     NoLinks,
     Include2<TestPerson, TestThingy>,
     NoAPIDescription,
-    UnknownJSONAPIError>
+    BasicJSONAPIError<String>>

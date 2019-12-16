@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "Chalk",
+        "repositoryURL": "https://github.com/mxcl/Chalk.git",
+        "state": {
+          "branch": null,
+          "revision": "9aa9f348b86db3cf6702a3e43c081ecec80cf3c7",
+          "version": "0.4.0"
+        }
+      },
+      {
         "package": "Commandant",
         "repositoryURL": "https://github.com/Carthage/Commandant.git",
         "state": {
@@ -42,8 +51,8 @@
         "repositoryURL": "https://github.com/llvm-swift/FileCheck.git",
         "state": {
           "branch": null,
-          "revision": "0eb888b85ca08c7ce85c8a6a459c94d7f282c1bb",
-          "version": "0.2.1"
+          "revision": "9ed91cc30a1a325d989fac117f3f3065a16b9f76",
+          "version": "0.2.3"
         }
       },
       {
@@ -69,8 +78,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
         "state": {
           "branch": null,
-          "revision": "104e5e17cd317624ec76577f97fdaaaad0af19b9",
-          "version": "0.8.0"
+          "revision": "7a0b0e171a02e67519d163b8a3ddf8ddbf36e786",
+          "version": "0.9.0"
         }
       },
       {
@@ -89,15 +98,6 @@
           "branch": null,
           "revision": "33682c2f6230c60614861dfc61df267e11a1602f",
           "version": "2.2.0"
-        }
-      },
-      {
-        "package": "Rainbow",
-        "repositoryURL": "https://github.com/onevcat/Rainbow.git",
-        "state": {
-          "branch": null,
-          "revision": "9c52c1952e9b2305d4507cf473392ac2d7c9b155",
-          "version": "3.1.5"
         }
       },
       {
@@ -128,15 +128,6 @@
         }
       },
       {
-        "package": "llbuild",
-        "repositoryURL": "https://github.com/apple/swift-llbuild.git",
-        "state": {
-          "branch": null,
-          "revision": "f73b84bc1525998e5e267f9d830c1411487ac65e",
-          "version": "0.2.0"
-        }
-      },
-      {
         "package": "NonEmpty",
         "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
         "state": {
@@ -146,12 +137,12 @@
         }
       },
       {
-        "package": "SwiftPM",
-        "repositoryURL": "https://github.com/apple/swift-package-manager.git",
+        "package": "swift-tools-support-core",
+        "repositoryURL": "https://github.com/apple/swift-tools-support-core.git",
         "state": {
           "branch": null,
-          "revision": "9abcc2260438177cecd7cf5185b144d13e74122b",
-          "version": "0.5.0"
+          "revision": "693aba4c4c9dcc4767cc853a0dd38bf90ad8c258",
+          "version": "0.0.1"
         }
       },
       {

@@ -208,3 +208,29 @@ extension Include10: Sampleable where A: Sampleable, B: Sampleable, C: Sampleabl
         return set1 + set2 + set3
     }
 }
+
+extension Include11: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable, K: Sampleable {
+    public static var sample: Include11<A, B, C, D, E, F, G, H, I, J, K> {
+        let randomChoice = Int.random(in: 0..<samples.count)
+
+        return samples[randomChoice]
+    }
+
+    public static var samples: [Include11<A, B, C, D, E, F, G, H, I, J, K>] {
+        let set1: [Include11<A, B, C, D, E, F, G, H, I, J, K>] = A.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + B.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + C.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+
+        let set2: [Include11<A, B, C, D, E, F, G, H, I, J, K>] = D.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + E.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + F.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + G.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+
+        let set3: [Include11<A, B, C, D, E, F, G, H, I, J, K>] = H.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + I.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + J.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+            + K.samples.map(Include11<A, B, C, D, E, F, G, H, I, J, K>.init)
+
+        return set1 + set2 + set3
+    }
+}

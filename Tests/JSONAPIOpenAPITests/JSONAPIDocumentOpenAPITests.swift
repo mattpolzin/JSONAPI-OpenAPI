@@ -13,7 +13,7 @@ import JSONAPIOpenAPI
 import Sampleable
 
 class JSONAPIDocumentOpenAPITests: XCTestCase {
-	func test_SingleResourceDocument() {
+	func test_SingleResourceDocumentSuccess() {
 
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateStyle = .medium
@@ -24,7 +24,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! SingleEntityDocument.openAPINodeWithExample(using: encoder)
+        let node = try! SingleEntityDocument.SuccessDocument.openAPINodeWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -63,7 +63,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 									   .init()))
 	}
 
-	func test_ManyResourceDocument() {
+	func test_ManyResourceDocumentSuccess() {
 
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateStyle = .medium
@@ -74,7 +74,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! ManyEntityDocument.openAPINodeWithExample(using: encoder)
+        let node = try! ManyEntityDocument.SuccessDocument.openAPINodeWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -125,7 +125,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 									   .init()))
 	}
 
-	func test_DocumentWithOneIncludeType() {
+	func test_DocumentWithOneIncludeTypeSuccess() {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateStyle = .medium
 		dateFormatter.timeStyle = .none
@@ -135,7 +135,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! DocumentWithIncludes.openAPINodeWithExample(using: encoder)
+        let node = try! DocumentWithIncludes.SuccessDocument.openAPINodeWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -205,7 +205,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 									   .init()))
 	}
 
-	func test_DocumentWithTwoIncludeTypes() {
+	func test_DocumentWithTwoIncludeTypesSuccess() {
 		let dateFormatter = DateFormatter()
 		dateFormatter.dateStyle = .medium
 		dateFormatter.timeStyle = .none
@@ -215,7 +215,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! DocumentWithMultipleTypesOfIncludes.openAPINodeWithExample(using: encoder)
+        let node = try! DocumentWithMultipleTypesOfIncludes.SuccessDocument.openAPINodeWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -375,4 +375,23 @@ extension Document: Sampleable where PrimaryResourceBody: Sampleable, MetaType: 
 						meta: .sample,
 						links: .sample)
 	}
+}
+
+extension Document.SuccessDocument: Sampleable where PrimaryResourceBody: Sampleable, MetaType: Sampleable, LinksType: Sampleable, IncludeType: Sampleable, APIDescription: Sampleable {
+    public static var sample: Document.SuccessDocument {
+        return Document.SuccessDocument(apiDescription: .sample,
+                                        body: .sample,
+                                        includes: .sample,
+                                        meta: .sample,
+                                        links: .sample)
+    }
+}
+
+extension Document.ErrorDocument: Sampleable where MetaType: Sampleable, LinksType: Sampleable, APIDescription: Sampleable, Error: Sampleable {
+    public static var sample: Document.ErrorDocument {
+        return Document.ErrorDocument(apiDescription: .sample,
+                                      errors: Error.samples,
+                                      meta: .sample,
+                                      links: .sample)
+    }
 }
