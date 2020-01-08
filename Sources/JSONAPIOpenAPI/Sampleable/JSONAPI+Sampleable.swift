@@ -50,19 +50,19 @@ extension Unidentified: Sampleable {
 	}
 }
 
-extension Attribute: Sampleable where RawValue: Sampleable {
+extension Attribute: Sampleable, AbstractSampleable where RawValue: Sampleable {
 	public static var sample: Attribute<RawValue> {
 		return .init(value: RawValue.sample)
 	}
 }
 
-extension SingleResourceBody: Sampleable where PrimaryResource: Sampleable {
+extension SingleResourceBody: Sampleable, AbstractSampleable where PrimaryResource: Sampleable {
 	public static var sample: SingleResourceBody<PrimaryResource> {
 		return .init(resourceObject: PrimaryResource.sample)
 	}
 }
 
-extension ManyResourceBody: Sampleable where PrimaryResource: Sampleable {
+extension ManyResourceBody: Sampleable, AbstractSampleable where PrimaryResource: Sampleable {
 	public static var sample: ManyResourceBody<PrimaryResource> {
 		return .init(resourceObjects: PrimaryResource.samples)
 	}

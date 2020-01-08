@@ -6,7 +6,6 @@
 //
 
 import OpenAPIKit
-import JSONAPIOpenAPI
 
 public struct ResourceObjectSwiftGenCollection {
     public let resourceObjectGenerators: [ResourceObjectSwiftGen]
