@@ -1,6 +1,8 @@
 
 import OpenAPIKit
 import JSONAPISwiftGen
+import JSONAPIVizGen
+import JSONAPIViz
 import Foundation
 
 let inFile = CommandLine.arguments[1]
@@ -18,11 +20,26 @@ let jsonDecoder = JSONDecoder()
 
 let openAPIStructure = try! jsonDecoder.decode(OpenAPI.Document.self, from: inputFileContents)
 
-let pathItems = openAPIStructure.paths
+let collection = try ResourceObjectSwiftGenCollection(openAPIStructure)
 
-produceAPITestPackage(for: pathItems,
-                      originatingAt: openAPIStructure.servers.first!,
-                      outputTo: outPath)
+print(
+    ResourceCollection(
+        resources: collection.resourceObjectGenerators,
+        ranks: [
+            ["Opal", "Brand", "User"],
+            ["Story", "Moment", "Content", "Account", "Budget"],
+            ["Placement", "Annotation", "AssetReference"],
+            ["Activity", "PhaseItem"]
+        ]
+    ).fullGraphVizDOT()
+)
+
+//
+//let pathItems = openAPIStructure.paths
+//
+//produceAPITestPackage(for: pathItems,
+//                      originatingAt: openAPIStructure.servers.first!,
+//                      outputTo: outPath)
 
 print("Done.")
 

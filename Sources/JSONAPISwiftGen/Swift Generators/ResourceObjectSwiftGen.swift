@@ -26,6 +26,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     public let decls: [Decl]
     public let resourceTypeName: String
     public let exportedSwiftTypeNames: Set<String>
+    public let relatives: Set<Relative>
     public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
 
     /// A Generator that produces Swift code for a JSONAPI Resource Object type.
@@ -38,7 +39,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                 allowPlaceholders: Bool = true) throws {
         self.structure = structure
 
-        (decls, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure,
+        (decls, relatives, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure,
                                                                                     allowPlaceholders: allowPlaceholders)
 
         let typealiases = decls.compactMap { $0 as? Typealias }
@@ -49,7 +50,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     }
 
     static func swiftDecls(from structure: JSONSchema,
-                           allowPlaceholders: Bool)  throws -> (decls: [Decl], relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
+                           allowPlaceholders: Bool)  throws -> (decls: [Decl], relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -98,12 +99,12 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         ].compactMap { $0 }
 
         let relationshipStubs = try Set(
-            relationships.relationshipJSONTypeNames.map {
-                try ResourceObjectStubSwiftGen(jsonAPITypeName: $0)
+            relationships.relatives.map {
+                try ResourceObjectStubSwiftGen(jsonAPITypeName: $0.jsonTypeName)
             }
         )
 
-        return (decls: decls, relationshipStubs: relationshipStubs)
+        return (decls: decls, relatives: Set(relationships.relatives), relationshipStubs: relationshipStubs)
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
@@ -234,15 +235,15 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
     private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext,
-                                             allowPlaceholders: Bool) throws -> (relationshipJSONTypeNames: [String], relationshipsDecl: Decl) {
+                                             allowPlaceholders: Bool) throws -> (relatives: [Relative], relationshipsDecl: Decl) {
 
         let relationshipTypeName = "Relationships"
 
         guard case let .object(_, relationshipsContextB)? = contextB.properties[Key.relationships.rawValue] else {
-            return (relationshipJSONTypeNames: [], relationshipsDecl: Typealias(alias: .init(relationshipTypeName), existingType: .init(NoRelationships.self)))
+            return (relatives: [], relationshipsDecl: Typealias(alias: .init(relationshipTypeName), existingType: .init(NoRelationships.self)))
         }
 
-        let relationshipDecls: [(jsonTypeName: String, decl: Decl)] = try relationshipsContextB
+        let relationshipDecls: [(relative: Relative, decl: Decl)] = try relationshipsContextB
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
@@ -268,19 +269,19 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             .map { $0.decl }
             + (hasRelationships ? [codingKeyDecl] : []) // only include CodingKeys if non-zero count of relationships
 
-        let relationshipJSONTypenames = relationshipDecls.map { $0.jsonTypeName }
+        let relatives = relationshipDecls.map { $0.relative }
 
         let decl = BlockTypeDecl.struct(typeName: relationshipTypeName,
                                         conformances: ["JSONAPI.\(relationshipTypeName)"],
                                         relationshipsAndCodingKeys)
 
-        return (relationshipJSONTypeNames: relationshipJSONTypenames,
+        return (relatives: relatives,
                 relationshipsDecl: decl)
     }
 
     private static func relationshipSnippet(name: String,
                                             schema: JSONSchema,
-                                            allowPlaceholders: Bool) throws -> (jsonTypeName: String, typeNameDeclCode: Decl) {
+                                            allowPlaceholders: Bool) throws -> (relative: Relative, typeNameDeclCode: Decl) {
 
         guard case let .object(_, relationshipContextB) = schema,
             let dataSchema = relationshipContextB.properties[Key.data.rawValue] else {
@@ -290,8 +291,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         let isOmittable = !schema.required
         let isNullable = dataSchema.nullable
 
+        let relationship: Relative.Relationship
         let oneOrManyName: String
         let relatedJSONTypeName: String
+        let relatedSwiftTypeName: String
         let relationshipTypeRep: SwiftTypeRep
         switch dataSchema {
         case .boolean,
@@ -306,11 +309,14 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             relatedJSONTypeName = try typeName(from: contextB,
                                                allowPlaceholders: allowPlaceholders)
 
-            let tmpRelTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
+            relatedSwiftTypeName = typeCased(relatedJSONTypeName)
+            let tmpRelTypeRep = SwiftTypeRep(relatedSwiftTypeName)
 
             relationshipTypeRep = isNullable
                 ? tmpRelTypeRep.optional
                 : tmpRelTypeRep
+
+            relationship = .toOne(isNullable || isOmittable ? .optional : .required)
 
         case .array(_, let contextB):
             guard isNullable == false else {
@@ -326,7 +332,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             relatedJSONTypeName = try typeName(from: relationshipObjectContext,
                                                allowPlaceholders: allowPlaceholders)
 
-            relationshipTypeRep = SwiftTypeRep(typeCased(relatedJSONTypeName))
+            relatedSwiftTypeName = typeCased(relatedJSONTypeName)
+            relationshipTypeRep = SwiftTypeRep(relatedSwiftTypeName)
+
+            relationship = .toMany(isOmittable ? .optional : .required)
 
         default:
             throw Error.relationshipMalformed
@@ -341,9 +350,15 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                                     ], optional: isOmittable)),
                                     nil)
 
-        return (jsonTypeName: relatedJSONTypeName,
-                typeNameDeclCode: typeDecl)
-
+        return (
+            relative: .init(
+                propertyName: name,
+                swiftTypeName: relatedSwiftTypeName,
+                jsonTypeName: relatedJSONTypeName,
+                relationshipType: relationship
+            ),
+            typeNameDeclCode: typeDecl
+        )
     }
 }
 
@@ -401,5 +416,22 @@ extension ResourceObjectSwiftGen: Hashable {
 
     public func hash(into hasher: inout Hasher) {
         hasher.combine(resourceTypeName)
+    }
+}
+
+public struct Relative: Hashable {
+    public let propertyName: String
+    public let swiftTypeName: String
+    public let jsonTypeName: String
+    public let relationshipType: Relationship
+
+    public enum Relationship: Hashable {
+        case toOne(Optionality)
+        case toMany(Optionality)
+
+        public enum Optionality: Hashable {
+            case required
+            case optional
+        }
     }
 }

@@ -12,6 +12,9 @@ let package = Package(
         .library(
             name: "JSONAPISwiftGen",
             targets: ["JSONAPISwiftGen"]),
+        .library(
+            name: "JSONAPIVizGen",
+            targets: ["JSONAPIVizGen"]),
         .executable(
           name: "openapi_2_jsonapi_swift",
           targets: ["openapi_2_jsonapi_swift"]
@@ -24,7 +27,8 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/OpenAPI.git", .upToNextMinor(from: "0.9.0")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.26.0")),
-        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0"))
+        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", .upToNextMinor(from: "0.0.1"))
     ],
     targets: [
         .target(
@@ -44,8 +48,16 @@ let package = Package(
             dependencies: ["JSONAPISwiftGen", "JSONAPITesting", "JSONAPIOpenAPI"]
         ),
         .target(
+            name: "JSONAPIVizGen",
+            dependencies: ["JSONAPISwiftGen", "JSONAPIViz"]
+        ),
+        .testTarget(
+            name: "JSONAPIVizGenTests",
+            dependencies: ["OpenAPIKit", "JSONAPISwiftGen", "JSONAPIVizGen"]
+        ),
+        .target(
           name: "openapi_2_jsonapi_swift",
-          dependencies: ["JSONAPISwiftGen", "OpenAPIKit"]
+          dependencies: ["JSONAPISwiftGen", "OpenAPIKit", "JSONAPIViz", "JSONAPIVizGen"]
         )
     ],
     swiftLanguageVersions: [.v5]

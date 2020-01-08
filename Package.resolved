@@ -65,12 +65,21 @@
         }
       },
       {
+        "package": "JSONAPIViz",
+        "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz.git",
+        "state": {
+          "branch": null,
+          "revision": "bc000af3f8492e4baf23e836844f63366fb0f78f",
+          "version": "0.0.1"
+        }
+      },
+      {
         "package": "Nimble",
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "6abeb3f5c03beba2b9e4dbe20886e773b5b629b6",
-          "version": "8.0.4"
+          "revision": "b02b00b30b6353632aa4a5fb6124f8147f7140c0",
+          "version": "8.0.5"
         }
       },
       {
@@ -114,8 +123,8 @@
         "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
         "state": {
           "branch": null,
-          "revision": "8a88ca056a58587daa99c33a04c63c9d59429932",
-          "version": "2.0.0"
+          "revision": "df44bf1a860481109dcf455e3c6daf0a0f1bc259",
+          "version": "2.1.0"
         }
       },
       {
