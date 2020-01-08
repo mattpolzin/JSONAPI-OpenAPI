@@ -8,7 +8,7 @@
 import JSONAPI
 import Sampleable
 
-extension Includes: Sampleable where I: Sampleable {
+extension Includes: Sampleable, AbstractSampleable where I: Sampleable {
 	public static var sample: Includes<I> {
 		guard I.self != NoIncludes.self else {
 			return .none
@@ -24,7 +24,7 @@ extension NoIncludes: Sampleable {
 	}
 }
 
-extension Include1: Sampleable where A: Sampleable {
+extension Include1: Sampleable, AbstractSampleable where A: Sampleable {
 	public static var sample: Include1<A> {
 		return .init(A.sample)
 	}
@@ -34,7 +34,7 @@ extension Include1: Sampleable where A: Sampleable {
 	}
 }
 
-extension Include2: Sampleable where A: Sampleable, B: Sampleable {
+extension Include2: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable {
 	public static var sample: Include2<A, B> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -47,7 +47,7 @@ extension Include2: Sampleable where A: Sampleable, B: Sampleable {
 	}
 }
 
-extension Include3: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable {
+extension Include3: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable {
 	public static var sample: Include3<A, B, C> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -61,7 +61,7 @@ extension Include3: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include4: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable {
+extension Include4: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable {
 	public static var sample: Include4<A, B, C, D> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -76,7 +76,7 @@ extension Include4: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include5: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable {
+extension Include5: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable {
 	public static var sample: Include5<A, B, C, D, E> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -95,7 +95,7 @@ extension Include5: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include6: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable {
+extension Include6: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable {
 	public static var sample: Include6<A, B, C, D, E, F> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -115,7 +115,7 @@ extension Include6: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include7: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable {
+extension Include7: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable {
 	public static var sample: Include7<A, B, C, D, E, F, G> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -137,7 +137,7 @@ extension Include7: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include8: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable {
+extension Include8: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable {
 	public static var sample: Include8<A, B, C, D, E, F, G, H> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -160,7 +160,7 @@ extension Include8: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include9: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable {
+extension Include9: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable {
 	public static var sample: Include9<A, B, C, D, E, F, G, H, I> {
 		let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -184,7 +184,7 @@ extension Include9: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable
 	}
 }
 
-extension Include10: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable {
+extension Include10: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable {
     public static var sample: Include10<A, B, C, D, E, F, G, H, I, J> {
         let randomChoice = Int.random(in: 0..<samples.count)
 
@@ -209,7 +209,7 @@ extension Include10: Sampleable where A: Sampleable, B: Sampleable, C: Sampleabl
     }
 }
 
-extension Include11: Sampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable, K: Sampleable {
+extension Include11: Sampleable, AbstractSampleable where A: Sampleable, B: Sampleable, C: Sampleable, D: Sampleable, E: Sampleable, F: Sampleable, G: Sampleable, H: Sampleable, I: Sampleable, J: Sampleable, K: Sampleable {
     public static var sample: Include11<A, B, C, D, E, F, G, H, I, J, K> {
         let randomChoice = Int.random(in: 0..<samples.count)
 

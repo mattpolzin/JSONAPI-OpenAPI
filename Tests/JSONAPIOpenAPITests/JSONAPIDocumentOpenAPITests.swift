@@ -351,13 +351,13 @@ extension JSONAPIDocumentOpenAPITests {
 	typealias DocumentWithMultipleTypesOfIncludes = Document<SingleResourceBody<TestEntity>, NoMetadata, NoLinks, Include2<TestEntity, TestEntity2>, NoAPIDescription, UnknownJSONAPIError>
 }
 
-extension Id: Sampleable where RawType == String {
+extension Id: Sampleable, AbstractSampleable where RawType == String {
 	public static var sample: Id<RawType, IdentifiableType> {
 		return .init(rawValue: String.arbitrary.generate)
 	}
 }
 
-extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
+extension JSONAPI.ResourceObject: Sampleable, AbstractSampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
 	public static var sample: JSONAPI.ResourceObject<Description, MetaType, LinksType, EntityRawIdType> {
 		return JSONAPI.ResourceObject(id: .sample,
                                       attributes: .sample,
@@ -367,7 +367,7 @@ extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampl
 	}
 }
 
-extension Document: Sampleable where PrimaryResourceBody: Sampleable, MetaType: Sampleable, LinksType: Sampleable, IncludeType: Sampleable, APIDescription: Sampleable, Error: Sampleable {
+extension Document: Sampleable, AbstractSampleable where PrimaryResourceBody: Sampleable, MetaType: Sampleable, LinksType: Sampleable, IncludeType: Sampleable, APIDescription: Sampleable, Error: Sampleable {
 	public static var sample: Document<PrimaryResourceBody, MetaType, LinksType, IncludeType, APIDescription, Error> {
 		return Document(apiDescription: .sample,
 						body: .sample,
@@ -377,7 +377,7 @@ extension Document: Sampleable where PrimaryResourceBody: Sampleable, MetaType: 
 	}
 }
 
-extension Document.SuccessDocument: Sampleable where PrimaryResourceBody: Sampleable, MetaType: Sampleable, LinksType: Sampleable, IncludeType: Sampleable, APIDescription: Sampleable {
+extension Document.SuccessDocument: Sampleable, AbstractSampleable where PrimaryResourceBody: Sampleable, MetaType: Sampleable, LinksType: Sampleable, IncludeType: Sampleable, APIDescription: Sampleable {
     public static var sample: Document.SuccessDocument {
         return Document.SuccessDocument(apiDescription: .sample,
                                         body: .sample,
@@ -387,7 +387,7 @@ extension Document.SuccessDocument: Sampleable where PrimaryResourceBody: Sample
     }
 }
 
-extension Document.ErrorDocument: Sampleable where MetaType: Sampleable, LinksType: Sampleable, APIDescription: Sampleable, Error: Sampleable {
+extension Document.ErrorDocument: Sampleable, AbstractSampleable where MetaType: Sampleable, LinksType: Sampleable, APIDescription: Sampleable, Error: Sampleable {
     public static var sample: Document.ErrorDocument {
         return Document.ErrorDocument(apiDescription: .sample,
                                       errors: Error.samples,
