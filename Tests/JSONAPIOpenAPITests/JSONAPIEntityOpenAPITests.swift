@@ -14,7 +14,7 @@ import Sampleable
 
 class JSONAPIEntityOpenAPITests: XCTestCase {
 	func test_EmptyEntity() {
-		let node = try! TestType1.openAPINode(using: JSONEncoder())
+		let node = try! TestType1.openAPISchema(using: JSONEncoder())
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -42,7 +42,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 	}
 
 	func test_UnidentifiedEmptyEntity() {
-		let node = try! UnidentifiedTestType1.openAPINode(using: JSONEncoder())
+		let node = try! UnidentifiedTestType1.openAPISchema(using: JSONEncoder())
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -76,7 +76,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 		let encoder = JSONEncoder()
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! TestType2.openAPINode(using: encoder)
+		let node = try! TestType2.openAPISchema(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -128,6 +128,8 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 									 required: true),
 							   .init()))
 
+        print(String(data: try! JSONEncoder().encode(attributesContext.properties["enumProperty"]), encoding: .utf8)!)
+
 		XCTAssertEqual(attributesContext.properties["enumProperty"],
 					   .string(.init(format: .generic,
 									 required: true,
@@ -165,7 +167,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 	}
 
 	func test_RelationshipsEntity() {
-		let node = try! TestType3.openAPINode(using: JSONEncoder())
+		let node = try! TestType3.openAPISchema(using: JSONEncoder())
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -304,7 +306,7 @@ extension JSONAPIEntityOpenAPITests {
 	enum TestType2Description: ResourceObjectDescription {
 		public static var jsonType: String { return "test2" }
 
-		public enum EnumType: String, CaseIterable, Codable, Equatable {
+		public enum EnumType: String, CaseIterable, Codable, Equatable, AnyJSONCaseIterable {
 			case one
 			case two
 		}
