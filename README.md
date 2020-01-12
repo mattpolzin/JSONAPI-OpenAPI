@@ -5,7 +5,7 @@ See parent project: https://github.com/mattpolzin/JSONAPI
 
 The `JSONAPIOpenAPI` framework adds the ability to generate OpenAPI compliant JSON Schema documentation of a JSONAPI Document.
 
-There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation on the `feature/gen-swift` branch. There is no formal documentation for this functionality, but it is an area of interest of mine. Reach out to me directly if you would like to know more. 
+There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation on the `feature/gen-swift` branch. There is no formal documentation for this functionality, but it is an area of interest of mine. Reach out to me directly if you would like to know more.
 
 See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md
 
@@ -28,15 +28,15 @@ encoder.outputFormatting = .prettyPrinted
 // First describe the resource object
 //
 struct WidgetDescription: JSONAPI.ResourceObjectDescription {
-  static var jsonType: String { return "widgets" }
+    static var jsonType: String { return "widgets" }
 
-  struct Attributes: JSONAPI.Attributes {
-    let productName: Attribute<String>
-  }
+    struct Attributes: JSONAPI.Attributes {
+        let productName: Attribute<String>
+    }
 
-  struct Relationships: JSONAPI.Relationships {
-    let subcomponents: ToManyRelationship<Widget, NoMetadata, NoLinks>
-  }
+    struct Relationships: JSONAPI.Relationships {
+        let subcomponents: ToManyRelationship<Widget, NoMetadata, NoLinks>
+    }
 }
 
 typealias Widget = JSONAPI.ResourceObject<WidgetDescription, NoMetadata, NoLinks, String>
@@ -48,21 +48,21 @@ typealias Widget = JSONAPI.ResourceObject<WidgetDescription, NoMetadata, NoLinks
 // instances of them.
 //
 extension WidgetDescription.Attributes: Sampleable {
-  static var sample: WidgetDescription.Attributes {
-    return .init(productName: .init(value: "Fillihizzer Nob Hub"))
-  }
+    static var sample: WidgetDescription.Attributes {
+        return .init(productName: .init(value: "Fillihizzer Nob Hub"))
+    }
 }
 
 extension WidgetDescription.Relationships: Sampleable {
-  static var sample: WidgetDescription.Relationships {
-    return .init(subcomponents: .init(ids: [.init(rawValue: "1")]))
-  }
+    static var sample: WidgetDescription.Relationships {
+        return .init(subcomponents: .init(ids: [.init(rawValue: "1")]))
+    }
 }
 
 //
 // We can create a JSON Schema for the Widget at this point
 //
-let widgetJSONSchema = Widget.openAPINode(using: encoder)
+let widgetJSONSchema = Widget.openAPISchema(using: encoder)
 
 //
 // Describe a JSON:API response body with 1 widget and
@@ -71,11 +71,21 @@ let widgetJSONSchema = Widget.openAPINode(using: encoder)
 typealias SingleWidgetDocumentWithIncludes = Document<SingleResourceBody<Widget>, NoMetadata, NoLinks, Include1<Widget>, NoAPIDescription, BasicJSONAPIError<String>>
 
 //
-// Finally we can create a JSON Schema for the response body
+// Finally we can create a JSON Schema for the response body of a successful request
 //
-let jsonAPIResponseSchema = SingleWidgetDocumentWithIncludes.openAPINode(using: encoder)
+let jsonAPIResponseSchema = SingleWidgetDocumentWithIncludes.SuccessDocument.openAPISchema(using: encoder)
 
 print(String(data: try! encoder.encode(jsonAPIResponseSchema), encoding: .utf8)!)
+
+//
+// Or a failed request
+//
+let jsonAPIResponseErrorSchema = SingleWidgetDocumentWithIncludes.ErrorDocument.openAPISchema(using: encoder)
+
+//
+// Or a schema describing the response as `oneOf` the success or error respones
+//
+let jsonAPIResponseFullSchema = SingleWidgetDocumentWithIncludes.openAPISchema(using: encoder)
 ```
 
 The above code produces:
@@ -86,9 +96,6 @@ The above code produces:
     "data" : {
       "type" : "object",
       "properties" : {
-        "id" : {
-          "type" : "string"
-        },
         "relationships" : {
           "type" : "object",
           "properties" : {
@@ -100,19 +107,19 @@ The above code produces:
                   "items" : {
                     "type" : "object",
                     "properties" : {
-                      "id" : {
-                        "type" : "string"
-                      },
                       "type" : {
                         "type" : "string",
                         "enum" : [
                           "widgets"
                         ]
+                      },
+                      "id" : {
+                        "type" : "string"
                       }
                     },
                     "required" : [
-                      "type",
-                      "id"
+                      "id",
+                      "type"
                     ]
                   }
                 }
@@ -125,6 +132,9 @@ The above code produces:
           "required" : [
             "subcomponents"
           ]
+        },
+        "id" : {
+          "type" : "string"
         },
         "type" : {
           "type" : "string",
@@ -146,9 +156,9 @@ The above code produces:
       },
       "required" : [
         "attributes",
-        "type",
+        "id",
         "relationships",
-        "id"
+        "type"
       ]
     },
     "included" : {
@@ -156,9 +166,6 @@ The above code produces:
       "items" : {
         "type" : "object",
         "properties" : {
-          "id" : {
-            "type" : "string"
-          },
           "relationships" : {
             "type" : "object",
             "properties" : {
@@ -196,6 +203,9 @@ The above code produces:
               "subcomponents"
             ]
           },
+          "id" : {
+            "type" : "string"
+          },
           "type" : {
             "type" : "string",
             "enum" : [
@@ -215,10 +225,10 @@ The above code produces:
           }
         },
         "required" : [
-          "type",
           "attributes",
+          "id",
           "relationships",
-          "id"
+          "type"
         ]
       },
       "uniqueItems" : true

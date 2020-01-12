@@ -161,6 +161,12 @@ extension GenericJSONAPIError: OpenAPIEncodedSchemaType where ErrorPayload: Open
     }
 }
 
+extension UnknownJSONAPIError: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+        return .string(allowedValues: "unknown")
+    }
+}
+
 extension Document: OpenAPIEncodedSchemaType where PrimaryResourceBody: OpenAPIEncodedSchemaType, IncludeType: OpenAPIEncodedSchemaType, Error: OpenAPIEncodedSchemaType {
 	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		// TODO: metadata, links, api description, errors

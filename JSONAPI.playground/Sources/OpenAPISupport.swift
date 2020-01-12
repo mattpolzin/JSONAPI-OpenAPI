@@ -30,7 +30,7 @@ extension DogDescription.Relationships: Sampleable {
 }
 
 private var counter = 1
-extension Id: Sampleable where RawType == String {
+extension Id: Sampleable, AbstractSampleable where RawType == String {
     public static var sample: Id<RawType, IdentifiableType> {
         let id = "\(counter)"
         counter = counter + 1
@@ -38,7 +38,7 @@ extension Id: Sampleable where RawType == String {
     }
 }
 
-extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
+extension JSONAPI.ResourceObject: Sampleable, AbstractSampleable where Description.Attributes: Sampleable, Description.Relationships: Sampleable, MetaType: Sampleable, LinksType: Sampleable, EntityRawIdType == String {
     public static var sample: JSONAPI.ResourceObject<Description, MetaType, LinksType, EntityRawIdType> {
         return JSONAPI.ResourceObject(id: .sample,
                                       attributes: .sample,
@@ -48,7 +48,7 @@ extension JSONAPI.ResourceObject: Sampleable where Description.Attributes: Sampl
     }
 }
 
-extension Document: Sampleable where PrimaryResourceBody: Sampleable, IncludeType: Sampleable, MetaType: Sampleable, LinksType: Sampleable, Error: Sampleable, APIDescription: Sampleable {
+extension Document: Sampleable, AbstractSampleable where PrimaryResourceBody: Sampleable, IncludeType: Sampleable, MetaType: Sampleable, LinksType: Sampleable, Error: Sampleable, APIDescription: Sampleable {
 	public static var sample: Document {
         return successSample!
 	}
@@ -68,3 +68,14 @@ extension Document: Sampleable where PrimaryResourceBody: Sampleable, IncludeTyp
                         links: LinksType.sample)
 	}
 }
+
+extension Document.SuccessDocument: Sampleable, AbstractSampleable where PrimaryResourceBody: Sampleable, IncludeType: Sampleable, MetaType: Sampleable, LinksType: Sampleable, Error: Sampleable, APIDescription: Sampleable {
+    public static var sample: Document.SuccessDocument {
+        return Document.SuccessDocument(apiDescription: APIDescription.sample,
+                                        body: PrimaryResourceBody.sample,
+                                        includes: .init(values: IncludeType.samples),
+                                        meta: MetaType.sample,
+                                        links: LinksType.sample)
+    }
+}
+
