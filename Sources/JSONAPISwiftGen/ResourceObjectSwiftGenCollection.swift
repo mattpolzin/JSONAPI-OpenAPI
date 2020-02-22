@@ -16,11 +16,7 @@ public struct ResourceObjectSwiftGenCollection {
         resourceObjectGenerators = OpenAPI.HttpVerb.allCases
             .flatMap { httpVerb in
                 return pathItems.flatMap { (path, pathItem) -> [ResourceObjectSwiftGen] in
-                    guard case let .b(operations) = pathItem else {
-                        return []
-                    }
-
-                    guard let operation = operations.for(httpVerb) else {
+                    guard let operation = pathItem.for(httpVerb) else {
                         return []
                     }
 
@@ -34,7 +30,7 @@ public struct ResourceObjectSwiftGenCollection {
                         for: httpVerb,
                         at: path,
                         on: doc.servers.first!,
-                        given: parameters.compactMap { $0.a }
+                        given: parameters.compactMap { $0.b }
                     ).values.flatMap { Array($0.resourceObjectGenerators) }
                 }
         }
@@ -51,7 +47,7 @@ func documents(from responses: OpenAPI.Response.Map,
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
-        guard let jsonResponse = response.a?.content[.json] else {
+        guard let jsonResponse = response.b?.content[.json] else {
             continue
         }
 

@@ -61,11 +61,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
     )]
     results = HttpVerb.allCases.flatMap { httpVerb in
         return pathItems.compactMap { (path, pathItem) in
-            guard case let .b(operations) = pathItem else {
-                return nil
-            }
-
-            guard let operation = operations.for(httpVerb) else {
+            guard let operation = pathItem.for(httpVerb) else {
                 return nil
             }
 
@@ -73,7 +69,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
 
             let apiRequestTest = try? APIRequestTestSwiftGen(server: server,
                                                          pathComponents: path,
-                                                         parameters: parameters.compactMap { $0.a })
+                                                         parameters: parameters.compactMap { $0.b })
 
             let responses = operation.responses
             let responseDocuments = documents(
@@ -81,13 +77,14 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                 for: httpVerb,
                 at: path,
                 on: server,
-                given: parameters.compactMap { $0.a }
+                given: parameters.compactMap { $0.b }
             )
 
             let requestDocument: DataDocumentSwiftGen?
             do {
                 try requestDocument = operation
                     .requestBody
+                    .flatMap { $0.b }
                     .flatMap { try document(from: $0, for: httpVerb, at: path) }
             } catch let err {
                 print("===")
@@ -120,7 +117,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
             return (
                 httpVerb: httpVerb,
                 path: path,
-                pathItem: operations,
+                pathItem: pathItem,
                 apiRequestTest: apiRequestTest,
                 requestDocument: requestDocument,
                 responseDocuments: responseDocuments,
@@ -432,7 +429,7 @@ func documents(from responses: OpenAPI.Response.Map,
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
-        guard let jsonResponse = response.a?.content[.json] else {
+        guard let jsonResponse = response.b?.content[.json] else {
             continue
         }
 

@@ -28,7 +28,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 parameters: [OpenAPI.PathItem.Parameter]) throws {
 
         let parameterArgs = try parameters
-            .filter { !$0.parameterLocation.isQuery } // for now these are handled as a block rather than each as separate args
+            .filter { !$0.parameterLocation.inQuery } // for now these are handled as a block rather than each as separate args
             .map(APIRequestTestSwiftGen.argument)
 
         let requestBodyTypeDef = SwiftTypeDef(name: "RequestBody", specializationReps: [])
@@ -64,7 +64,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         ]
 
         let headersValue = Value.array(elements: parameters
-            .filter { $0.parameterLocation.isHeader }
+            .filter { $0.parameterLocation.inHeader }
             .map {
                 let headerVal = Value.tuple(elements: [
                     (name: "name",
