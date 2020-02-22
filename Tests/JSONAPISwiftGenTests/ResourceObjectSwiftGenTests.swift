@@ -47,7 +47,7 @@ class ResourceObjectSwiftGenTests: XCTestCase {
     }
 
     func test_ViaOpenAPI() {
-        let openAPIStructure = try! TestPerson.openAPINode(using: testEncoder)
+        let openAPIStructure = try! TestPerson.openAPISchema(using: testEncoder)
 
         let testPersonSwiftGen = try! ResourceObjectSwiftGen(structure: openAPIStructure)
 
