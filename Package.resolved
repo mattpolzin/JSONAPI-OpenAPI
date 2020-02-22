@@ -29,6 +29,15 @@
         }
       },
       {
+        "package": "FineJSON",
+        "repositoryURL": "https://github.com/omochi/FineJSON.git",
+        "state": {
+          "branch": null,
+          "revision": "05101709243cb66d80c92e645210a3b80cf4e17f",
+          "version": "1.14.0"
+        }
+      },
+      {
         "package": "JSONAPI",
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
@@ -39,11 +48,20 @@
       },
       {
         "package": "OpenAPIKit",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "7843345a17042260f987bbf372efc236d567f5a5",
-          "version": "0.11.0"
+          "revision": "02bf3f48c3678bb93869a10c7867d9a9373971dc",
+          "version": "0.20.0"
+        }
+      },
+      {
+        "package": "OrderedDictionary",
+        "repositoryURL": "https://github.com/mattpolzin/OrderedDictionary.git",
+        "state": {
+          "branch": null,
+          "revision": "389f38b3f70b3b8c04305a0247db773c9236907f",
+          "version": "1.1.0"
         }
       },
       {
@@ -53,6 +71,15 @@
           "branch": null,
           "revision": "0c9c08204142babc480938d704a23513d11420e5",
           "version": "2.3.1"
+        }
+      },
+      {
+        "package": "RichJSONParser",
+        "repositoryURL": "https://github.com/omochi/RichJSONParser.git",
+        "state": {
+          "branch": null,
+          "revision": "263e2ecfe88d0500fa99e4cbc8c948529d335534",
+          "version": "3.0.0"
         }
       },
       {
@@ -80,6 +107,15 @@
           "branch": null,
           "revision": "077c096c3ddfc38db223ac8e525ad16ffb987138",
           "version": "0.12.0"
+        }
+      },
+      {
+        "package": "Yams",
+        "repositoryURL": "https://github.com/jpsim/Yams.git",
+        "state": {
+          "branch": null,
+          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
+          "version": "2.0.0"
         }
       }
     ]
