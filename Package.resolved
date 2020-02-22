@@ -56,6 +56,15 @@
         }
       },
       {
+        "package": "FineJSON",
+        "repositoryURL": "https://github.com/omochi/FineJSON.git",
+        "state": {
+          "branch": null,
+          "revision": "05101709243cb66d80c92e645210a3b80cf4e17f",
+          "version": "1.14.0"
+        }
+      },
+      {
         "package": "JSONAPI",
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
@@ -84,11 +93,20 @@
       },
       {
         "package": "OpenAPIKit",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPI.git",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "44ded671ba54700f6948e166b7bd5dd331dd6a1e",
-          "version": "0.10.0"
+          "revision": "02bf3f48c3678bb93869a10c7867d9a9373971dc",
+          "version": "0.20.0"
+        }
+      },
+      {
+        "package": "OrderedDictionary",
+        "repositoryURL": "https://github.com/mattpolzin/OrderedDictionary.git",
+        "state": {
+          "branch": null,
+          "revision": "389f38b3f70b3b8c04305a0247db773c9236907f",
+          "version": "1.1.0"
         }
       },
       {
@@ -119,6 +137,15 @@
         }
       },
       {
+        "package": "RichJSONParser",
+        "repositoryURL": "https://github.com/omochi/RichJSONParser.git",
+        "state": {
+          "branch": null,
+          "revision": "263e2ecfe88d0500fa99e4cbc8c948529d335534",
+          "version": "3.0.0"
+        }
+      },
+      {
         "package": "Sampleable",
         "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
         "state": {
@@ -141,8 +168,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
         "state": {
           "branch": null,
-          "revision": "2051d80bcc1510f14508c942d64b5c6364ed1bdc",
-          "version": "0.2.0"
+          "revision": "2eec250e2034b80b7d1a0b4a8fd2ce3977708fab",
+          "version": "0.2.1"
         }
       },
       {

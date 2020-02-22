@@ -9,6 +9,7 @@ import JSONAPI
 import OpenAPIKit
 import Foundation
 import AnyCodable
+import Sampleable
 
 private protocol _Optional {}
 extension Optional: _Optional {}
@@ -18,150 +19,127 @@ private protocol Wrapper {
 }
 extension Optional: Wrapper {}
 
+public protocol OpenAPIAttributeType {
+    static func attributeOpenAPISchemaGuess(using encoder: JSONEncoder) throws -> JSONSchema
+}
+
 // MARK: Attribute
-extension Attribute: OpenAPINodeType where RawValue: OpenAPINodeType {
-	static public func openAPINode() throws -> JSONSchema {
+extension Attribute: OpenAPISchemaType where RawValue: OpenAPISchemaType {
+	static public func openAPISchema() throws -> JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.openAPINode().required {
-			return try RawValue.openAPINode().requiredSchemaObject().nullableSchemaObject()
+		if try !RawValue.openAPISchema().required {
+			return try RawValue.openAPISchema().requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.openAPINode()
+		return try RawValue.openAPISchema()
 	}
 }
 
-extension Attribute: RawOpenAPINodeType where RawValue: RawRepresentable, RawValue.RawValue: OpenAPINodeType {
-	static public func rawOpenAPINode() throws -> JSONSchema {
+extension Attribute: RawOpenAPISchemaType where RawValue: RawOpenAPISchemaType {
+	static public func rawOpenAPISchema() throws -> JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.RawValue.openAPINode().required {
-			return try RawValue.RawValue.openAPINode().requiredSchemaObject().nullableSchemaObject()
+		if try !RawValue.rawOpenAPISchema().required {
+			return try RawValue.rawOpenAPISchema().requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.RawValue.openAPINode()
+		return try RawValue.rawOpenAPISchema()
 	}
 }
 
-extension Attribute: WrappedRawOpenAPIType where RawValue: RawOpenAPINodeType {
-	public static func wrappedOpenAPINode() throws -> JSONSchema {
-		// If the RawValue is not required, we actually consider it
-		// nullable. To be not required is for the Attribute itself
-		// to be optional.
-		if try !RawValue.rawOpenAPINode().required {
-			return try RawValue.rawOpenAPINode().requiredSchemaObject().nullableSchemaObject()
-		}
-		return try RawValue.rawOpenAPINode()
-	}
-}
-
-extension Attribute: GenericOpenAPINodeType where RawValue: GenericOpenAPINodeType {
-	public static func genericOpenAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		// If the RawValue is not required, we actually consider it
-		// nullable. To be not required is for the Attribute itself
-		// to be optional.
-		if try !RawValue.genericOpenAPINode(using: encoder).required {
-			return try RawValue.genericOpenAPINode(using: encoder).requiredSchemaObject().nullableSchemaObject()
-		}
-		return try RawValue.genericOpenAPINode(using: encoder)
-	}
-}
-
-extension Attribute: DateOpenAPINodeType where RawValue: DateOpenAPINodeType {
-	public static func dateOpenAPINodeGuess(using encoder: JSONEncoder) -> JSONSchema? {
+extension Attribute: DateOpenAPISchemaType where RawValue: DateOpenAPISchemaType {
+	public static func dateOpenAPISchemaGuess(using encoder: JSONEncoder) -> JSONSchema? {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
 		if
-			!(RawValue.dateOpenAPINodeGuess(using: encoder)?.required ?? true) {
-			return RawValue.dateOpenAPINodeGuess(using: encoder)?.requiredSchemaObject().nullableSchemaObject()
+			!(RawValue.dateOpenAPISchemaGuess(using: encoder)?.required ?? true) {
+			return RawValue.dateOpenAPISchemaGuess(using: encoder)?.requiredSchemaObject().nullableSchemaObject()
 		}
-		return RawValue.dateOpenAPINodeGuess(using: encoder)
+		return RawValue.dateOpenAPISchemaGuess(using: encoder)
 	}
 }
 
-extension Attribute: AnyRawRepresentable, AnyJSONCaseIterable where RawValue: CaseIterable, RawValue: Codable {
+extension Attribute: AnyRawRepresentable where RawValue: AnyRawRepresentable {
+    public static var rawValueType: Any.Type { return RawValue.rawValueType }
+}
+
+extension Attribute: AnyJSONCaseIterable where RawValue: AnyJSONCaseIterable {
 	public static func allCases(using encoder: JSONEncoder) -> [AnyCodable] {
-		return (try? allCases(from: Array(RawValue.allCases), using: encoder)) ?? []
-	}
-}
-
-extension Attribute: AnyWrappedJSONCaseIterable where RawValue: AnyJSONCaseIterable {
-	public static func wrappedAllCases(using encoder: JSONEncoder) -> [AnyCodable] {
 		return RawValue.allCases(using: encoder)
 	}
+}
+
+extension Attribute: OpenAPIAttributeType where RawValue: Sampleable, RawValue: Encodable {
+    public static func attributeOpenAPISchemaGuess(using encoder: JSONEncoder) throws -> JSONSchema {
+        // If the RawValue is not required, we actually consider it
+        // nullable. To be not required is for the Attribute itself
+        // to be optional.
+        if try !OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
+            return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
+        }
+        return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
+    }
 }
 
 // MARK: - TransformedAttribute
-extension TransformedAttribute: OpenAPINodeType where RawValue: OpenAPINodeType {
-	static public func openAPINode() throws -> JSONSchema {
+extension TransformedAttribute: OpenAPISchemaType where RawValue: OpenAPISchemaType {
+	static public func openAPISchema() throws -> JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.openAPINode().required {
-			return try RawValue.openAPINode().requiredSchemaObject().nullableSchemaObject()
+		if try !RawValue.openAPISchema().required {
+			return try RawValue.openAPISchema().requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.openAPINode()
+		return try RawValue.openAPISchema()
 	}
 }
 
-extension TransformedAttribute: RawOpenAPINodeType where RawValue: RawRepresentable, RawValue.RawValue: OpenAPINodeType {
-	static public func rawOpenAPINode() throws -> JSONSchema {
+extension TransformedAttribute: RawOpenAPISchemaType where RawValue: RawOpenAPISchemaType {
+	static public func rawOpenAPISchema() throws -> JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.RawValue.openAPINode().required {
-			return try RawValue.RawValue.openAPINode().requiredSchemaObject().nullableSchemaObject()
+		if try !RawValue.rawOpenAPISchema().required {
+			return try RawValue.rawOpenAPISchema().requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.RawValue.openAPINode()
+		return try RawValue.rawOpenAPISchema()
 	}
 }
 
-extension TransformedAttribute: WrappedRawOpenAPIType where RawValue: RawOpenAPINodeType {
-	public static func wrappedOpenAPINode() throws -> JSONSchema {
-		// If the RawValue is not required, we actually consider it
-		// nullable. To be not required is for the Attribute itself
-		// to be optional.
-		if try !RawValue.rawOpenAPINode().required {
-			return try RawValue.rawOpenAPINode().requiredSchemaObject().nullableSchemaObject()
-		}
-		return try RawValue.rawOpenAPINode()
-	}
-}
-
-extension TransformedAttribute: GenericOpenAPINodeType where RawValue: GenericOpenAPINodeType {
-	public static func genericOpenAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		// If the RawValue is not required, we actually consider it
-		// nullable. To be not required is for the Attribute itself
-		// to be optional.
-		if try !RawValue.genericOpenAPINode(using: encoder).required {
-			return try RawValue.genericOpenAPINode(using: encoder).requiredSchemaObject().nullableSchemaObject()
-		}
-		return try RawValue.genericOpenAPINode(using: encoder)
-	}
-}
-
-extension TransformedAttribute: DateOpenAPINodeType where RawValue: DateOpenAPINodeType {
-	public static func dateOpenAPINodeGuess(using encoder: JSONEncoder) -> JSONSchema? {
+extension TransformedAttribute: DateOpenAPISchemaType where RawValue: DateOpenAPISchemaType {
+	public static func dateOpenAPISchemaGuess(using encoder: JSONEncoder) -> JSONSchema? {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
 		if
-			!(RawValue.dateOpenAPINodeGuess(using: encoder)?.required ?? true) {
-			return RawValue.dateOpenAPINodeGuess(using: encoder)?.requiredSchemaObject().nullableSchemaObject()
+			!(RawValue.dateOpenAPISchemaGuess(using: encoder)?.required ?? true) {
+			return RawValue.dateOpenAPISchemaGuess(using: encoder)?.requiredSchemaObject().nullableSchemaObject()
 		}
-		return RawValue.dateOpenAPINodeGuess(using: encoder)
+		return RawValue.dateOpenAPISchemaGuess(using: encoder)
 	}
 }
 
-extension TransformedAttribute: AnyRawRepresentable, AnyJSONCaseIterable where RawValue: CaseIterable, RawValue: Codable {
+extension TransformedAttribute: AnyRawRepresentable where RawValue: AnyRawRepresentable {
+
+    public static var rawValueType: Any.Type { return RawValue.rawValueType }
+}
+
+extension TransformedAttribute: AnyJSONCaseIterable where RawValue: AnyJSONCaseIterable {
 	public static func allCases(using encoder: JSONEncoder) -> [AnyCodable] {
-		return (try? allCases(from: Array(RawValue.allCases), using: encoder)) ?? []
-	}
-}
-
-extension TransformedAttribute: AnyWrappedJSONCaseIterable where RawValue: AnyJSONCaseIterable {
-	public static func wrappedAllCases(using encoder: JSONEncoder) -> [AnyCodable] {
 		return RawValue.allCases(using: encoder)
 	}
+}
+
+extension TransformedAttribute: OpenAPIAttributeType where RawValue: Sampleable, RawValue: Encodable {
+    public static func attributeOpenAPISchemaGuess(using encoder: JSONEncoder) throws -> JSONSchema {
+        // If the RawValue is not required, we actually consider it
+        // nullable. To be not required is for the Attribute itself
+        // to be optional.
+        if try !OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
+            return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
+        }
+        return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
+    }
 }

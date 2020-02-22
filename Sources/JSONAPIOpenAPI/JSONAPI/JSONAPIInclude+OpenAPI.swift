@@ -9,9 +9,9 @@ import JSONAPI
 import OpenAPIKit
 import Foundation
 
-extension Includes: OpenAPIEncodedNodeType where I: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		let includeNode = try I.openAPINode(using: encoder)
+extension Includes: OpenAPIEncodedSchemaType where I: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+		let includeNode = try I.openAPISchema(using: encoder)
 
 		return .array(.init(format: .generic,
 							required: true),
@@ -20,149 +20,149 @@ extension Includes: OpenAPIEncodedNodeType where I: OpenAPIEncodedNodeType {
 	}
 }
 
-extension Include0: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include0: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		throw OpenAPITypeError.invalidNode
 	}
 }
 
-extension Include1: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		return try A.openAPINode(using: encoder)
+extension Include1: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+		return try A.openAPISchema(using: encoder)
 	}
 }
 
-extension Include2: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include2: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder)
 		])
 	}
 }
 
-extension Include3: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include3: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include4: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include4: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include5: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include5: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder),
-			E.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder),
+			E.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include6: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include6: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder),
-			E.openAPINode(using: encoder),
-			F.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder),
+			E.openAPISchema(using: encoder),
+			F.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include7: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include7: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType, G: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder),
-			E.openAPINode(using: encoder),
-			F.openAPINode(using: encoder),
-			G.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder),
+			E.openAPISchema(using: encoder),
+			F.openAPISchema(using: encoder),
+			G.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include8: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType, H: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include8: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType, G: OpenAPIEncodedSchemaType, H: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder),
-			E.openAPINode(using: encoder),
-			F.openAPINode(using: encoder),
-			G.openAPINode(using: encoder),
-			H.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder),
+			E.openAPISchema(using: encoder),
+			F.openAPISchema(using: encoder),
+			G.openAPISchema(using: encoder),
+			H.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include9: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType, H: OpenAPIEncodedNodeType, I: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include9: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType, G: OpenAPIEncodedSchemaType, H: OpenAPIEncodedSchemaType, I: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return try .one(of: [
-			A.openAPINode(using: encoder),
-			B.openAPINode(using: encoder),
-			C.openAPINode(using: encoder),
-			D.openAPINode(using: encoder),
-			E.openAPINode(using: encoder),
-			F.openAPINode(using: encoder),
-			G.openAPINode(using: encoder),
-			H.openAPINode(using: encoder),
-			I.openAPINode(using: encoder)
+			A.openAPISchema(using: encoder),
+			B.openAPISchema(using: encoder),
+			C.openAPISchema(using: encoder),
+			D.openAPISchema(using: encoder),
+			E.openAPISchema(using: encoder),
+			F.openAPISchema(using: encoder),
+			G.openAPISchema(using: encoder),
+			H.openAPISchema(using: encoder),
+			I.openAPISchema(using: encoder)
 			])
 	}
 }
 
-extension Include10: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType, H: OpenAPIEncodedNodeType, I: OpenAPIEncodedNodeType, J: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include10: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType, G: OpenAPIEncodedSchemaType, H: OpenAPIEncodedSchemaType, I: OpenAPIEncodedSchemaType, J: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         return try .one(of: [
-            A.openAPINode(using: encoder),
-            B.openAPINode(using: encoder),
-            C.openAPINode(using: encoder),
-            D.openAPINode(using: encoder),
-            E.openAPINode(using: encoder),
-            F.openAPINode(using: encoder),
-            G.openAPINode(using: encoder),
-            H.openAPINode(using: encoder),
-            I.openAPINode(using: encoder),
-            J.openAPINode(using: encoder)
+            A.openAPISchema(using: encoder),
+            B.openAPISchema(using: encoder),
+            C.openAPISchema(using: encoder),
+            D.openAPISchema(using: encoder),
+            E.openAPISchema(using: encoder),
+            F.openAPISchema(using: encoder),
+            G.openAPISchema(using: encoder),
+            H.openAPISchema(using: encoder),
+            I.openAPISchema(using: encoder),
+            J.openAPISchema(using: encoder)
         ])
     }
 }
 
-extension Include11: OpenAPIEncodedNodeType where A: OpenAPIEncodedNodeType, B: OpenAPIEncodedNodeType, C: OpenAPIEncodedNodeType, D: OpenAPIEncodedNodeType, E: OpenAPIEncodedNodeType, F: OpenAPIEncodedNodeType, G: OpenAPIEncodedNodeType, H: OpenAPIEncodedNodeType, I: OpenAPIEncodedNodeType, J: OpenAPIEncodedNodeType, K: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Include11: OpenAPIEncodedSchemaType where A: OpenAPIEncodedSchemaType, B: OpenAPIEncodedSchemaType, C: OpenAPIEncodedSchemaType, D: OpenAPIEncodedSchemaType, E: OpenAPIEncodedSchemaType, F: OpenAPIEncodedSchemaType, G: OpenAPIEncodedSchemaType, H: OpenAPIEncodedSchemaType, I: OpenAPIEncodedSchemaType, J: OpenAPIEncodedSchemaType, K: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         return try .one(of: [
-            A.openAPINode(using: encoder),
-            B.openAPINode(using: encoder),
-            C.openAPINode(using: encoder),
-            D.openAPINode(using: encoder),
-            E.openAPINode(using: encoder),
-            F.openAPINode(using: encoder),
-            G.openAPINode(using: encoder),
-            H.openAPINode(using: encoder),
-            I.openAPINode(using: encoder),
-            J.openAPINode(using: encoder),
-            K.openAPINode(using: encoder)
+            A.openAPISchema(using: encoder),
+            B.openAPISchema(using: encoder),
+            C.openAPISchema(using: encoder),
+            D.openAPISchema(using: encoder),
+            E.openAPISchema(using: encoder),
+            F.openAPISchema(using: encoder),
+            G.openAPISchema(using: encoder),
+            H.openAPISchema(using: encoder),
+            I.openAPISchema(using: encoder),
+            J.openAPISchema(using: encoder),
+            K.openAPISchema(using: encoder)
         ])
     }
 }

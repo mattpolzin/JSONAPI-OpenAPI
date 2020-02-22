@@ -38,12 +38,12 @@ extension RelationshipType {
 	}
 }
 
-extension ToOneRelationship: OpenAPINodeType {
+extension ToOneRelationship: OpenAPISchemaType {
 	// NOTE: const for json `type` not supported by OpenAPI 3.0
 	//		Will use "enum" with one possible value for now.
 
 	// TODO: metadata & links
-	static public func openAPINode() throws -> JSONSchema {
+	static public func openAPISchema() throws -> JSONSchema {
 		let nullable = Identifiable.self is _Optional.Type
 		return .object(.init(format: .generic,
 							 required: true),
@@ -53,12 +53,12 @@ extension ToOneRelationship: OpenAPINodeType {
 	}
 }
 
-extension ToManyRelationship: OpenAPINodeType {
+extension ToManyRelationship: OpenAPISchemaType {
 	// NOTE: const for json `type` not supported by OpenAPI 3.0
 	//		Will use "enum" with one possible value for now.
 
 	// TODO: metadata & links
-	static public func openAPINode() throws -> JSONSchema {
+	static public func openAPISchema() throws -> JSONSchema {
 		return .object(.init(format: .generic,
 							 required: true),
 					   .init(properties: [
@@ -69,8 +69,8 @@ extension ToManyRelationship: OpenAPINodeType {
 	}
 }
 
-extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: Sampleable, Description.Relationships: Sampleable {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension ResourceObject: OpenAPIEncodedSchemaType where Description.Attributes: Sampleable, Description.Relationships: Sampleable {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		// NOTE: const for json `type` not supported by OpenAPI 3.0
 		//		Will use "enum" with one possible value for now.
 
@@ -91,13 +91,13 @@ extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: S
 
 		let attributesNode: JSONSchema? = Description.Attributes.self == NoAttributes.self
 			? nil
-			: try Description.Attributes.genericOpenAPINode(using: encoder)
+			: try Description.Attributes.genericOpenAPISchemaGuess(using: encoder)
 
 		let attributesProperty = attributesNode.map { ("attributes", $0) }
 
 		let relationshipsNode: JSONSchema? = Description.Relationships.self == NoRelationships.self
 			? nil
-			: try Description.Relationships.genericOpenAPINode(using: encoder)
+			: try Description.Relationships.genericOpenAPISchemaGuess(using: encoder)
 
 		let relationshipsProperty = relationshipsNode.map { ("relationships", $0) }
 
@@ -114,31 +114,31 @@ extension ResourceObject: OpenAPIEncodedNodeType where Description.Attributes: S
 	}
 }
 
-extension Optional: OpenAPIEncodedNodeType where Wrapped: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-        return try Wrapped.openAPINode(using: encoder).nullableSchemaObject()
+extension Optional: OpenAPIEncodedSchemaType where Wrapped: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+        return try Wrapped.openAPISchema(using: encoder).nullableSchemaObject()
     }
 }
 
-extension SingleResourceBody: OpenAPIEncodedNodeType where PrimaryResource: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-		return try PrimaryResource.openAPINode(using: encoder)
+extension SingleResourceBody: OpenAPIEncodedSchemaType where PrimaryResource: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+		return try PrimaryResource.openAPISchema(using: encoder)
 	}
 }
 
-extension ManyResourceBody: OpenAPIEncodedNodeType where PrimaryResource: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension ManyResourceBody: OpenAPIEncodedSchemaType where PrimaryResource: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		return .array(.init(format: .generic,
 							required: true),
-					  .init(items: try PrimaryResource.openAPINode(using: encoder)))
+					  .init(items: try PrimaryResource.openAPISchema(using: encoder)))
 	}
 }
 
-extension BasicJSONAPIErrorPayload: OpenAPIEncodedNodeType where IdType: OpenAPINodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension BasicJSONAPIErrorPayload: OpenAPIEncodedSchemaType where IdType: OpenAPISchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         return .object(
             properties: [
-                "id": try IdType.openAPINode().optionalSchemaObject(),
+                "id": try IdType.openAPISchema().optionalSchemaObject(),
                 "status": .string(required: false),
                 "code": .string(required: false),
                 "title": .string(required: false),
@@ -155,19 +155,25 @@ extension BasicJSONAPIErrorPayload: OpenAPIEncodedNodeType where IdType: OpenAPI
     }
 }
 
-extension GenericJSONAPIError: OpenAPIEncodedNodeType where ErrorPayload: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
-        return try ErrorPayload.openAPINode(using: encoder)
+extension GenericJSONAPIError: OpenAPIEncodedSchemaType where ErrorPayload: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+        return try ErrorPayload.openAPISchema(using: encoder)
     }
 }
 
-extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType, Error: OpenAPIEncodedNodeType {
-	public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension UnknownJSONAPIError: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
+        return .string(allowedValues: "unknown")
+    }
+}
+
+extension Document: OpenAPIEncodedSchemaType where PrimaryResourceBody: OpenAPIEncodedSchemaType, IncludeType: OpenAPIEncodedSchemaType, Error: OpenAPIEncodedSchemaType {
+	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
 		// TODO: metadata, links, api description, errors
 		// TODO: represent data and errors as the two distinct possible outcomes
 
-        let success = try Self.SuccessDocument.openAPINode(using: encoder)
-        let error = try Self.ErrorDocument.openAPINode(using: encoder)
+        let success = try Self.SuccessDocument.openAPISchema(using: encoder)
+        let error = try Self.ErrorDocument.openAPISchema(using: encoder)
 
         return .one(of: [
             success,
@@ -176,17 +182,17 @@ extension Document: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEnc
 	}
 }
 
-extension Document.SuccessDocument: OpenAPIEncodedNodeType where PrimaryResourceBody: OpenAPIEncodedNodeType, IncludeType: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Document.SuccessDocument: OpenAPIEncodedSchemaType where PrimaryResourceBody: OpenAPIEncodedSchemaType, IncludeType: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         // TODO: metadata, links, api description
 
-        let primaryDataNode: JSONSchema = try PrimaryResourceBody.openAPINode(using: encoder)
+        let primaryDataNode: JSONSchema = try PrimaryResourceBody.openAPISchema(using: encoder)
 
         let primaryDataProperty = ("data", primaryDataNode)
 
         let includeNode: JSONSchema?
         do {
-            includeNode = try Includes<IncludeType>.openAPINode(using: encoder)
+            includeNode = try Includes<IncludeType>.openAPISchema(using: encoder)
         } catch let err as OpenAPITypeError {
             guard case .invalidNode = err else {
                 throw err
@@ -207,11 +213,11 @@ extension Document.SuccessDocument: OpenAPIEncodedNodeType where PrimaryResource
     }
 }
 
-extension Document.ErrorDocument: OpenAPIEncodedNodeType where Error: OpenAPIEncodedNodeType {
-    public static func openAPINode(using encoder: JSONEncoder) throws -> JSONSchema {
+extension Document.ErrorDocument: OpenAPIEncodedSchemaType where Error: OpenAPIEncodedSchemaType {
+    public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         // TODO: metadata, links, api description
 
-        let errorNode: JSONSchema = try Error.openAPINode(using: encoder)
+        let errorNode: JSONSchema = try Error.openAPISchema(using: encoder)
 
         let errorsArray = JSONSchema.array(
             items: errorNode

@@ -47,7 +47,7 @@ extension WidgetDescription.Relationships: Sampleable {
 //
 // We can create a JSON Schema for the Widget at this point
 //
-let widgetJSONSchema = Widget.openAPINode(using: encoder)
+let widgetJSONSchema = Widget.openAPISchema(using: encoder)
 
 //
 // Describe a JSON:API response body with 1 widget and
@@ -56,8 +56,18 @@ let widgetJSONSchema = Widget.openAPINode(using: encoder)
 typealias SingleWidgetDocumentWithIncludes = Document<SingleResourceBody<Widget>, NoMetadata, NoLinks, Include1<Widget>, NoAPIDescription, BasicJSONAPIError<String>>
 
 //
-// Finally we can create a JSON Schema for the response body
+// Finally we can create a JSON Schema for the response body of a successful request
 //
-let jsonAPIResponseSchema = SingleWidgetDocumentWithIncludes.openAPINode(using: encoder)
+let jsonAPIResponseSchema = SingleWidgetDocumentWithIncludes.SuccessDocument.openAPISchema(using: encoder)
 
 print(String(data: try! encoder.encode(jsonAPIResponseSchema), encoding: .utf8)!)
+
+//
+// Or a failed request
+//
+let jsonAPIResponseErrorSchema = SingleWidgetDocumentWithIncludes.ErrorDocument.openAPISchema(using: encoder)
+
+//
+// Or a schema describing the response as `oneOf` the success or error respones
+//
+let jsonAPIResponseFullSchema = SingleWidgetDocumentWithIncludes.openAPISchema(using: encoder)
