@@ -9,6 +9,11 @@ import XCTest
 import JSONAPI
 import JSONAPITesting
 
+import Foundation
+#if canImport(FoundationNetworking)
+import FoundationNetworking
+#endif
+
 final class APIRequestTestSwiftGenTests: XCTestCase {
 }
 
