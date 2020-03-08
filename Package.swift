@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "JSONAPIOpenAPI",
+    name: "JSONAPI-OpenAPI",
     products: [
         .library(
             name: "JSONAPIOpenAPI",
