@@ -177,8 +177,8 @@
         "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
         "state": {
           "branch": null,
-          "revision": "2eec250e2034b80b7d1a0b4a8fd2ce3977708fab",
-          "version": "0.2.1"
+          "revision": "9ef8c4aea57b8da7fedd5303d29470ea2a00c08d",
+          "version": "0.2.2"
         }
       },
       {
