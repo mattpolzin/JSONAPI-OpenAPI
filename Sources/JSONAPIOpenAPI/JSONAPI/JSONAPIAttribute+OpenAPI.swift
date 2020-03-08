@@ -7,6 +7,7 @@
 
 import JSONAPI
 import OpenAPIKit
+import OpenAPIReflection
 import Foundation
 import AnyCodable
 import Sampleable
@@ -76,10 +77,10 @@ extension Attribute: OpenAPIAttributeType where RawValue: Sampleable, RawValue: 
         // If the RawValue is not required, we actually consider it
         // nullable. To be not required is for the Attribute itself
         // to be optional.
-        if try !OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
-            return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
+        if try !OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
+            return try OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
         }
-        return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
+        return try OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
     }
 }
 
@@ -137,9 +138,9 @@ extension TransformedAttribute: OpenAPIAttributeType where RawValue: Sampleable,
         // If the RawValue is not required, we actually consider it
         // nullable. To be not required is for the Attribute itself
         // to be optional.
-        if try !OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
-            return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
+        if try !OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).required {
+            return try OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder).requiredSchemaObject().nullableSchemaObject()
         }
-        return try OpenAPIKit.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
+        return try OpenAPIReflection.genericOpenAPISchemaGuess(for: RawValue.sample, using: encoder)
     }
 }

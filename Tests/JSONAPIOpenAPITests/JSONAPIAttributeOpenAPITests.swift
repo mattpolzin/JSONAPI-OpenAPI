@@ -559,7 +559,10 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+        let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
+
+        XCTAssertEqual(node, node2)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.date))
@@ -628,6 +631,9 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
 		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
+
+        XCTAssertEqual(node, node2)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
@@ -687,6 +693,9 @@ extension JSONAPIAttributeOpenAPITests {
 			encoder.dateEncodingStrategy = .iso8601
 
 			let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+            let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
+
+            XCTAssertEqual(node, node2)
 
 			XCTAssertTrue(node.required)
 			XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
@@ -746,6 +755,9 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.dateEncodingStrategy = .secondsSince1970
 
 		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
+
+        XCTAssertEqual(node, node2)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -787,6 +799,9 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.dateEncodingStrategy = .deferredToDate
 
 		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
+        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
+
+        XCTAssertEqual(node, node2)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))

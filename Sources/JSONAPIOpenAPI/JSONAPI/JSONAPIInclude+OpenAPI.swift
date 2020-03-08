@@ -7,6 +7,7 @@
 
 import JSONAPI
 import OpenAPIKit
+import OpenAPIReflection
 import Foundation
 
 extension Includes: OpenAPIEncodedSchemaType where I: OpenAPIEncodedSchemaType {
@@ -22,7 +23,7 @@ extension Includes: OpenAPIEncodedSchemaType where I: OpenAPIEncodedSchemaType {
 
 extension Include0: OpenAPIEncodedSchemaType {
 	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
-		throw OpenAPITypeError.invalidNode
+        throw OpenAPI.TypeError.invalidNode
 	}
 }
 

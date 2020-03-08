@@ -96,8 +96,17 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "02bf3f48c3678bb93869a10c7867d9a9373971dc",
-          "version": "0.20.0"
+          "revision": "7386355f3c31a4094f528e0f650947ceb90b2cd7",
+          "version": "0.23.0"
+        }
+      },
+      {
+        "package": "OpenAPIReflection",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection.git",
+        "state": {
+          "branch": null,
+          "revision": "3c93e1d343b0e1660ae871b780a49c4758202ead",
+          "version": "0.0.1"
         }
       },
       {
@@ -105,8 +114,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OrderedDictionary.git",
         "state": {
           "branch": null,
-          "revision": "389f38b3f70b3b8c04305a0247db773c9236907f",
-          "version": "1.1.0"
+          "revision": "33a40de47e798d58f42e84e529d087f795f5a9db",
+          "version": "1.1.1"
         }
       },
       {
@@ -114,8 +123,8 @@
         "repositoryURL": "https://github.com/mattpolzin/Poly.git",
         "state": {
           "branch": null,
-          "revision": "0c9c08204142babc480938d704a23513d11420e5",
-          "version": "2.3.1"
+          "revision": "9031b8497e025cbcfae196e59eecad5ba988e267",
+          "version": "2.4.0"
         }
       },
       {
