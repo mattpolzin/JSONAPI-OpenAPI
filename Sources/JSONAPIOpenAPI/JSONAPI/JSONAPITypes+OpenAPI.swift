@@ -7,6 +7,7 @@
 
 import JSONAPI
 import OpenAPIKit
+import OpenAPIReflection
 import Foundation
 import AnyCodable
 import Sampleable
@@ -193,7 +194,7 @@ extension Document.SuccessDocument: OpenAPIEncodedSchemaType where PrimaryResour
         let includeNode: JSONSchema?
         do {
             includeNode = try Includes<IncludeType>.openAPISchema(using: encoder)
-        } catch let err as OpenAPITypeError {
+        } catch let err as OpenAPI.TypeError {
             guard case .invalidNode = err else {
                 throw err
             }

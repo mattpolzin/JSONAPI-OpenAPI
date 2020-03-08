@@ -7,3 +7,4 @@
 
 @_exported import JSONAPI
 @_exported import OpenAPIKit
+@_exported import OpenAPIReflection
