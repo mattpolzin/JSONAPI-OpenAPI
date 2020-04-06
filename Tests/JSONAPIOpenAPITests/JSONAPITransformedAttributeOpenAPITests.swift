@@ -10,7 +10,6 @@ import JSONAPI
 import OpenAPIKit
 import JSONAPIOpenAPI
 import SwiftCheck
-import AnyCodable
 
 class JSONAPITransformedAttributeOpenAPITests: XCTestCase {
 }

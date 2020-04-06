@@ -9,7 +9,6 @@ import JSONAPI
 import OpenAPIKit
 import OpenAPIReflection
 import Foundation
-import AnyCodable
 import Sampleable
 
 private protocol _Optional {}
