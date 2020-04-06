@@ -44,13 +44,19 @@ extension ToOneRelationship: OpenAPISchemaType {
 	//		Will use "enum" with one possible value for now.
 
 	// TODO: metadata & links
-	static public func openAPISchema() throws -> JSONSchema {
+    static public var openAPISchema: JSONSchema {
 		let nullable = Identifiable.self is _Optional.Type
-		return .object(.init(format: .generic,
-							 required: true),
-					   .init(properties: [
-						"data": ToOneRelationship.relationshipNode(nullable: nullable, jsonType: Identifiable.jsonType)
-						]))
+        return .object(
+            .init(
+                format: .generic,
+                required: true
+            ),
+            .init(
+                properties: [
+                    "data": ToOneRelationship.relationshipNode(nullable: nullable, jsonType: Identifiable.jsonType)
+                ]
+            )
+        )
 	}
 }
 
@@ -59,14 +65,24 @@ extension ToManyRelationship: OpenAPISchemaType {
 	//		Will use "enum" with one possible value for now.
 
 	// TODO: metadata & links
-	static public func openAPISchema() throws -> JSONSchema {
-		return .object(.init(format: .generic,
-							 required: true),
-					   .init(properties: [
-						"data": .array(.init(format: .generic,
-											 required: true),
-									   .init(items: ToManyRelationship.relationshipNode(nullable: false, jsonType: Relatable.jsonType)))
-						]))
+    static public var openAPISchema: JSONSchema {
+		return .object(
+            .init(
+                format: .generic,
+                required: true
+            ),
+            .init(
+                properties: [
+                    "data": .array(
+                        .init(
+                            format: .generic,
+                            required: true
+                        ),
+                        .init(items: ToManyRelationship.relationshipNode(nullable: false, jsonType: Relatable.jsonType))
+                    )
+                ]
+            )
+        )
 	}
 }
 
@@ -139,7 +155,7 @@ extension BasicJSONAPIErrorPayload: OpenAPIEncodedSchemaType where IdType: OpenA
     public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
         return .object(
             properties: [
-                "id": try IdType.openAPISchema().optionalSchemaObject(),
+                "id": IdType.openAPISchema.optionalSchemaObject(),
                 "status": .string(required: false),
                 "code": .string(required: false),
                 "title": .string(required: false),

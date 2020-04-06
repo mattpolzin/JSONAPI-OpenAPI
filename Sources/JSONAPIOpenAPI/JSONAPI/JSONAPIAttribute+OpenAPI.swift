@@ -9,7 +9,6 @@ import JSONAPI
 import OpenAPIKit
 import OpenAPIReflection
 import Foundation
-import AnyCodable
 import Sampleable
 
 private protocol _Optional {}
@@ -26,14 +25,14 @@ public protocol OpenAPIAttributeType {
 
 // MARK: Attribute
 extension Attribute: OpenAPISchemaType where RawValue: OpenAPISchemaType {
-	static public func openAPISchema() throws -> JSONSchema {
+    static public var openAPISchema: JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.openAPISchema().required {
-			return try RawValue.openAPISchema().requiredSchemaObject().nullableSchemaObject()
+		if !RawValue.openAPISchema.required {
+			return RawValue.openAPISchema.requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.openAPISchema()
+		return RawValue.openAPISchema
 	}
 }
 
@@ -86,14 +85,14 @@ extension Attribute: OpenAPIAttributeType where RawValue: Sampleable, RawValue: 
 
 // MARK: - TransformedAttribute
 extension TransformedAttribute: OpenAPISchemaType where RawValue: OpenAPISchemaType {
-	static public func openAPISchema() throws -> JSONSchema {
+    static public var openAPISchema: JSONSchema {
 		// If the RawValue is not required, we actually consider it
 		// nullable. To be not required is for the Attribute itself
 		// to be optional.
-		if try !RawValue.openAPISchema().required {
-			return try RawValue.openAPISchema().requiredSchemaObject().nullableSchemaObject()
+		if !RawValue.openAPISchema.required {
+			return RawValue.openAPISchema.requiredSchemaObject().nullableSchemaObject()
 		}
-		return try RawValue.openAPISchema()
+		return RawValue.openAPISchema
 	}
 }
 

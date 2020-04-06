@@ -19,7 +19,7 @@ class JSONAPIAttributeOpenAPITests: XCTestCase {
 // MARK: - Boolean
 extension JSONAPIAttributeOpenAPITests {
 	func test_BooleanAttribute() {
-		let node = try! Attribute<Bool>.openAPISchema()
+		let node = Attribute<Bool>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
@@ -36,7 +36,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_NullableBooleanAttribute() {
-		let node = try! Attribute<Bool?>.openAPISchema()
+		let node = Attribute<Bool?>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
@@ -53,7 +53,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalBooleanAttribute() {
-		let node = try! Attribute<Bool>?.openAPISchema()
+		let node = Attribute<Bool>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
@@ -70,7 +70,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableBooleanAttribute() {
-		let node = try! Attribute<Bool?>?.openAPISchema()
+		let node = Attribute<Bool?>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
@@ -90,7 +90,7 @@ extension JSONAPIAttributeOpenAPITests {
 // MARK: - Array of Strings
 extension JSONAPIAttributeOpenAPITests {
 	func test_Arrayttribute() {
-		let node = try! Attribute<[String]>.openAPISchema()
+		let node = Attribute<[String]>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
@@ -113,7 +113,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_NullableArrayAttribute() {
-		let node = try! Attribute<[String]?>.openAPISchema()
+		let node = Attribute<[String]?>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
@@ -136,7 +136,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalArrayAttribute() {
-		let node = try! Attribute<[String]>?.openAPISchema()
+		let node = Attribute<[String]>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
@@ -159,7 +159,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableArrayAttribute() {
-		let node = try! Attribute<[String]?>?.openAPISchema()
+		let node = Attribute<[String]?>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
@@ -185,7 +185,7 @@ extension JSONAPIAttributeOpenAPITests {
 // MARK: - Number
 extension JSONAPIAttributeOpenAPITests {
 	func test_NumberAttribute() {
-		let node = try! Attribute<Double>.openAPISchema()
+		let node = Attribute<Double>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -204,7 +204,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_NullableNumberAttribute() {
-		let node = try! Attribute<Double?>.openAPISchema()
+		let node = Attribute<Double?>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -223,7 +223,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNumberAttribute() {
-		let node = try! Attribute<Double>?.openAPISchema()
+		let node = Attribute<Double>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -242,7 +242,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableNumberAttribute() {
-		let node = try! Attribute<Double?>?.openAPISchema()
+		let node = Attribute<Double?>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -261,7 +261,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_FloatNumberAttribute() {
-		let node = try! Attribute<Float>.openAPISchema()
+		let node = Attribute<Float>.openAPISchema
 
 		XCTAssertEqual(node.jsonTypeFormat, .number(.float))
 	}
@@ -270,7 +270,7 @@ extension JSONAPIAttributeOpenAPITests {
 // MARK: - Integer
 extension JSONAPIAttributeOpenAPITests {
 	func test_IntegerAttribute() {
-		let node = try! Attribute<Int>.openAPISchema()
+		let node = Attribute<Int>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
@@ -289,7 +289,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_NullableIntegerAttribute() {
-		let node = try! Attribute<Int?>.openAPISchema()
+		let node = Attribute<Int?>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
@@ -308,7 +308,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalIntegerAttribute() {
-		let node = try! Attribute<Int>?.openAPISchema()
+		let node = Attribute<Int>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
@@ -327,7 +327,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableIntegerAttribute() {
-		let node = try! Attribute<Int?>?.openAPISchema()
+		let node = Attribute<Int?>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
@@ -349,7 +349,7 @@ extension JSONAPIAttributeOpenAPITests {
 // MARK: - String
 extension JSONAPIAttributeOpenAPITests {
 	func test_StringAttribute() {
-		let node = try! Attribute<String>.openAPISchema()
+		let node = Attribute<String>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
@@ -368,7 +368,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_NullableStringAttribute() {
-		let node = try! Attribute<String?>.openAPISchema()
+		let node = Attribute<String?>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
@@ -387,7 +387,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalStringAttribute() {
-		let node = try! Attribute<String>?.openAPISchema()
+		let node = Attribute<String>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
@@ -406,7 +406,7 @@ extension JSONAPIAttributeOpenAPITests {
 	}
 
 	func test_OptionalNullableStringAttribute() {
-		let node = try! Attribute<String?>?.openAPISchema()
+		let node = Attribute<String?>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
@@ -559,10 +559,7 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-        let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
-        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
-
-        XCTAssertEqual(node, node2)
+        let node = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.date))
@@ -630,10 +627,7 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
-        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
-
-        XCTAssertEqual(node, node2)
+		let node = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
@@ -692,10 +686,7 @@ extension JSONAPIAttributeOpenAPITests {
 			encoder.outputFormatting = .prettyPrinted
 			encoder.dateEncodingStrategy = .iso8601
 
-			let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
-            let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
-
-            XCTAssertEqual(node, node2)
+			let node = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
 
 			XCTAssertTrue(node.required)
 			XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
@@ -754,10 +745,7 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .secondsSince1970
 
-		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
-        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
-
-        XCTAssertEqual(node, node2)
+		let node = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
@@ -798,10 +786,7 @@ extension JSONAPIAttributeOpenAPITests {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .deferredToDate
 
-		let node = try! Attribute<Date>.genericOpenAPISchemaGuess(using: encoder)
-        let node2 = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
-
-        XCTAssertEqual(node, node2)
+		let node = try! Attribute<Date>.attributeOpenAPISchemaGuess(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
