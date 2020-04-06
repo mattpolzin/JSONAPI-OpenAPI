@@ -21,7 +21,6 @@ let package = Package(
         )
     ],
     dependencies: [
-        .package(url: "https://github.com/Flight-School/AnyCodable.git", .upToNextMinor(from: "0.2.2")),
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "3.0.0")),
         .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .upToNextMinor(from: "0.28.0")),
@@ -34,7 +33,7 @@ let package = Package(
     targets: [
         .target(
             name: "JSONAPIOpenAPI",
-            dependencies: ["JSONAPI", "OpenAPIKit", "OpenAPIReflection", "AnyCodable", "Sampleable"]),
+            dependencies: ["JSONAPI", "OpenAPIKit", "OpenAPIReflection", "Sampleable"]),
         .testTarget(
             name: "JSONAPIOpenAPITests",
             dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI", "SwiftCheck"]
