@@ -41,7 +41,7 @@ public struct ResourceObjectSwiftGenCollection {
 
 func documents(from responses: OpenAPI.Response.Map,
                for httpVerb: OpenAPI.HttpVerb,
-               at path: OpenAPI.PathComponents,
+               at path: OpenAPI.Path,
                on server: OpenAPI.Server,
                given params: [OpenAPI.PathItem.Parameter]) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()

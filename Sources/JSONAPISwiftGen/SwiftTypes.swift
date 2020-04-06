@@ -7,8 +7,7 @@
 
 import Foundation
 import JSONAPI
-import Poly
-import AnyCodable
+import struct OpenAPIKit.AnyCodable
 
 #if canImport(FoundationNetworking)
 import FoundationNetworking

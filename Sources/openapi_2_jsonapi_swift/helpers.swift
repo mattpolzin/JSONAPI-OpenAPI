@@ -52,7 +52,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
 
     let results: [(
         httpVerb: HttpVerb,
-        path: OpenAPI.PathComponents,
+        path: OpenAPI.Path,
         pathItem: OpenAPI.PathItem,
         apiRequestTest: APIRequestTestSwiftGen?,
         requestDocument: DataDocumentSwiftGen?,
@@ -100,7 +100,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                     doc.testExampleFuncs.map { $0.functionName }
                 }
                 .map {
-                    namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Response"]))
+                    namespace(for: OpenAPI.Path(path.components + [httpVerb.rawValue, "Response"]))
                         + "." + $0
                 }
 
@@ -109,7 +109,7 @@ func produceAPITestPackage(for pathItems: OpenAPI.PathItem.Map,
                     let testFuncNames = doc.testExampleFuncs.map { $0.functionName }
                     return testFuncNames
                         .map {
-                            namespace(for: OpenAPI.PathComponents(path.components + [httpVerb.rawValue, "Request"]))
+                            namespace(for: OpenAPI.Path(path.components + [httpVerb.rawValue, "Request"]))
                                 + "." + $0
                     }
                 } ?? []
@@ -177,21 +177,21 @@ func swiftTypeName(from string: String) -> String {
 }
 
 func namespace(
-    path: OpenAPI.PathComponents,
+    path: OpenAPI.Path,
     verb: HttpVerb,
     direction: HttpDirection
 ) -> String {
-    return namespace(for: OpenAPI.PathComponents(path.components + [verb.rawValue, direction.rawValue.uppercased()]))
+    return namespace(for: OpenAPI.Path(path.components + [verb.rawValue, direction.rawValue.uppercased()]))
 }
 
-func namespace(for path: OpenAPI.PathComponents) -> String {
+func namespace(for path: OpenAPI.Path) -> String {
     return path.components
         .map(swiftTypeName)
         .joined(separator: ".")
 }
 
 func documentTypeName(
-    path: OpenAPI.PathComponents,
+    path: OpenAPI.Path,
     verb: HttpVerb
 ) -> String {
     let pathSnippet = swiftTypeName(
@@ -423,7 +423,7 @@ func namespaceDecls(for pathItems: OpenAPI.PathItem.Map) -> [DeclNode] {
 
 func documents(from responses: OpenAPI.Response.Map,
                for httpVerb: HttpVerb,
-               at path: OpenAPI.PathComponents,
+               at path: OpenAPI.Path,
                on server: OpenAPI.Server,
                given params: [OpenAPI.PathItem.Parameter]) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
@@ -505,7 +505,7 @@ func documents(from responses: OpenAPI.Response.Map,
 
 func document(from request: OpenAPI.Request,
               for httpVerb: HttpVerb,
-              at path: OpenAPI.PathComponents) throws -> DataDocumentSwiftGen? {
+              at path: OpenAPI.Path) throws -> DataDocumentSwiftGen? {
 
     guard let jsonRequest = request.content[.json] else {
         return nil

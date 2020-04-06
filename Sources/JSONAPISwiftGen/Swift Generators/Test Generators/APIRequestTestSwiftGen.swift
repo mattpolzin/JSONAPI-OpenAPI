@@ -8,7 +8,6 @@
 import Foundation
 import OpenAPIKit
 import JSONAPI
-import Poly
 
 /// A Generator that produces Swift code defining a function that
 /// takes all arguments required to construct a test request and
@@ -24,7 +23,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     public static var testFuncDecl: Decl { makeTestRequestFunc }
 
     public init(server: OpenAPI.Server,
-                pathComponents: OpenAPI.PathComponents,
+                pathComponents: OpenAPI.Path,
                 parameters: [OpenAPI.PathItem.Parameter]) throws {
 
         let parameterArgs = try parameters
@@ -113,7 +112,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             """ as LiteralSwiftCode
     }
 
-    static func urlSnippet(from path: OpenAPI.PathComponents,
+    static func urlSnippet(from path: OpenAPI.Path,
                            originatingAt server: OpenAPI.Server) -> Decl {
 
         let host = server.url
@@ -121,7 +120,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return urlSnippet(from: path, originatingAt: host)
     }
 
-    static func urlSnippet(from path: OpenAPI.PathComponents,
+    static func urlSnippet(from path: OpenAPI.Path,
                            originatingAt hostUrl: URL) -> Decl {
         let pathString = path.components.map { component in
             guard component.first == "{",

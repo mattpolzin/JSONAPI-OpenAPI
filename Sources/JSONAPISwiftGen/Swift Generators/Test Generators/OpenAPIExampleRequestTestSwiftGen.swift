@@ -27,7 +27,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     ///         If specified, must be the name of a property containing `Data` that will be compared to the response data.
     ///
     public init(server: OpenAPI.Server,
-                pathComponents: OpenAPI.PathComponents,
+                pathComponents: OpenAPI.Path,
                 parameters: [OpenAPI.PathItem.Parameter],
                 testProperties: TestProperties,
                 exampleResponseDataPropName: String?,
