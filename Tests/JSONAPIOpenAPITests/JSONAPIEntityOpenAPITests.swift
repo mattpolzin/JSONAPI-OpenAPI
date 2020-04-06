@@ -9,7 +9,6 @@ import XCTest
 import JSONAPI
 import OpenAPIKit
 import JSONAPIOpenAPI
-import AnyCodable
 import Sampleable
 
 class JSONAPIEntityOpenAPITests: XCTestCase {
