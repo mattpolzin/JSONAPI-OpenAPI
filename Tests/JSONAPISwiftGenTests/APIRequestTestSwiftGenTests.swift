@@ -40,6 +40,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
         do {
             document = try decoder.decode(ResponseBody.self, from: data)
         } catch let err {
+            XCTWarn("Failed to parse as JSON:API: \(String(data: data, encoding: .utf8) ?? "")", at: requestUrl)
             XCTFail("Failed to parse response: " + String(describing: err))
             return
         }
@@ -55,6 +56,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     makeTestRequest(
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
+        expectedResponseStatusCode: expectedResponseStatusCode,
         requestUrl: requestUrl,
         headers: headers,
         queryParams: queryParams,
@@ -79,6 +81,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
         do {
             document = try decoder.decode(ResponseBody.self, from: data)
         } catch let err {
+            XCTWarn("Failed to parse: \(String(data: data, encoding: .utf8) ?? "")", at: requestUrl)
             XCTFail("Failed to parse response: " + String(describing: err))
             return
         }
@@ -91,6 +94,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     makeTestRequest(
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
+        expectedResponseStatusCode: expectedResponseStatusCode,
         requestUrl: requestUrl,
         headers: headers,
         queryParams: queryParams,
@@ -126,8 +130,7 @@ func makeTestRequest<RequestBody>(
         XCTAssertNil(error)
         XCTAssertNotNil(data)
 
-        if let expectedStatusCode = expectedResponseStatusCode {
-            let actualCode = (response as? HTTPURLResponse)?.statusCode
+        if let expectedStatusCode = expectedResponseStatusCode, let actualCode = (response as? HTTPURLResponse)?.statusCode {
             XCTAssertEqual(actualCode, expectedStatusCode, "The response HTTP status code did not match the expected status code.")
         } else {
             XCTWarn("Not asserting a particular status code for response.", at: requestUrl)
@@ -135,6 +138,11 @@ func makeTestRequest<RequestBody>(
 
         guard let receivedData = data else {
             XCTFail("Failed to retrieve data from API.")
+            return
+        }
+
+        guard let mimeType = response?.mimeType, mimeType.contains("json") else {
+            XCTFail("Response mime type (\(response?.mimeType ?? "unknown")) is not JSON-based.")
             return
         }
 

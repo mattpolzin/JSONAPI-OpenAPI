@@ -69,7 +69,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             example = nil
         }
@@ -106,7 +106,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             testExampleFuncs = []
         }
@@ -121,7 +121,7 @@ func documents(from responses: OpenAPI.Response.Map,
         } catch let err {
             print("===")
             print("-> " + String(describing: err))
-            print("-- While parsing the \(statusCode) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+            print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
             print("===")
             continue
         }

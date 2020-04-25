@@ -120,22 +120,33 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
 
     static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap, inTest testName: String) throws -> Decl {
 
-        let headers = try Value.array(elements: parameters
-            .filter {
-                $0.parameterLocation == .header(required: true)
-                    || $0.parameterLocation == .header(required: false) }
-            .map { param in
-                guard let parameterValue = values[param.name] else {
-                    throw Error.valueMissingForParameter(named: param.name, inTest: testName)
-                }
+        let knownHeaderNames = [
+            "Session-Token",
+            "Authorization",
+            "Content-Type",
+            "User-Agent"
+        ]
 
-                return Value.tuple(elements: [
-                    (name: "name",
-                     value: "\"\(param.name)\""),
-                    (name: "value",
-                     value: "\"\(parameterValue)\"")
-                ])
-        }, compacted: true)
+        let parameterHeaderNames = parameters.filter { $0.parameterLocation.inHeader }.map { $0.name }
+
+        let allHeaderNames = parameterHeaderNames + knownHeaderNames.filter { values.keys.contains($0) }
+
+        let headers = try Value.array(
+            elements: allHeaderNames
+                .map { parameterName in
+                    guard let parameterValue = values[parameterName] else {
+                        throw Error.valueMissingForParameter(named: parameterName, inTest: testName)
+                    }
+
+                    return Value.tuple(elements: [
+                        (name: "name",
+                         value: "\"\(parameterName)\""),
+                        (name: "value",
+                         value: "\"\(parameterValue)\"")
+                    ])
+            },
+            compacted: true
+        )
 
         return PropDecl.let(propName: "headers",
                             swiftType: .def(.init(name: "[(name: String, value: String)]")),
