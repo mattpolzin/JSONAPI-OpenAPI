@@ -120,27 +120,36 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
 
     static func headersSnippet(from parameters: [OpenAPI.PathItem.Parameter], values: OpenAPI.PathItem.Parameter.ValueMap, inTest testName: String) throws -> Decl {
 
-        let knownHeaderNames = [
+        struct HeaderOption: Hashable {
+            let name: String
+            let required: Bool
+        }
+
+        let knownHeaders = [
             "Session-Token",
             "Authorization",
             "Content-Type",
             "User-Agent"
-        ]
+        ].map { HeaderOption(name: $0, required: false) }
 
-        let parameterHeaderNames = parameters.filter { $0.parameterLocation.inHeader }.map { $0.name }
+        let parameterHeaders = parameters.filter { $0.parameterLocation.inHeader }
+            .map { HeaderOption(name: $0.name, required: $0.required) }
 
-        let allHeaderNames = parameterHeaderNames + knownHeaderNames.filter { values.keys.contains($0) }
+        let allHeaders = Set(parameterHeaders + knownHeaders)
 
         let headers = try Value.array(
-            elements: allHeaderNames
-                .map { parameterName in
-                    guard let parameterValue = values[parameterName] else {
-                        throw Error.valueMissingForParameter(named: parameterName, inTest: testName)
+            elements: allHeaders
+                .compactMap { header in
+                    guard let parameterValue = values[header.name] else {
+                        if header.required {
+                            throw Error.valueMissingForParameter(named: header.name, inTest: testName)
+                        }
+                        return nil
                     }
 
                     return Value.tuple(elements: [
                         (name: "name",
-                         value: "\"\(parameterName)\""),
+                         value: "\"\(header.name)\""),
                         (name: "value",
                          value: "\"\(parameterValue)\"")
                     ])
