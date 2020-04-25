@@ -141,7 +141,7 @@ func makeTestRequest<RequestBody>(
             return
         }
 
-        guard let mimeType = response?.mimeType, mimeType.contains("json") else {
+        guard let mimeType = response?.mimeType, mimeType.lowercased().contains("json") else {
             XCTFail("Response mime type (\(response?.mimeType ?? "unknown")) is not JSON-based.")
             return
         }
