@@ -82,18 +82,24 @@ func documents(from responses: OpenAPI.Response.Map,
                 testExampleFuncs = try OpenAPIExampleRequestTestSwiftGen.TestProperties
                     .properties(for: testPropertiesDict, server: server)
                     .map { testProps in
-                        try OpenAPIExampleRequestTestSwiftGen(server: server,
-                                                              pathComponents: path,
-                                                              parameters: params,
-                                                              testProperties: testProps,
-                                                              exampleResponseDataPropName: examplePropName,
-                                                              responseBodyType: responseBodyType,
-                                                              expectedHttpStatus: statusCode)
+                        try OpenAPIExampleRequestTestSwiftGen(
+                            server: server,
+                            pathComponents: path,
+                            parameters: params,
+                            testProperties: testProps,
+                            exampleResponseDataPropName: examplePropName,
+                            responseBodyType: responseBodyType,
+                            expectedHttpStatus: statusCode
+                        )
                 }
             } else if example != nil {
-                testExampleFuncs = try [OpenAPIExampleParseTestSwiftGen(exampleDataPropName: examplePropName,
-                                                                        bodyType: responseBodyType,
-                                                                        exampleHttpStatusCode: statusCode)]
+                testExampleFuncs = try [
+                    OpenAPIExampleParseTestSwiftGen(
+                        exampleDataPropName: examplePropName,
+                        bodyType: responseBodyType,
+                        exampleHttpStatusCode: statusCode
+                    )
+                ]
             } else {
                 testExampleFuncs = []
             }
@@ -106,10 +112,12 @@ func documents(from responses: OpenAPI.Response.Map,
         }
 
         do {
-            responseDocuments[statusCode] = try DataDocumentSwiftGen(swiftTypeName: responseBodyTypeName,
-                                                                     structure: responseSchema,
-                                                                     example: example,
-                                                                     testExampleFuncs: testExampleFuncs)
+            responseDocuments[statusCode] = try DataDocumentSwiftGen(
+                swiftTypeName: responseBodyTypeName,
+                structure: responseSchema,
+                example: example,
+                testExampleFuncs: testExampleFuncs
+            )
         } catch let err {
             print("===")
             print("-> " + String(describing: err))

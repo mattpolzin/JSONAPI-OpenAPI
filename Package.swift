@@ -14,11 +14,7 @@ let package = Package(
             targets: ["JSONAPISwiftGen"]),
         .library(
             name: "JSONAPIVizGen",
-            targets: ["JSONAPIVizGen"]),
-        .executable(
-          name: "openapi_2_jsonapi_swift",
-          targets: ["openapi_2_jsonapi_swift"]
-        )
+            targets: ["JSONAPIVizGen"])
     ],
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
@@ -53,10 +49,6 @@ let package = Package(
         .testTarget(
             name: "JSONAPIVizGenTests",
             dependencies: ["OpenAPIKit", "JSONAPISwiftGen", "JSONAPIVizGen"]
-        ),
-        .target(
-          name: "openapi_2_jsonapi_swift",
-          dependencies: ["JSONAPISwiftGen", "OpenAPIKit", "JSONAPIViz", "JSONAPIVizGen"]
         )
     ],
     swiftLanguageVersions: [.v5]

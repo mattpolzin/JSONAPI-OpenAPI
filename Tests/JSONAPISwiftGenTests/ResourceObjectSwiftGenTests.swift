@@ -10,30 +10,43 @@ let testEncoder = JSONEncoder()
 
 class ResourceObjectSwiftGenTests: XCTestCase {
     func test_DirectConstruction() {
-        let personDescription = BlockTypeDecl.enum(typeName: "PersonDescription",
-                                                       conformances: ["JSONAPI.ResourceObjectDescription"],
-                                                       [
-                                                        StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), "\"people\"")),
-                                                        BlockTypeDecl.struct(typeName: "Attributes",
-                                                                             conformances: ["JSONAPI.Attributes"],
-                                                                             [
-                                                                                PropDecl.let(propName: "firstName", swiftType: .init(Attribute<String>.self), nil),
-                                                                                PropDecl.let(propName: "lastName", swiftType: .init(Attribute<String>.self), nil),
-                                                                                PropDecl.let(propName: "optional", swiftType: .init(Attribute<String?>.self), nil),
-                                                                                PropDecl.let(propName: "omittable", swiftType: .init(Attribute<String>?.self), nil)
-                                                            ]),
-                                                        BlockTypeDecl.struct(typeName: "Relationships",
-                                                                             conformances: ["JSONAPI.Relationships"],
-                                                                             [
-                                                                                PropDecl.let(propName: "friends",
-                                                                                             swiftType: .init(SwiftTypeDef(name: "ToManyRelationship",
-                                                                                                                           specializationReps: [
-                                                                                                                            "Person",
-                                                                                                                            .init(NoMetadata.self),
-                                                                                                                            .init(NoLinks.self)
-                                                                                                ])), nil)
-                                                            ])
-            ])
+        let personDescription = BlockTypeDecl.enum(
+            typeName: "PersonDescription",
+            conformances: ["JSONAPI.ResourceObjectDescription"],
+            [
+                StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), "\"people\"")),
+                BlockTypeDecl.struct(
+                    typeName: "Attributes",
+                    conformances: ["JSONAPI.Attributes"],
+                    [
+                        PropDecl.let(propName: "firstName", swiftType: .init(Attribute<String>.self), nil),
+                        PropDecl.let(propName: "lastName", swiftType: .init(Attribute<String>.self), nil),
+                        PropDecl.let(propName: "optional", swiftType: .init(Attribute<String?>.self), nil),
+                        PropDecl.let(propName: "omittable", swiftType: .init(Attribute<String>?.self), nil)
+                    ]
+                ),
+                BlockTypeDecl.struct(
+                    typeName: "Relationships",
+                    conformances: ["JSONAPI.Relationships"],
+                    [
+                        PropDecl.let(
+                            propName: "friends",
+                            swiftType: .init(
+                                SwiftTypeDef(
+                                    name: "ToManyRelationship",
+                                    specializationReps: [
+                                        "Person",
+                                        .init(NoMetadata.self),
+                                        .init(NoLinks.self)
+                                    ]
+                                )
+                            ),
+                            nil
+                        )
+                    ]
+                )
+            ]
+        )
         let person = Typealias(alias: .init("Person"), existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
                                                                                         specializationReps: [
                                                                                             "PersonDescription",

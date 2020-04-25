@@ -1,5 +1,5 @@
 //
-//  TestSwiftGen.swift
+//  OpenAPIExampleRequestTestSwiftGen.swift
 //  JSONAPISwiftGen
 //
 //  Created by Mathew Polzin on 9/18/19.
@@ -163,6 +163,12 @@ extension OpenAPIExampleRequestTestSwiftGen {
         let parameters: OpenAPI.PathItem.Parameter.ValueMap
         let queryParameters: OpenAPI.PathItem.Parameter.ValueMap
 
+        /// Create properties for an API Test
+        ///
+        /// - parameters:
+        ///     - name: The name of the test. This can be anything descriptive.
+        ///     - server: The server to run the test against.
+        ///     - props: The properties defining the test.
         public init(name: String, server: OpenAPI.Server, props testProps: [String: Any]) throws {
 
             self.name = name
@@ -210,11 +216,17 @@ extension OpenAPIExampleRequestTestSwiftGen {
         /// ```
         /// {
         ///     "test_name": {
-        ///         "host": "url", (optional, if omitted then default server for API will be used.
+        ///         "test_host": "url", (optional, if omitted then default server for API will be used.
         ///         "skip_example": true | false, (optional, defaults to false)
         ///         "parameters": {
         ///             "path_param_name": "value",
         ///             "header_param_name": "value" (must be a string, even if the parameter type is Int or other)
+        ///         },
+        ///         "query_parameters": {
+        ///             {
+        ///                 "name": "param_name",
+        ///                 "value": "param_value"
+        ///             }
         ///         }
         ///     }
         /// }

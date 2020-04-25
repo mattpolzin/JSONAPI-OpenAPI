@@ -18,13 +18,21 @@ final class APIRequestTestSwiftGenTests: XCTestCase {
 }
 
 // MARK: - Function written to generated test suites
+/// Log warning after test case logs
+func XCTWarn(_ message: String, at url: URL) {
+    print("[\(url.absoluteString)] : warning - \(message)")
+}
+
 /// JSONAPI Document Response request test
-func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
-                                                expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                expectedResponseStatusCode: Int? = nil,
-                                                requestUrl: URL,
-                                                headers: [(name: String, value: String)],
-                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody: TestableResourceBody, ResponseBody.Body: Equatable {
+func makeTestRequest<RequestBody, ResponseBody>(
+    requestBody: RequestBody,
+    expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
+    expectedResponseStatusCode: Int? = nil,
+    requestUrl: URL,
+    headers: [(name: String, value: String)],
+    queryParams: [(name: String, value: String)],
+    function: StaticString = #function
+) where RequestBody: Encodable, ResponseBody: CodableJSONAPIDocument, ResponseBody.PrimaryResourceBody: TestableResourceBody, ResponseBody.Body: Equatable {
     let successResponseHandler = { (data: Data) in
         let decoder = JSONDecoder()
 
@@ -39,23 +47,31 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
         if let expectedResponseBody = optionallyExpectedResponseBody {
             let comparison = document.compare(to: expectedResponseBody)
             XCTAssert(comparison.isSame, comparison.rawValue)
+        } else {
+            XCTWarn("Not asserting a particular response body is received, only that response can be parsed.", at: requestUrl)
         }
     }
 
-    makeTestRequest(requestBody: requestBody,
-                    successResponseHandler: successResponseHandler,
-                    requestUrl: requestUrl,
-                    headers: headers,
-                    queryParams: queryParams)
+    makeTestRequest(
+        requestBody: requestBody,
+        successResponseHandler: successResponseHandler,
+        requestUrl: requestUrl,
+        headers: headers,
+        queryParams: queryParams,
+        function: function
+    )
 }
 
 /// General purpose request test
-func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
-                                                expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
-                                                expectedResponseStatusCode: Int? = nil,
-                                                requestUrl: URL,
-                                                headers: [(name: String, value: String)],
-                                                queryParams: [(name: String, value: String)]) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
+func makeTestRequest<RequestBody, ResponseBody>(
+    requestBody: RequestBody,
+    expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
+    expectedResponseStatusCode: Int? = nil,
+    requestUrl: URL,
+    headers: [(name: String, value: String)],
+    queryParams: [(name: String, value: String)],
+    function: StaticString = #function
+) where RequestBody: Encodable, ResponseBody: Decodable & Equatable {
     let successResponseHandler = { (data: Data) in
         let decoder = JSONDecoder()
 
@@ -72,19 +88,25 @@ func makeTestRequest<RequestBody, ResponseBody>(requestBody: RequestBody,
         }
     }
 
-    makeTestRequest(requestBody: requestBody,
-                    successResponseHandler: successResponseHandler,
-                    requestUrl: requestUrl,
-                    headers: headers,
-                    queryParams: queryParams)
+    makeTestRequest(
+        requestBody: requestBody,
+        successResponseHandler: successResponseHandler,
+        requestUrl: requestUrl,
+        headers: headers,
+        queryParams: queryParams,
+        function: function
+    )
 }
 
-func makeTestRequest<RequestBody>(requestBody: RequestBody,
-                                  successResponseHandler: @escaping (Data) -> Void,
-                                  expectedResponseStatusCode: Int? = nil,
-                                  requestUrl: URL,
-                                  headers: [(name: String, value: String)],
-                                  queryParams: [(name: String, value: String)]) where RequestBody: Encodable {
+func makeTestRequest<RequestBody>(
+    requestBody: RequestBody,
+    successResponseHandler: @escaping (Data) -> Void,
+    expectedResponseStatusCode: Int? = nil,
+    requestUrl: URL,
+    headers: [(name: String, value: String)],
+    queryParams: [(name: String, value: String)],
+    function: StaticString = #function
+) where RequestBody: Encodable {
     var urlComponents = URLComponents(url: requestUrl, resolvingAgainstBaseURL: false)!
 
     urlComponents.queryItems = queryParams
@@ -107,6 +129,8 @@ func makeTestRequest<RequestBody>(requestBody: RequestBody,
         if let expectedStatusCode = expectedResponseStatusCode {
             let actualCode = (response as? HTTPURLResponse)?.statusCode
             XCTAssertEqual(actualCode, expectedStatusCode, "The response HTTP status code did not match the expected status code.")
+        } else {
+            XCTWarn("Not asserting a particular status code for response.", at: requestUrl)
         }
 
         guard let receivedData = data else {
@@ -124,6 +148,9 @@ func makeTestRequest<RequestBody>(requestBody: RequestBody,
 
     XCTWaiter().wait(for: [completionExpectation], timeout: 5)
 }
+
+
+
 
 // MARK: - Test Types
 extension APIRequestTestSwiftGenTests {
