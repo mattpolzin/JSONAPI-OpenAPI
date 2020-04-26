@@ -39,7 +39,12 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
         let pathParamDecls: [PropDecl] = try parameters
             .filter { $0.parameterLocation == .path }
             .map { parameter in
-                let (propertyName, propertyType) = try APIRequestTestSwiftGen.argument(for: parameter)
+                let (propertyName, _) = try APIRequestTestSwiftGen.argument(for: parameter)
+
+                // always use string type here for path components. this is how the path components
+                // are required to be specifed (as strings) in the `x-tests` OpenAPI extension.
+                let propertyType = SwiftTypeRep(String.self)
+
                 guard let propertyValue = testProperties.parameters[parameter.name] else {
                     // we can't _not_ throw the following error because if a path parameter is missing
                     // then we cannot even build the URL for the request. However, if ignoring missing
