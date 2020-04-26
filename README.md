@@ -5,15 +5,19 @@ See parent project: https://github.com/mattpolzin/JSONAPI
 
 The `JSONAPIOpenAPI` framework adds the ability to generate OpenAPI compliant JSON Schema documentation of a JSONAPI Document.
 
-There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation on the `feature/gen-swift` branch. There is no formal documentation for this functionality, but it is an area of interest of mine. Reach out to me directly if you would like to know more.
+There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation in the JSONAPISwiftGen module. There is no formal documentation for this functionality, but it is an area of interest of mine. Reach out to me directly if you would like to know more.
 
 See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md
 
-*This library is in its infancy. The documentation will grow as the framework becomes more complete.*
+*This library has many loose ends and very little documentation. The documentation will grow as the framework becomes more complete.*
 
 ## _Experimental_ Swift Code Generation
 
-The `feature/gen-swift` branch has experimental support for generating Swift code for `JSONAPI` models. You can dig into the source code or try out the included `openapi_2_jsonapi_swift` executable target. It takes 2 arguments; the file path of a complete OpenAPI Document and the directory to which all resulting files should be output. **IMPORTANT**: The output directory currently must contain a folder named "responses". It runs through the document looking for response payloads that are **JSON:API** compliant and pulling out all of the Resource Objects it finds to generate Swift code that would encode/decode data fitting the schemas. It also creates JSON:API Document aliases for `GET` response bodies and `test_request()` functions for `GET` requests.
+The JSONAPISwiftGen module has experimental support for generating Swift code for `JSONAPI` models. You can dig into the source code or reach out to me for more information. This module is used by the API Test server project at [mattpolzin/jsonapi-openapi-test-server](https://github.com/mattpolzin/jsonapi-openapi-test-server) to generate models and tests.
+
+## _Experimental_ Graphviz (DOT) Generation
+
+The JSONAPIVizGen module has experimental support for generating Graphviz DOT files that graph out the models and relationships represented by the JSON:API/OpenAPI input. You can dig into the source code or reach out to me for more information.
 
 ## OpenAPI JSON Schema Generation
 ### Simple Example
