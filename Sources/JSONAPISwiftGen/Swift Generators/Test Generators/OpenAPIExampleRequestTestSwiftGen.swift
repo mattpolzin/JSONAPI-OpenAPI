@@ -36,13 +36,13 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
 
         let pathParamDecls: [PropDecl] = try parameters
             .filter { $0.parameterLocation == .path }
-            .compactMap { param in
+            .map { param in
             let (propertyName, propertyType) = try APIRequestTestSwiftGen.argument(for: param)
                 guard let propertyValue = testProperties.parameters[param.name] else {
-                    if !testProperties.ignoreMissingParameterWarnings {
-                        throw Error.valueMissingForParameter(named: propertyName, inTest: testProperties.name)
-                    }
-                    return nil
+                    // we can't _not_ throw the following error because if a path parameter is missing
+                    // then we cannot even build the URL for the request. However, if ignoring missing
+                    // parameters is enabled, then this error will not be tracked as a warning.
+                    throw Error.valueMissingForParameter(named: propertyName, inTest: testProperties.name)
             }
 
             return PropDecl.let(propName: propertyName,

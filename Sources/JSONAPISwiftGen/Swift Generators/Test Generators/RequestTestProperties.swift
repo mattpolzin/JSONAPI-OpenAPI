@@ -11,12 +11,12 @@ import OpenAPIKit
 extension OpenAPIExampleRequestTestSwiftGen {
 
     public struct TestProperties {
-        let name: String
-        let host: URL
-        let skipExample: Bool
-        let parameters: OpenAPI.PathItem.Parameter.ValueMap
-        let queryParameters: OpenAPI.PathItem.Parameter.ValueMap
-        let ignoreMissingParameterWarnings: Bool
+        public let name: String
+        public let host: URL
+        public let skipExample: Bool
+        public let parameters: OpenAPI.PathItem.Parameter.ValueMap
+        public let queryParameters: OpenAPI.PathItem.Parameter.ValueMap
+        public let ignoreMissingParameterWarnings: Bool
 
         /// Create properties for an API Test
         ///
