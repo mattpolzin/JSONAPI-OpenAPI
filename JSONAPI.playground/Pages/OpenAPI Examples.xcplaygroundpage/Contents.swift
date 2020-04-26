@@ -4,7 +4,6 @@ import Foundation
 import JSONAPI
 import OpenAPIKit
 import JSONAPIOpenAPI
-import Poly
 
 // print Entity Schema
 let encoder = JSONEncoder()
