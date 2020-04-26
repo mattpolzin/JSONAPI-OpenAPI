@@ -26,32 +26,38 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     ///     - exampleResponseDataPropName: If `nil`, no example data will be compared to the response data for the test.
     ///         If specified, must be the name of a property containing `Data` that will be compared to the response data.
     ///
-    public init(server: OpenAPI.Server,
-                pathComponents: OpenAPI.Path,
-                parameters: [OpenAPI.PathItem.Parameter],
-                testProperties: TestProperties,
-                exampleResponseDataPropName: String?,
-                responseBodyType: SwiftTypeRep,
-                expectedHttpStatus: OpenAPI.Response.StatusCode) throws {
+    public init(
+        server: OpenAPI.Server,
+        pathComponents: OpenAPI.Path,
+        parameters: [OpenAPI.PathItem.Parameter],
+        testProperties: TestProperties,
+        exampleResponseDataPropName: String?,
+        responseBodyType: SwiftTypeRep,
+        expectedHttpStatus: OpenAPI.Response.StatusCode
+    ) throws {
 
         let pathParamDecls: [PropDecl] = try parameters
             .filter { $0.parameterLocation == .path }
-            .map { param in
-            let (propertyName, propertyType) = try APIRequestTestSwiftGen.argument(for: param)
-                guard let propertyValue = testProperties.parameters[param.name] else {
+            .map { parameter in
+                let (propertyName, propertyType) = try APIRequestTestSwiftGen.argument(for: parameter)
+                guard let propertyValue = testProperties.parameters[parameter.name] else {
                     // we can't _not_ throw the following error because if a path parameter is missing
                     // then we cannot even build the URL for the request. However, if ignoring missing
                     // parameters is enabled, then this error will not be tracked as a warning.
-                    throw Error.valueMissingForParameter(named: propertyName, inTest: testProperties.name)
-            }
+                    throw Error.valueMissingForParameter(named: parameter.name, inTest: testProperties.name)
+                }
 
-            return PropDecl.let(propName: propertyName,
-                                swiftType: propertyType,
-                                Value(value: "\"\(propertyValue)\""))
+                return PropDecl.let(
+                    propName: propertyName,
+                    swiftType: propertyType,
+                    Value(value: "\"\(propertyValue)\"")
+                )
         }
 
-        let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
-                                                               originatingAt: testProperties.host)
+        let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(
+            from: pathComponents,
+            originatingAt: testProperties.host
+        )
 
         let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(
             from: parameters,
@@ -60,16 +66,22 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             reportingMissingParameters: !testProperties.ignoreMissingParameterWarnings
         )
 
-        let requestBodyDecl = PropDecl.let(propName: "requestBody",
-                                           swiftType: .rep(String.self),
-                                           "\"\"")
+        let requestBodyDecl = PropDecl.let(
+            propName: "requestBody",
+            swiftType: .rep(String.self),
+            "\"\""
+        )
 
-        let responseBodyDecl = Self.expectedResponseBodySnippet(responseBodyType: responseBodyType,
-                                                                exampleResponseDataPropName: testProperties.skipExample ? nil : exampleResponseDataPropName)
+        let responseBodyDecl = Self.expectedResponseBodySnippet(
+            responseBodyType: responseBodyType,
+            exampleResponseDataPropName: testProperties.skipExample ? nil : exampleResponseDataPropName
+        )
 
-        let statusCodeDecl = PropDecl.let(propName: "expectedResponseStatusCode",
-                                          swiftType: .init(Int?.self),
-                                          Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil"))
+        let statusCodeDecl = PropDecl.let(
+            propName: "expectedResponseStatusCode",
+            swiftType: .init(Int?.self),
+            Value(value: Int(expectedHttpStatus.rawValue).map(String.init) ?? "nil")
+        )
 
         let queryParamsValue = Value.array(elements: testProperties.queryParameters.map { (name, value) in
             return Value.tuple(elements: [
@@ -80,26 +92,30 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             ])
         }, compacted: true)
 
-        let queryParamsDecl = PropDecl.let(propName: "queryParams",
-                                           swiftType: .def(.init(name: "[(name: String, value: String)]")),
-                                           queryParamsValue)
+        let queryParamsDecl = PropDecl.let(
+            propName: "queryParams",
+            swiftType: .def(.init(name: "[(name: String, value: String)]")),
+            queryParamsValue
+        )
 
         functionName = "_test_example_request_\(safeForPropertyName(testProperties.name))__\(expectedHttpStatus.rawValue)"
 
-        let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
-                                    name: functionName,
-                                    specializations: nil,
-                                    arguments: [],
-                                    conditions: nil,
-                                    body: pathParamDecls + [
-                                        requestUrlDecl,
-                                        headersDecl,
-                                        requestBodyDecl,
-                                        responseBodyDecl,
-                                        statusCodeDecl,
-                                        queryParamsDecl,
-                                        APIRequestTestSwiftGen.requestFuncCallSnippet
-        ])
+        let functionDecl = Function(
+            scoping: .init(static: true, privacy: .internal),
+            name: functionName,
+            specializations: nil,
+            arguments: [],
+            conditions: nil,
+            body: pathParamDecls + [
+                requestUrlDecl,
+                headersDecl,
+                requestBodyDecl,
+                responseBodyDecl,
+                statusCodeDecl,
+                queryParamsDecl,
+                APIRequestTestSwiftGen.requestFuncCallSnippet
+            ]
+        )
 
         decls = [
             functionDecl
