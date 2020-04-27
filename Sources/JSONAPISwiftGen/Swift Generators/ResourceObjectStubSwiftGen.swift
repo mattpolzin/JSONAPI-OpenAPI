@@ -20,22 +20,30 @@ public struct ResourceObjectStubSwiftGen: ResourceTypeSwiftGenerator {
 
         let descriptionTypeName = "\(resourceTypeName)Description"
 
-        let descriptionBlock = BlockTypeDecl.enum(typeName: descriptionTypeName,
-                                                  conformances: ["JSONAPI.ResourceObjectDescription"],
-                                                  [
-                                                    StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(jsonAPITypeName)\""))),
-                                                    Typealias(alias: "Attributes", existingType: .init(NoAttributes.self)),
-                                                    Typealias(alias: "Relationships", existingType: .init(NoRelationships.self))
-        ])
+        let descriptionBlock = BlockTypeDecl.enum(
+            typeName: descriptionTypeName,
+            conformances: ["JSONAPI.ResourceObjectDescription"],
+            [
+                StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(jsonAPITypeName)\""))),
+                Typealias(alias: "Attributes", existingType: .init(NoAttributes.self)),
+                Typealias(alias: "Relationships", existingType: .init(NoRelationships.self))
+            ]
+        )
 
-        let alias = Typealias(alias: .init(resourceTypeName),
-                              existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
-                                                               specializationReps: [
-                                                                .init(descriptionTypeName),
-                                                                .init(NoMetadata.self),
-                                                                .init(NoLinks.self),
-                                                                .init(String.self)
-                              ])))
+        let alias = Typealias(
+            alias: .init(resourceTypeName),
+            existingType: .init(
+                SwiftTypeDef(
+                    name: "JSONAPI.ResourceObject",
+                    specializationReps: [
+                        .init(descriptionTypeName),
+                        .init(NoMetadata.self),
+                        .init(NoLinks.self),
+                        .init(String.self)
+                    ]
+                )
+            )
+        )
 
 
         decls = [

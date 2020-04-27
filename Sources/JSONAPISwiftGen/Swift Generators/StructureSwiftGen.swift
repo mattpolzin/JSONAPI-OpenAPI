@@ -25,10 +25,12 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
     ///         if specified, rootConformances will take the place of cascading conformances
     ///         for the root object. If not specified, cascading conformances will be used on
     ///         the root object and all children.
-    public init(swiftTypeName: String,
-                structure: JSONSchema,
-                cascadingConformances: [String] = [],
-                rootConformances: [String]? = nil) throws {
+    public init(
+        swiftTypeName: String,
+        structure: JSONSchema,
+        cascadingConformances: [String] = [],
+        rootConformances: [String]? = nil
+    ) throws {
         guard case .object(_, let context) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -37,17 +39,21 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         self.structure = structure
 
         decls = [
-            try StructureSwiftGen.structure(named: swiftTypeName,
-                                            forObject: context,
-                                            cascadingConformances: cascadingConformances,
-                                            rootConformances: rootConformances)
+            try StructureSwiftGen.structure(
+                named: swiftTypeName,
+                forObject: context,
+                cascadingConformances: cascadingConformances,
+                rootConformances: rootConformances
+            )
         ]
     }
 
-    static func structure(named name: String,
-                          forObject context: JSONSchema.ObjectContext,
-                          cascadingConformances: [String],
-                          rootConformances: [String]? = nil) throws -> BlockTypeDecl {
+    static func structure(
+        named name: String,
+        forObject context: JSONSchema.ObjectContext,
+        cascadingConformances: [String],
+        rootConformances: [String]? = nil
+    ) throws -> BlockTypeDecl {
 
         let decls = try context
             .properties
@@ -63,9 +69,11 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
                                     decls)
     }
 
-    static func structure(named name: String,
-                          forArray context: JSONSchema.ArrayContext,
-                          conformances: [String]) throws -> Decl {
+    static func structure(
+        named name: String,
+        forArray context: JSONSchema.ArrayContext,
+        conformances: [String]
+    ) throws -> Decl {
 
         guard let items = context.items,
             case .object(_, let objContext) = items else  {
@@ -73,14 +81,18 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
         }
 
-        return try structure(named: name,
-                             forObject: objContext,
-                             cascadingConformances: conformances)
+        return try structure(
+            named: name,
+            forObject: objContext,
+            cascadingConformances: conformances
+        )
     }
 
-    static func declsForProp(named name: String,
-                             for schema: JSONSchema,
-                             conformances: [String]) throws -> [Decl] {
+    static func declsForProp(
+        named name: String,
+        for schema: JSONSchema,
+        conformances: [String]
+    ) throws -> [Decl] {
         let type: SwiftTypeRep
         let structureDecl: Decl?
 
@@ -101,9 +113,11 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
                 type = optional ? typeIntermediate.optional : typeIntermediate
 
-                structureDecl = try structure(named: newTypeName,
-                                              forObject: objContext,
-                                              cascadingConformances: conformances)
+                structureDecl = try structure(
+                    named: newTypeName,
+                    forObject: objContext,
+                    cascadingConformances: conformances
+                )
 
             case .array(let context, let arrayContext):
                 let newTypeName = typeCased(name)
@@ -117,9 +131,11 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
                 type = optional ? typeIntermediate.optional : typeIntermediate
 
-                structureDecl = try structure(named: newTypeName,
-                                              forArray: arrayContext,
-                                              conformances: conformances)
+                structureDecl = try structure(
+                    named: newTypeName,
+                    forArray: arrayContext,
+                    conformances: conformances
+                )
             default:
                 throw SwiftTypeError.typeNotFound
             }
