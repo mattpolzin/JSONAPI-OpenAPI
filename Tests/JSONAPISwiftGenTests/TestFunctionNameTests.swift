@@ -6,6 +6,7 @@
 //
 
 import JSONAPISwiftGen
+import OpenAPIKit
 import XCTest
 
 final class TestFunctionNameTests: XCTestCase {
@@ -72,6 +73,57 @@ final class TestFunctionNameTests: XCTestCase {
                 testName: "hello_world"
             )
         )
+
+        assertReflexiveRawValue(
+            TestFunctionName(
+                path: .init(["hello_world", "v2"]),
+                endpoint: .get,
+                direction: .request,
+                testName: "hello_world"
+            )
+        )
+    }
+
+    func test_statusCodeExtraction() {
+        let test1 = TestFunctionName(
+            path: .init(["hello_world", "v2"]),
+            endpoint: .get,
+            direction: .request,
+            testName: "hello_world"
+        )
+        XCTAssertNil(test1.testStatusCodeGuess)
+
+        let test2 = TestFunctionName(
+            path: .init(["hello_world", "v2"]),
+            endpoint: .get,
+            direction: .request,
+            testName: "hello_world__hi"
+        )
+        XCTAssertNil(test2.testStatusCodeGuess)
+
+        let test3 = TestFunctionName(
+            path: .init(["hello_world", "v2"]),
+            endpoint: .get,
+            direction: .request,
+            testName: "hello_world__404"
+        )
+        XCTAssertEqual(test3.testStatusCodeGuess, OpenAPI.Response.StatusCode.status(code: 404))
+
+        let test4 = TestFunctionName(
+            path: .init(["hello_world", "v2"]),
+            endpoint: .get,
+            direction: .request,
+            testName: "hello_world__3xx"
+        )
+        XCTAssertEqual(test4.testStatusCodeGuess, OpenAPI.Response.StatusCode.range(.redirect))
+
+        let test5 = TestFunctionName(
+            path: .init(["hello_world", "v2"]),
+            endpoint: .get,
+            direction: .request,
+            testName: "hello_world__default"
+        )
+        XCTAssertEqual(test5.testStatusCodeGuess, OpenAPI.Response.StatusCode.default)
     }
 
     func assertReflexiveRawValue(_ testName: TestFunctionName, file: StaticString = #file, line: UInt = #line) {

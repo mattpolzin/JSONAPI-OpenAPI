@@ -45,7 +45,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     /// To get the fully qualified name of the test, use `fullyQualifiedTestFunctionName`
     public var rawValue: String {
         return Self.testPrefix +
-            fullyQualifiedTestFunctionName
+            nameApplying(pathComponentTransform: Self.functionEncodedName)
                 .replacingOccurrences(of: ".", with: "\(Self.periodReplacementCharacter)")
     }
 
@@ -54,11 +54,29 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     /// callable whereas the `rawValue` is the name of the test function
     /// that will call this callable.
     public var fullyQualifiedTestFunctionName: String {
+        return nameApplying(pathComponentTransform: Self.swiftName)
+    }
+
+    /// Will take a guess at what response status code is being tested, if applicable.
+    /// The guess is determined using a known test name pattern of the status
+    /// code being appending to the end of the test name after double underscores.
+    public var testStatusCodeGuess: OpenAPI.Response.StatusCode? {
+        let components = testName.components(separatedBy: "__")
+
+        guard components.count > 1 else { return nil }
+
+        return components.last.flatMap(OpenAPI.Response.StatusCode.init(rawValue:))
+    }
+
+    /// This function facilitates a split between the `rawValue` and `fullyQualifiedTestFunctionName`
+    /// because the former retains all path information with its `pathComponentTransform` whereas the
+    /// latter is lossy with respect to some path component transformations.
+    internal func nameApplying(pathComponentTransform: (String) -> String) -> String {
         let components = path.components
-            + [endpoint.rawValue, direction.rawValue]
+            + [endpoint.rawValue, direction.rawValue.capitalized]
 
         return components
-            .map(Self.swiftTypeName)
+            .map(pathComponentTransform)
             .joined(separator: ".")
             + ".\(testName)"
     }
@@ -76,9 +94,9 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             return nil
         }
 
-        self.testName = String(components.removeLast())
+        self.testName = Self.functionDecodedName(from: String(components.removeLast()))
 
-        guard let direction = HttpDirection(rawValue: String(components.removeLast())) else {
+        guard let direction = HttpDirection(rawValue: String(components.removeLast()).lowercased()) else {
             return nil
         }
 
@@ -90,7 +108,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
 
         self.endpoint = endpoint
 
-        self.path = OpenAPI.Path(components.map(String.init))
+        self.path = OpenAPI.Path(components.map(String.init).map(Self.functionDecodedName))
     }
 
     public init(
@@ -105,14 +123,31 @@ public struct TestFunctionName: Equatable, RawRepresentable {
         self.testName = testName
     }
 
-    internal static func swiftTypeName(from string: String) -> String {
+    /// For function name encoding we hold onto information like where there are
+    /// spaces or braces.
+    internal static func functionEncodedName(from string: String) -> String {
         return string
             .replacingOccurrences(of: "{", with: "\(Self.openBraceReplacementCharacter)")
             .replacingOccurrences(of: "}", with: "\(Self.closeBraceReplacementCharacter)")
             .replacingOccurrences(of: " ", with: "\(Self.spaceReplacementCharacter)")
     }
 
-    private static var testPrefix = "test__"
+    internal static func functionDecodedName(from string: String) -> String {
+        return string
+            .replacingOccurrences(of: "\(Self.openBraceReplacementCharacter)", with: "{")
+            .replacingOccurrences(of: "\(Self.closeBraceReplacementCharacter)", with: "}")
+            .replacingOccurrences(of: "\(Self.spaceReplacementCharacter)", with: " ")
+    }
+
+    /// For swift names, we remove braces and convert spaces to underscores.
+    internal static func swiftName(from string: String) -> String {
+        return string
+            .replacingOccurrences(of: "{", with: "")
+            .replacingOccurrences(of: "}", with: "")
+            .replacingOccurrences(of: " ", with: "_")
+    }
+
+    public static var testPrefix = "test__"
     private static var openBraceReplacementCharacter: Character = "➊"
     private static var closeBraceReplacementCharacter: Character = "➋"
     private static var spaceReplacementCharacter: Character = "➌"
