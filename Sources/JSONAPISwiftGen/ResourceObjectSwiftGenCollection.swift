@@ -10,7 +10,7 @@ import OpenAPIKit
 public struct ResourceObjectSwiftGenCollection {
     public let resourceObjectGenerators: [ResourceObjectSwiftGen]
 
-    public init(_ doc: OpenAPI.Document) throws {
+    public init(_ doc: OpenAPI.Document, testSuiteConfiguration: TestSuiteConfiguration) throws {
         let pathItems = doc.paths
 
         resourceObjectGenerators = OpenAPI.HttpVerb.allCases
@@ -30,7 +30,8 @@ public struct ResourceObjectSwiftGenCollection {
                         for: httpVerb,
                         at: path,
                         on: doc.servers.first!,
-                        given: parameters.compactMap { $0.b }
+                        given: parameters.compactMap { $0.b },
+                        testSuiteConfiguration: testSuiteConfiguration
                     ).values.flatMap { Array($0.resourceObjectGenerators) }
                 }
         }
@@ -39,11 +40,14 @@ public struct ResourceObjectSwiftGenCollection {
     }
 }
 
-func documents(from responses: OpenAPI.Response.Map,
-               for httpVerb: OpenAPI.HttpVerb,
-               at path: OpenAPI.Path,
-               on server: OpenAPI.Server,
-               given params: [OpenAPI.PathItem.Parameter]) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
+func documents(
+    from responses: OpenAPI.Response.Map,
+    for httpVerb: OpenAPI.HttpVerb,
+    at path: OpenAPI.Path,
+    on server: OpenAPI.Server,
+    given params: [OpenAPI.PathItem.Parameter],
+    testSuiteConfiguration: TestSuiteConfiguration
+) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
@@ -86,6 +90,7 @@ func documents(from responses: OpenAPI.Response.Map,
                             server: server,
                             pathComponents: path,
                             parameters: params,
+                            testSuiteConfiguration: testSuiteConfiguration,
                             testProperties: testProps,
                             exampleResponseDataPropName: examplePropName,
                             responseBodyType: responseBodyType,

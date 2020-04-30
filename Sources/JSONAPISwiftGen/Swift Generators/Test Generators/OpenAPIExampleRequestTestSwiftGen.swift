@@ -30,6 +30,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
         parameters: [OpenAPI.PathItem.Parameter],
+        testSuiteConfiguration: TestSuiteConfiguration,
         testProperties: TestProperties,
         exampleResponseDataPropName: String?,
         responseBodyType: SwiftTypeRep,
@@ -61,7 +62,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
 
         let requestUrlDecl = APIRequestTestSwiftGen.urlSnippet(
             from: pathComponents,
-            originatingAt: testProperties.host
+            originatingAt: testSuiteConfiguration.apiHostOverride ?? testProperties.host
         )
 
         let headersDecl = try OpenAPIExampleRequestTestSwiftGen.headersSnippet(
