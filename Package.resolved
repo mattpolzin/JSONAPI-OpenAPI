@@ -20,24 +20,6 @@
         }
       },
       {
-        "package": "CwlCatchException",
-        "repositoryURL": "https://github.com/mattgallagher/CwlCatchException.git",
-        "state": {
-          "branch": null,
-          "revision": "7cd2f8cacc4d22f21bc0b2309c3b18acf7957b66",
-          "version": "1.2.0"
-        }
-      },
-      {
-        "package": "CwlPreconditionTesting",
-        "repositoryURL": "https://github.com/mattgallagher/CwlPreconditionTesting.git",
-        "state": {
-          "branch": null,
-          "revision": "c228db5d2ad1b01ebc84435e823e6cca4e3db98b",
-          "version": "1.2.0"
-        }
-      },
-      {
         "package": "FileCheck",
         "repositoryURL": "https://github.com/llvm-swift/FileCheck.git",
         "state": {
@@ -57,20 +39,20 @@
       },
       {
         "package": "JSONAPI",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
+        "repositoryURL": "https://github.com/mattpolzin/JSONAPI",
         "state": {
           "branch": null,
-          "revision": "6ab4237c97e27ab0b5e3e1fe34738fa031a8dab9",
-          "version": "3.0.0"
+          "revision": "bbd6db6d7a999c4109b4166a726a59157d16d875",
+          "version": "4.0.0-alpha.2"
         }
       },
       {
         "package": "JSONAPIViz",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz.git",
+        "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz",
         "state": {
           "branch": null,
-          "revision": "c11b79a029c74ed72f86857f0da4f1e2b113ded8",
-          "version": "0.0.2"
+          "revision": "578000fd8a2f16bcb24c964bec3bea61f078a62a",
+          "version": "0.0.3"
         }
       },
       {
@@ -78,31 +60,31 @@
         "repositoryURL": "https://github.com/Quick/Nimble.git",
         "state": {
           "branch": null,
-          "revision": "b02b00b30b6353632aa4a5fb6124f8147f7140c0",
-          "version": "8.0.5"
+          "revision": "7fd118ec8795888bcbbebc1a41f6984454c4cd6f",
+          "version": "8.0.7"
         }
       },
       {
         "package": "OpenAPIKit",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
         "state": {
           "branch": null,
-          "revision": "abbfc112ebef55e4eff1bba04340289aa1b6ba09",
-          "version": "0.29.0"
+          "revision": "5c18f9c57617d8b0232a50fcfd1568e4f1d1da6c",
+          "version": "0.30.1"
         }
       },
       {
         "package": "OpenAPIReflection",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection.git",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection",
         "state": {
           "branch": null,
-          "revision": "253abc5da0c275dca1ad4e618cc1039ab1a4b8c9",
-          "version": "0.1.0"
+          "revision": "d2f1e5e0b26c97c458543818ce251c56d8ed5e78",
+          "version": "0.2.0"
         }
       },
       {
         "package": "Poly",
-        "repositoryURL": "https://github.com/mattpolzin/Poly.git",
+        "repositoryURL": "https://github.com/mattpolzin/Poly",
         "state": {
           "branch": null,
           "revision": "9031b8497e025cbcfae196e59eecad5ba988e267",
@@ -138,7 +120,7 @@
       },
       {
         "package": "Sampleable",
-        "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
+        "repositoryURL": "https://github.com/mattpolzin/Sampleable",
         "state": {
           "branch": null,
           "revision": "df44bf1a860481109dcf455e3c6daf0a0f1bc259",
@@ -147,7 +129,7 @@
       },
       {
         "package": "SourceKitten",
-        "repositoryURL": "https://github.com/jpsim/SourceKitten.git",
+        "repositoryURL": "https://github.com/jpsim/SourceKitten",
         "state": {
           "branch": null,
           "revision": "cc1f16acc70630d27498e81078789f5fa55d7463",
@@ -156,7 +138,7 @@
       },
       {
         "package": "NonEmpty",
-        "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
+        "repositoryURL": "https://github.com/pointfreeco/swift-nonempty",
         "state": {
           "branch": null,
           "revision": "9ef8c4aea57b8da7fedd5303d29470ea2a00c08d",
@@ -174,7 +156,7 @@
       },
       {
         "package": "SwiftCheck",
-        "repositoryURL": "https://github.com/typelift/SwiftCheck.git",
+        "repositoryURL": "https://github.com/typelift/SwiftCheck",
         "state": {
           "branch": null,
           "revision": "077c096c3ddfc38db223ac8e525ad16ffb987138",

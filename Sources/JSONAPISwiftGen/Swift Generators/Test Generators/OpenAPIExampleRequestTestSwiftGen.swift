@@ -38,7 +38,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     ) throws {
 
         let pathParamDecls: [PropDecl] = try parameters
-            .filter { $0.parameterLocation == .path }
+            .filter { $0.location == .path }
             .map { parameter in
                 let (propertyName, _) = try APIRequestTestSwiftGen.argument(for: parameter)
 
@@ -165,7 +165,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             "User-Agent"
         ].map { HeaderOption(name: $0, required: false) }
 
-        let parameterHeaders = parameters.filter { $0.parameterLocation.inHeader }
+        let parameterHeaders = parameters.filter { $0.context.inHeader }
             .map { HeaderOption(name: $0.name, required: $0.required) }
 
         let allHeaders = Set(parameterHeaders + knownHeaders)

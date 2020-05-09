@@ -1,5 +1,4 @@
-// swift-tools-version:5.1
-// The swift-tools-version declares the minimum version of Swift required to build this package.
+// swift-tools-version:5.2
 
 import PackageDescription
 
@@ -17,38 +16,65 @@ let package = Package(
             targets: ["JSONAPIVizGen"])
     ],
     dependencies: [
-        .package(url: "https://github.com/mattpolzin/Sampleable.git", .upToNextMajor(from: "2.0.0")),
-        .package(url: "https://github.com/mattpolzin/JSONAPI.git", .upToNextMajor(from: "3.0.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .upToNextMinor(from: "0.29.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", .upToNextMinor(from: "0.1.0")),
-        .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
-        .package(url: "https://github.com/jpsim/SourceKitten.git", .upToNextMinor(from: "0.26.0")),
-        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
-        .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", .upToNextMinor(from: "0.0.2"))
+        .package(url: "https://github.com/mattpolzin/Sampleable", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPI", from: "4.0.0-alpha.2"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit", .upToNextMinor(from: "0.30.0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/typelift/SwiftCheck", .upToNextMinor(from: "0.12.0")),
+        .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMinor(from: "0.26.0")),
+        .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPIViz", .upToNextMinor(from: "0.0.3"))
     ],
     targets: [
         .target(
             name: "JSONAPIOpenAPI",
-            dependencies: ["JSONAPI", "OpenAPIKit", "OpenAPIReflection", "Sampleable"]),
+            dependencies: [
+                "JSONAPI",
+                "OpenAPIKit",
+                "OpenAPIReflection",
+                "Sampleable"
+            ]
+        ),
         .testTarget(
             name: "JSONAPIOpenAPITests",
-            dependencies: ["JSONAPI", "JSONAPITesting", "JSONAPIOpenAPI", "SwiftCheck"]
+            dependencies: [
+                "JSONAPI",
+                .product(name: "JSONAPITesting", package: "JSONAPI"),
+                "JSONAPIOpenAPI",
+                "SwiftCheck"
+            ]
         ),
         .target(
             name: "JSONAPISwiftGen",
-            dependencies: ["JSONAPI", "OpenAPIKit", "SourceKittenFramework", "NonEmpty"]
+            dependencies: [
+                "JSONAPI",
+                "OpenAPIKit",
+                .product(name: "SourceKittenFramework", package: "SourceKitten"),
+                .product(name: "NonEmpty", package: "NonEmpty")
+            ]
         ),
         .testTarget(
             name: "JSONAPISwiftGenTests",
-            dependencies: ["JSONAPISwiftGen", "JSONAPITesting", "JSONAPIOpenAPI"]
+            dependencies: [
+                "JSONAPISwiftGen",
+                .product(name: "JSONAPITesting", package: "JSONAPI"),
+                "JSONAPIOpenAPI"
+            ]
         ),
         .target(
             name: "JSONAPIVizGen",
-            dependencies: ["JSONAPISwiftGen", "JSONAPIViz"]
+            dependencies: [
+                "JSONAPISwiftGen",
+                "JSONAPIViz"
+            ]
         ),
         .testTarget(
             name: "JSONAPIVizGenTests",
-            dependencies: ["OpenAPIKit", "JSONAPISwiftGen", "JSONAPIVizGen"]
+            dependencies: [
+                "OpenAPIKit",
+                "JSONAPISwiftGen",
+                "JSONAPIVizGen"
+            ]
         )
     ],
     swiftLanguageVersions: [.v5]
