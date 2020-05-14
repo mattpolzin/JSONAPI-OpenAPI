@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
         "state": {
           "branch": null,
-          "revision": "5c18f9c57617d8b0232a50fcfd1568e4f1d1da6c",
-          "version": "0.30.1"
+          "revision": "382668c4fff04b3adaf921840190edcebf855d47",
+          "version": "1.0.0"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection",
         "state": {
           "branch": null,
-          "revision": "d2f1e5e0b26c97c458543818ce251c56d8ed5e78",
-          "version": "0.2.0"
+          "revision": "34eb557d0ab49a95d3a39e7a821fcb12ff50ba8a",
+          "version": "0.3.0"
         }
       },
       {

@@ -13,7 +13,7 @@ public struct ResourceObjectSwiftGenCollection {
     public init(_ doc: OpenAPI.Document, testSuiteConfiguration: TestSuiteConfiguration) throws {
         let pathItems = doc.paths
 
-        resourceObjectGenerators = OpenAPI.HttpVerb.allCases
+        resourceObjectGenerators = OpenAPI.HttpMethod.allCases
             .flatMap { httpVerb in
                 return pathItems.flatMap { (path, pathItem) -> [ResourceObjectSwiftGen] in
                     guard let operation = pathItem.for(httpVerb) else {
@@ -42,10 +42,10 @@ public struct ResourceObjectSwiftGenCollection {
 
 func documents(
     from responses: OpenAPI.Response.Map,
-    for httpVerb: OpenAPI.HttpVerb,
+    for httpVerb: OpenAPI.HttpMethod,
     at path: OpenAPI.Path,
     on server: OpenAPI.Server,
-    given params: [OpenAPI.PathItem.Parameter],
+    given params: [OpenAPI.Parameter],
     testSuiteConfiguration: TestSuiteConfiguration
 ) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()

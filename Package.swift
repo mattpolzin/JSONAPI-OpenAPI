@@ -16,10 +16,10 @@ let package = Package(
             targets: ["JSONAPIVizGen"])
     ],
     dependencies: [
-        .package(url: "https://github.com/mattpolzin/Sampleable", .upToNextMajor(from: "2.0.0")),
+        .package(url: "https://github.com/mattpolzin/Sampleable", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI", from: "4.0.0-alpha.2"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit", .upToNextMinor(from: "0.30.0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit", from: "1.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection", .upToNextMinor(from: "0.3.0")),
         .package(url: "https://github.com/typelift/SwiftCheck", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/jpsim/SourceKitten", .upToNextMinor(from: "0.26.0")),
         .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty", .upToNextMinor(from: "0.2.0")),

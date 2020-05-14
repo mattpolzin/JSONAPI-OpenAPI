@@ -167,7 +167,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             // a `oneOf` with resource types within it.
             let resources: [ResourceObjectSwiftGen]
             switch items {
-            case .one(of: let resourceTypeSchemas):
+            case .one(of: let resourceTypeSchemas, _):
                 resources = try Array(Set(resourceTypeSchemas.map {
                     try ResourceObjectSwiftGen(structure: $0,
                                                allowPlaceholders: allowPlaceholders)

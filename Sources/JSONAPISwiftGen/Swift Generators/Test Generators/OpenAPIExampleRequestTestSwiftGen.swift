@@ -8,7 +8,7 @@
 import Foundation
 import OpenAPIKit
 
-public extension OpenAPI.PathItem.Parameter {
+public extension OpenAPI.Parameter {
     /// Map from a Parameter's name to that Parameter's string-encoded value
     typealias ValueMap = [String: String]
 }
@@ -29,7 +29,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     public init(
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
-        parameters: [OpenAPI.PathItem.Parameter],
+        parameters: [OpenAPI.Parameter],
         testSuiteConfiguration: TestSuiteConfiguration,
         testProperties: TestProperties,
         exampleResponseDataPropName: String?,
@@ -147,8 +147,8 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     }
 
     static func headersSnippet(
-        from parameters: [OpenAPI.PathItem.Parameter],
-        values: OpenAPI.PathItem.Parameter.ValueMap,
+        from parameters: [OpenAPI.Parameter],
+        values: OpenAPI.Parameter.ValueMap,
         inTest testName: String,
         reportingMissingParameters: Bool
     ) throws -> Decl {

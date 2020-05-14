@@ -265,7 +265,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertTrue(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .one(of: includeNodes)? = arrayContext.items else {
+		guard case let .one(of: includeNodes, _)? = arrayContext.items else {
 			XCTFail("Expected Included to contain multiple types of items.")
 			return
 		}

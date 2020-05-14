@@ -24,7 +24,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     public init(server: OpenAPI.Server,
                 pathComponents: OpenAPI.Path,
-                parameters: [OpenAPI.PathItem.Parameter]) throws {
+                parameters: [OpenAPI.Parameter]) throws {
 
         let parameterArgs = try parameters
             .filter { !$0.context.inQuery } // for now these are handled as a block rather than each as separate args
@@ -139,7 +139,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                             .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!"))
     }
 
-    private static func parameterSnippet(from parameter: OpenAPI.PathItem.Parameter) throws -> Decl {
+    private static func parameterSnippet(from parameter: OpenAPI.Parameter) throws -> Decl {
         let (parameterName, parameterType) = try argument(for: parameter)
 
         return PropDecl.let(propName: parameterName,
@@ -147,7 +147,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                             .placeholder(name: parameter.name, type: parameterType))
     }
 
-    static func argument(for parameter: OpenAPI.PathItem.Parameter) throws -> (name: String, type: SwiftTypeRep) {
+    static func argument(for parameter: OpenAPI.Parameter) throws -> (name: String, type: SwiftTypeRep) {
         let parameterName = propertyCased(parameter.name)
         let isParamRequired = parameter.required
         let parameterType = try type(from: parameter.schemaOrContent)
@@ -155,7 +155,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return (name: parameterName, type: isParamRequired ? parameterType : parameterType.optional)
     }
 
-    private static func type(from parameterSchemaOrContent: Either<OpenAPI.PathItem.Parameter.Schema, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
+    private static func type(from parameterSchemaOrContent: Either<OpenAPI.Parameter.SchemaContext, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
         switch parameterSchemaOrContent {
         case .a(let paramSchema):
             guard let schema = paramSchema.schema.b else {

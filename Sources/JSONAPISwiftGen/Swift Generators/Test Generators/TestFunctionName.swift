@@ -35,7 +35,7 @@ import OpenAPIKit
 public struct TestFunctionName: Equatable, RawRepresentable {
 
     public let path: OpenAPI.Path
-    public let endpoint: OpenAPI.HttpVerb
+    public let endpoint: OpenAPI.HttpMethod
     public let direction: HttpDirection
     public let testName: String
 
@@ -102,7 +102,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
 
         self.direction = direction
 
-        guard let endpoint = OpenAPI.HttpVerb(rawValue: String(components.removeLast())) else {
+        guard let endpoint = OpenAPI.HttpMethod(rawValue: String(components.removeLast())) else {
             return nil
         }
 
@@ -113,7 +113,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
 
     public init(
         path: OpenAPI.Path,
-        endpoint: OpenAPI.HttpVerb,
+        endpoint: OpenAPI.HttpMethod,
         direction: HttpDirection,
         testName: String
     ) {

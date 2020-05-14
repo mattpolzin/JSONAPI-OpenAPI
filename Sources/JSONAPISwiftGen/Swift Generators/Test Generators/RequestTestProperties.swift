@@ -14,8 +14,8 @@ extension OpenAPIExampleRequestTestSwiftGen {
         public let name: String
         public let host: URL
         public let skipExample: Bool
-        public let parameters: OpenAPI.PathItem.Parameter.ValueMap
-        public let queryParameters: OpenAPI.PathItem.Parameter.ValueMap
+        public let parameters: OpenAPI.Parameter.ValueMap
+        public let queryParameters: OpenAPI.Parameter.ValueMap
         public let ignoreMissingParameterWarnings: Bool
 
         /// Create properties for an API Test
@@ -40,7 +40,7 @@ extension OpenAPIExampleRequestTestSwiftGen {
                 .flatMap { $0 as? Bool }
                 ?? false
 
-            guard let testParams = testProps["parameters"] as? OpenAPI.PathItem.Parameter.ValueMap else {
+            guard let testParams = testProps["parameters"] as? OpenAPI.Parameter.ValueMap else {
                 throw Error.invalidTestParameters(inTest: name)
             }
             parameters = testParams
