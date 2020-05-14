@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
         "state": {
           "branch": null,
-          "revision": "382668c4fff04b3adaf921840190edcebf855d47",
-          "version": "1.0.0"
+          "revision": "732251ae2eb1965c9323ae4f8024df908979b7cf",
+          "version": "1.0.1"
         }
       },
       {
@@ -122,9 +122,9 @@
         "package": "SourceKitten",
         "repositoryURL": "https://github.com/jpsim/SourceKitten",
         "state": {
-          "branch": null,
-          "revision": "77a4dbbb477a8110eb8765e3c44c70fb4929098f",
-          "version": "0.29.0"
+          "branch": "master",
+          "revision": "be4af15681951a090cf92c1ce345549cb15c536b",
+          "version": null
         }
       },
       {
@@ -168,8 +168,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "c947a306d2e80ecb2c0859047b35c73b8e1ca27f",
-          "version": "2.0.0"
+          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
+          "version": "3.0.1"
         }
       }
     ]
