@@ -11,6 +11,9 @@ See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/ma
 
 *This library has many loose ends and very little documentation. The documentation will grow as the framework becomes more complete.*
 
+## Running and Testing
+As of this writing, you need to run `swift package generate-xcodeproj` and then open that project in Xcode. Using Xcode's built-in Swift Package Manager support is currently broken for libraries like swift-syntax that require dynamic libraries from the Swift toolchain. `swift build`, `swift test`, etc. from the command line will work fine, though.
+
 ## _Experimental_ Swift Code Generation
 
 The JSONAPISwiftGen module has experimental support for generating Swift code for `JSONAPI` models. You can dig into the source code or reach out to me for more information. This module is used by the API Test server project at [mattpolzin/jsonapi-openapi-test-server](https://github.com/mattpolzin/jsonapi-openapi-test-server) to generate models and tests.
