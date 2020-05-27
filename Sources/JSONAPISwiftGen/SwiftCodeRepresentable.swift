@@ -6,7 +6,8 @@
 //
 
 import Foundation
-import SourceKittenFramework
+import SwiftFormat
+import SwiftFormatConfiguration
 
 public protocol SwiftCodeRepresentable {
     var swiftCode: String { get }
@@ -20,14 +21,17 @@ public extension SwiftCodeRepresentable {
         let tmpFilename = "./tmpOut"
         let tmpFilepath = URL(fileURLWithPath: tmpFilename)
         try swiftCode.write(to: tmpFilepath, atomically: true, encoding: .utf8)
-        try File(path: tmpFilename)!
-            .format(trimmingTrailingWhitespace: true,
-                    useTabs: false,
-                    indentWidth: 4)
-            .write(to: tmpFilepath, atomically: true, encoding: .utf8)
+        let formatter = SwiftFormatter(configuration: configuration)
+        var output = ""
+        try formatter.format(contentsOf: tmpFilepath, to: &output)
 
-        let readBack = try String(contentsOf: tmpFilepath)
-        try FileManager.default.removeItem(at: tmpFilepath)
-        return readBack
+        return output
     }
 }
+
+fileprivate let configuration: SwiftFormatConfiguration.Configuration = {
+    var configuration = Configuration()
+    configuration.tabWidth = 4
+    configuration.indentation = .spaces(4)
+    return configuration
+}()

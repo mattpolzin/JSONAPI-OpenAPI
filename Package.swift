@@ -21,8 +21,7 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/OpenAPIKit", from: "1.0.0"),
         .package(url: "https://github.com/mattpolzin/OpenAPIReflection", .upToNextMinor(from: "0.3.0")),
         .package(url: "https://github.com/typelift/SwiftCheck", .upToNextMinor(from: "0.12.0")),
-        //.package(url: "https://github.com/jpsim/SourceKitten", .upToNextMinor(from: "0.29.0")),
-	.package(url: "https://github.com/jpsim/SourceKitten", .branch("master")),
+        .package(url: "https://github.com/apple/swift-format", from: "0.50200.1"),
         .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty", .upToNextMinor(from: "0.2.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPIViz", .upToNextMinor(from: "0.0.3"))
     ],
@@ -50,7 +49,8 @@ let package = Package(
             dependencies: [
                 "JSONAPI",
                 "OpenAPIKit",
-                .product(name: "SourceKittenFramework", package: "SourceKitten"),
+                .product(name: "SwiftFormat", package: "swift-format"),
+                .product(name: "SwiftFormatConfiguration", package: "swift-format"),
                 .product(name: "NonEmpty", package: "NonEmpty")
             ]
         ),
