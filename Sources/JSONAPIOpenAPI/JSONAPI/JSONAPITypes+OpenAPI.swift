@@ -92,7 +92,7 @@ extension ResourceObject: OpenAPIEncodedSchemaType where Description.Attributes:
 
 		// TODO: metadata, links
 
-		let idNode: JSONSchema? = Id.RawType.self != Unidentified.self
+		let idNode: JSONSchema? = ID.RawType.self != Unidentified.self
 			? JSONSchema.string(.init(format: .generic,
 									required: true),
 							  .init())
