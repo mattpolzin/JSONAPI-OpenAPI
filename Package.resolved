@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI",
         "state": {
           "branch": null,
-          "revision": "5b0a01620954ba89c7d1d8f82dfcbf6fd777d17e",
-          "version": "4.0.0-rc.3.2"
+          "revision": "51cb140ebf27949d1185227e3eaef5a54d9a3bee",
+          "version": "4.0.0"
         }
       },
       {
@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz",
         "state": {
           "branch": null,
-          "revision": "4bc91378028b7f42d91e42c1673b3b671934aa36",
-          "version": "0.0.4"
+          "revision": "95b14e304459038ae63a7c3518abf5ea390cdee8",
+          "version": "0.0.5"
         }
       },
       {
