@@ -128,7 +128,10 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
         ]
     }
 
-    static func expectedResponseBodySnippet(responseBodyType: SwiftTypeRep, exampleResponseDataPropName: String?) -> Decl {
+    static func expectedResponseBodySnippet(
+        responseBodyType: SwiftTypeRep,
+        exampleResponseDataPropName: String?
+    ) -> Decl {
         let value = Value(value:
             exampleResponseDataPropName
                 .map { "testDecodable(\(responseBodyType.swiftCode).self, from: \($0))" }
@@ -190,9 +193,11 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             compacted: true
         )
 
-        return PropDecl.let(propName: "headers",
-                            swiftType: .def(.init(name: "[(name: String, value: String)]")),
-                            headers)
+        return PropDecl.let(
+            propName: "headers",
+            swiftType: .def(.init(name: "[(name: String, value: String)]")),
+            headers
+        )
     }
 
     public enum Error: Swift.Error, CustomDebugStringConvertible {

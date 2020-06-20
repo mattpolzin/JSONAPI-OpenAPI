@@ -64,9 +64,11 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
                                  conformances: cascadingConformances)
         }.flatMap { $0 }
 
-        return BlockTypeDecl.struct(typeName: name,
-                                    conformances: rootConformances ?? cascadingConformances,
-                                    decls)
+        return BlockTypeDecl.struct(
+            typeName: name,
+            conformances: rootConformances ?? cascadingConformances,
+            decls
+        )
     }
 
     static func structure(

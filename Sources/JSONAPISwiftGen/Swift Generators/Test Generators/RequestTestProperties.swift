@@ -24,7 +24,11 @@ extension OpenAPIExampleRequestTestSwiftGen {
         ///     - name: The name of the test. This can be anything descriptive.
         ///     - server: The server to run the test against.
         ///     - props: The properties defining the test.
-        public init(name: String, server: OpenAPI.Server, props testProps: [String: Any]) throws {
+        public init(
+            name: String,
+            server: OpenAPI.Server,
+            props testProps: [String: Any]
+        ) throws {
 
             self.name = name
 

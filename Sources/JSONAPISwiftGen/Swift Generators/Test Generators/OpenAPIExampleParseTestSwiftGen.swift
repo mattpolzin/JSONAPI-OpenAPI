@@ -29,24 +29,30 @@ public struct OpenAPIExampleParseTestSwiftGen: SwiftFunctionGenerator {
     ///         This type must be Decodable. The given example will be decoded as this type.
     ///     - exampleHttpStatusCode: The status code under which this example lives. This is just
     ///         used to help name the test function.
-    public init(exampleDataPropName: String,
-                bodyType: SwiftTypeRep,
-                exampleHttpStatusCode: OpenAPI.Response.StatusCode?) throws {
+    public init(
+        exampleDataPropName: String,
+        bodyType: SwiftTypeRep,
+        exampleHttpStatusCode: OpenAPI.Response.StatusCode?
+    ) throws {
 
-        let responseBodyDecl = PropDecl.let(propName: "_",
-                                            swiftType: bodyType.optional,
-                                            Value(value: "testDecodable(\(bodyType.swiftCode).self, from: \(exampleDataPropName))"))
+        let responseBodyDecl = PropDecl.let(
+            propName: "_",
+            swiftType: bodyType.optional,
+            Value(value: "testDecodable(\(bodyType.swiftCode).self, from: \(exampleDataPropName))")
+        )
 
         let statusCodeNameSuffix = exampleHttpStatusCode.map { "__\($0.rawValue)" } ?? ""
 
         functionName = "_test_example_parse\(statusCodeNameSuffix)"
 
-        let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
-                                    name: functionName,
-                                    specializations: nil,
-                                    arguments: [],
-                                    conditions: nil,
-                                    body: [ responseBodyDecl ])
+        let functionDecl = Function(
+            scoping: .init(static: true, privacy: .internal),
+            name: functionName,
+            specializations: nil,
+            arguments: [],
+            conditions: nil,
+            body: [ responseBodyDecl ]
+        )
 
         decls = [
             functionDecl

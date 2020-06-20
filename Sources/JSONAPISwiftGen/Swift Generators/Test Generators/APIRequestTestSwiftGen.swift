@@ -22,9 +22,11 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     public static var testFuncDecl: Decl { makeTestRequestFunc }
 
-    public init(server: OpenAPI.Server,
-                pathComponents: OpenAPI.Path,
-                parameters: [OpenAPI.Parameter]) throws {
+    public init(
+        server: OpenAPI.Server,
+        pathComponents: OpenAPI.Path,
+        parameters: [OpenAPI.Parameter]
+    ) throws {
 
         let parameterArgs = try parameters
             .filter { !$0.context.inQuery } // for now these are handled as a block rather than each as separate args
@@ -83,17 +85,21 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                                             swiftType: .def(.init(name: "[(name: String, value: String)]")),
                                             headersValue)
 
-        let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
-                                    name: "test_request",
-                                    specializations: specializations,
-                                    arguments: allArgs,
-                                    conditions: conditions,
-                                    body: [
-                                        APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
-                                                                          originatingAt: server),
-                                        headerParamsDecl,
-                                        APIRequestTestSwiftGen.requestFuncCallSnippet
-        ])
+        let functionDecl = Function(
+            scoping: .init(static: true, privacy: .internal),
+            name: "test_request",
+            specializations: specializations,
+            arguments: allArgs,
+            conditions: conditions,
+            body: [
+                APIRequestTestSwiftGen.urlSnippet(
+                    from: pathComponents,
+                    originatingAt: server
+                ),
+                headerParamsDecl,
+                APIRequestTestSwiftGen.requestFuncCallSnippet
+            ]
+        )
 
         decls = [
             functionDecl
@@ -114,16 +120,20 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             """ as LiteralSwiftCode
     }
 
-    static func urlSnippet(from path: OpenAPI.Path,
-                           originatingAt server: OpenAPI.Server) -> Decl {
+    static func urlSnippet(
+        from path: OpenAPI.Path,
+        originatingAt server: OpenAPI.Server
+    ) -> Decl {
 
         let host = server.url
 
         return urlSnippet(from: path, originatingAt: host)
     }
 
-    static func urlSnippet(from path: OpenAPI.Path,
-                           originatingAt hostUrl: URL) -> Decl {
+    static func urlSnippet(
+        from path: OpenAPI.Path,
+        originatingAt hostUrl: URL
+    ) -> Decl {
         let pathString = path.components.map { component in
             guard component.first == "{",
                 component.last == "}" else {
@@ -134,17 +144,21 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 + ")"
         }.joined(separator: "/")
 
-        return PropDecl.let(propName: "requestUrl",
-                            swiftType: .rep(URL.self),
-                            .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!"))
+        return PropDecl.let(
+            propName: "requestUrl",
+            swiftType: .rep(URL.self),
+            .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!")
+        )
     }
 
     private static func parameterSnippet(from parameter: OpenAPI.Parameter) throws -> Decl {
         let (parameterName, parameterType) = try argument(for: parameter)
 
-        return PropDecl.let(propName: parameterName,
-                            swiftType: parameterType,
-                            .placeholder(name: parameter.name, type: parameterType))
+        return PropDecl.let(
+            propName: parameterName,
+            swiftType: parameterType,
+            .placeholder(name: parameter.name, type: parameterType)
+        )
     }
 
     static func argument(for parameter: OpenAPI.Parameter) throws -> (name: String, type: SwiftTypeRep) {
