@@ -12,13 +12,17 @@ import OpenAPIKit
 
 class StructureSwiftGenTests: XCTestCase {
     func test_nonObjects() {
-        XCTAssertThrowsError(try StructureSwiftGen(swiftTypeName: "hello",
-                                                   structure: .string,
-                                                   cascadingConformances: ["Codable"]))
+        XCTAssertThrowsError(try StructureSwiftGen(
+            swiftTypeName: "hello",
+            structure: JSONSchema.string.dereferencedSchemaObject()!,
+            cascadingConformances: ["Codable"])
+        )
 
-        XCTAssertThrowsError(try StructureSwiftGen(swiftTypeName: "hello",
-                                                   structure: .array(items: .object),
-                                                   cascadingConformances: ["Codable"]))
+        XCTAssertThrowsError(try StructureSwiftGen(
+            swiftTypeName: "hello",
+            structure: JSONSchema.array(items: .object).dereferencedSchemaObject()!,
+            cascadingConformances: ["Codable"])
+        )
     }
 
     func test_conformances() {
@@ -26,13 +30,17 @@ class StructureSwiftGenTests: XCTestCase {
             properties: [
                 "hello": .string
             ]
-        )
+        ).dereferencedSchemaObject()!
 
-        let swiftCodeNoConformances = try? StructureSwiftGen(swiftTypeName: "GeneratedType",
-                                                             structure: structure)
-        let swiftCodeTwoConformances = try? StructureSwiftGen(swiftTypeName: "GeneratedType",
-                                                              structure: structure,
-                                                              cascadingConformances: ["Codable", "Equatable"])
+        let swiftCodeNoConformances = try? StructureSwiftGen(
+            swiftTypeName: "GeneratedType",
+            structure: structure
+        )
+        let swiftCodeTwoConformances = try? StructureSwiftGen(
+            swiftTypeName: "GeneratedType",
+            structure: structure,
+            cascadingConformances: ["Codable", "Equatable"]
+        )
 
         XCTAssertEqual(try? swiftCodeNoConformances?.formattedSwiftCode(),
 """
@@ -59,11 +67,13 @@ struct GeneratedType: Codable, Equatable {
                 "world": .integer,
                 "fancy": .array(items: .number)
             ]
-        )
+        ).dereferencedSchemaObject()!
 
-        let simpleObjectSwiftCode = try? StructureSwiftGen(swiftTypeName: "GeneratedType",
-                                                           structure: structure,
-                                                           cascadingConformances: ["Codable"])
+        let simpleObjectSwiftCode = try? StructureSwiftGen(
+            swiftTypeName: "GeneratedType",
+            structure: structure,
+            cascadingConformances: ["Codable"]
+        )
 
         XCTAssertEqual(try? simpleObjectSwiftCode?.formattedSwiftCode(),
 """
@@ -83,18 +93,20 @@ struct GeneratedType: Codable {
                 properties: [
                     "hello": .string(required: false)
                 ]
-            ),
+            ).dereferencedSchemaObject()!,
             JSONSchema.object(
                 properties: [
                     "hello": .string(nullable: true)
                 ]
-            )
+            ).dereferencedSchemaObject()!
         ]
 
         let swiftCodes = structures.map {
-            try? StructureSwiftGen(swiftTypeName: "GeneratedType",
-                                   structure: $0,
-                                   cascadingConformances: ["Codable"])
+            try? StructureSwiftGen(
+                swiftTypeName: "GeneratedType",
+                structure: $0,
+                cascadingConformances: ["Codable"]
+            )
         }.compactMap { try? $0?.formattedSwiftCode() }
 
         print(swiftCodes[0])
@@ -138,11 +150,13 @@ struct GeneratedType: Codable {
                     ]
                 )
             ]
-        )
+        ).dereferencedSchemaObject()!
 
-        let simpleObjectSwiftCode = try? StructureSwiftGen(swiftTypeName: "GeneratedType",
-                                                           structure: structure,
-                                                           cascadingConformances: ["Codable"])
+        let simpleObjectSwiftCode = try? StructureSwiftGen(
+            swiftTypeName: "GeneratedType",
+            structure: structure,
+            cascadingConformances: ["Codable"]
+        )
 
         XCTAssertEqual(try? simpleObjectSwiftCode?.formattedSwiftCode(),
 """

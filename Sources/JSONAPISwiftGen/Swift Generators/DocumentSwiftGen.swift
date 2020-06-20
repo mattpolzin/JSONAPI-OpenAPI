@@ -14,7 +14,7 @@ import JSONAPI
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
-    public let structure: JSONSchema
+    public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
@@ -32,7 +32,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
 
     public init(
         swiftTypeName: String,
-        structure: JSONSchema,
+        structure: DereferencedJSONSchema,
         allowPlaceholders: Bool = true,
         example: ExampleSwiftGen? = nil,
         testExampleFuncs: [SwiftFunctionGenerator] = []
@@ -50,7 +50,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     }
 
     static func swiftDeclsForErrorDocument(
-        from resourceObjectContext: JSONSchema.ObjectContext,
+        from resourceObjectContext: DereferencedJSONSchema.ObjectContext,
         swiftTypeName: String
     ) throws -> [Decl] {
         guard let errorsSchema = resourceObjectContext.properties["errors"],
@@ -107,7 +107,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     }
 
     static func swiftDecls(
-        from structure: JSONSchema,
+        from structure: DereferencedJSONSchema,
         swiftTypeName: String,
         allowPlaceholders: Bool
     ) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {

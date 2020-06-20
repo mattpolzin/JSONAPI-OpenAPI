@@ -29,7 +29,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     public init(
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
-        parameters: [OpenAPI.Parameter],
+        parameters: [DereferencedParameter],
         testSuiteConfiguration: TestSuiteConfiguration,
         testProperties: TestProperties,
         exampleResponseDataPropName: String?,
@@ -150,7 +150,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
     }
 
     static func headersSnippet(
-        from parameters: [OpenAPI.Parameter],
+        from parameters: [DereferencedParameter],
         values: OpenAPI.Parameter.ValueMap,
         inTest testName: String,
         reportingMissingParameters: Bool

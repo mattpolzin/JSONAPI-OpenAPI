@@ -11,7 +11,7 @@ import OpenAPIKit
 /// Given some JSON Schema, attempt to generate Swift code for
 /// a `struct` that is capable of parsing data adhering to the schema.
 public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
-    public let structure: JSONSchema
+    public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let swiftTypeName: String
 
@@ -27,7 +27,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
     ///         the root object and all children.
     public init(
         swiftTypeName: String,
-        structure: JSONSchema,
+        structure: DereferencedJSONSchema,
         cascadingConformances: [String] = [],
         rootConformances: [String]? = nil
     ) throws {
@@ -50,7 +50,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
     static func structure(
         named name: String,
-        forObject context: JSONSchema.ObjectContext,
+        forObject context: DereferencedJSONSchema.ObjectContext,
         cascadingConformances: [String],
         rootConformances: [String]? = nil
     ) throws -> BlockTypeDecl {
@@ -59,9 +59,11 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
             .properties
             .sorted { $0.key < $1.key  }
             .map { (key, value) in
-                try declsForProp(named: key,
-                                 for: value,
-                                 conformances: cascadingConformances)
+                try declsForProp(
+                    named: key,
+                    for: value,
+                    conformances: cascadingConformances
+                )
         }.flatMap { $0 }
 
         return BlockTypeDecl.struct(
@@ -73,7 +75,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
     static func structure(
         named name: String,
-        forArray context: JSONSchema.ArrayContext,
+        forArray context: DereferencedJSONSchema.ArrayContext,
         conformances: [String]
     ) throws -> Decl {
 
@@ -92,7 +94,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
     static func declsForProp(
         named name: String,
-        for schema: JSONSchema,
+        for schema: DereferencedJSONSchema,
         conformances: [String]
     ) throws -> [Decl] {
         let type: SwiftTypeRep

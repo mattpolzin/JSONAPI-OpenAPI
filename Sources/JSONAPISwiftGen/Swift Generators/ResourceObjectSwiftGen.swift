@@ -22,7 +22,7 @@ extension ResourceTypeSwiftGenerator {
 /// A Swift generator that produces code for the types needed
 /// by a JSONAPI ResourceObject.
 public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwiftGenerator {
-    public let structure: JSONSchema
+    public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let resourceTypeName: String
     public let exportedSwiftTypeNames: Set<String>
@@ -36,7 +36,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     ///         types of things the generator cannot determine the type or structure of. If false, the
     ///         generator will throw an error in those situations.
     public init(
-        structure: JSONSchema,
+        structure: DereferencedJSONSchema,
         allowPlaceholders: Bool = true
     ) throws {
         self.structure = structure
@@ -54,7 +54,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     }
 
     static func swiftDecls(
-        from structure: JSONSchema,
+        from structure: DereferencedJSONSchema,
         allowPlaceholders: Bool
     )  throws -> (decls: [Decl], relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
@@ -135,7 +135,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
     private static func typeNameSnippet(
-        contextB: JSONSchema.ObjectContext,
+        contextB: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> (typeName: String, typeNameDeclCode: Decl) {
         let typeNameString = try typeName(
@@ -150,7 +150,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     }
 
     private static func typeName(
-        from resourceIdentifierContext: JSONSchema.ObjectContext,
+        from resourceIdentifierContext: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> String {
         guard case let .string(typeNameContextA, _)? = resourceIdentifierContext.properties[Key.type.rawValue] else {
@@ -185,7 +185,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
     private static func attributesSnippet(
-        contextB: JSONSchema.ObjectContext,
+        contextB: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> (attributes: Decl, dependencies: [Decl]) {
 
@@ -241,7 +241,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     private static func attributeSnippet(
         name: String,
-        schema: JSONSchema,
+        schema: DereferencedJSONSchema,
         allowPlaceholders: Bool
     ) throws -> (property: Decl, dependencies: [Decl]) {
 
@@ -290,7 +290,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
     private static func relationshipsSnippet(
-        contextB: JSONSchema.ObjectContext,
+        contextB: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> (relatives: [Relative], relationshipsDecl: Decl) {
 
@@ -344,7 +344,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
     private static func relationshipSnippet(
         name: String,
-        schema: JSONSchema,
+        schema: DereferencedJSONSchema,
         allowPlaceholders: Bool
     ) throws -> (relative: Relative, typeNameDeclCode: Decl) {
 

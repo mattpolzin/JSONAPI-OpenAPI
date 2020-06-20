@@ -17,7 +17,7 @@ import FoundationNetworking
 final class APIRequestTestSwiftGenTests: XCTestCase {
 }
 
-// MARK: - Function written to generated test suites
+// MARK: - START - Function written to generated test suites
 /// Log warning after test case logs
 func XCTWarn(_ message: String, at url: URL) {
     print("[\(url.absoluteString)] : warning - \(message)")
@@ -157,7 +157,7 @@ func makeTestRequest<RequestBody>(
     XCTWaiter().wait(for: [completionExpectation], timeout: 5)
 }
 
-
+// MARK: - END - Function written to generated test suites
 
 
 // MARK: - Test Types

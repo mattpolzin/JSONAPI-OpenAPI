@@ -25,7 +25,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     public init(
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
-        parameters: [OpenAPI.Parameter]
+        parameters: [DereferencedParameter]
     ) throws {
 
         let parameterArgs = try parameters
@@ -151,7 +151,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         )
     }
 
-    private static func parameterSnippet(from parameter: OpenAPI.Parameter) throws -> Decl {
+    private static func parameterSnippet(from parameter: DereferencedParameter) throws -> Decl {
         let (parameterName, parameterType) = try argument(for: parameter)
 
         return PropDecl.let(
@@ -161,7 +161,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         )
     }
 
-    static func argument(for parameter: OpenAPI.Parameter) throws -> (name: String, type: SwiftTypeRep) {
+    static func argument(for parameter: DereferencedParameter) throws -> (name: String, type: SwiftTypeRep) {
         let parameterName = propertyCased(parameter.name)
         let isParamRequired = parameter.required
         let parameterType = try type(from: parameter.schemaOrContent)
@@ -169,16 +169,17 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return (name: parameterName, type: isParamRequired ? parameterType : parameterType.optional)
     }
 
-    private static func type(from parameterSchemaOrContent: Either<OpenAPI.Parameter.SchemaContext, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
+    private static func type(
+        from parameterSchemaOrContent: Either<DereferencedSchemaContext, DereferencedContent.Map>
+    ) throws -> SwiftTypeRep {
         switch parameterSchemaOrContent {
         case .a(let paramSchema):
-            guard let schema = paramSchema.schema.b else {
-                throw Error.parameterSchemaByReferenceNotSupported
-            }
             do {
-                return try swiftType(from: schema,
-                                     allowPlaceholders: false,
-                                     handleOptionality: false)
+                return try swiftType(
+                    from: paramSchema.schema,
+                    allowPlaceholders: false,
+                    handleOptionality: false
+                )
             } catch {
                 throw Error.unsupportedParameterSchema
             }
@@ -189,7 +190,6 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     public enum Error: Swift.Error {
         case parameterContentMapNotSupported
-        case parameterSchemaByReferenceNotSupported
         case unsupportedParameterSchema
 
         case duplicateFunctionArgumentDetected
