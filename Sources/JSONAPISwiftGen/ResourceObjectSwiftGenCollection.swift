@@ -76,7 +76,7 @@ func documents(
             example = nil
         }
 
-        let testExampleFuncs: [SwiftFunctionGenerator]
+        let testExampleFuncs: [TestFunctionGenerator]
         do {
             let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
             if let testPropertiesDict = jsonResponse.vendorExtensions["x-tests"]?.value as? [String: Any] {
