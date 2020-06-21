@@ -15,9 +15,9 @@ public extension OpenAPI.Parameter {
 
 /// A Generator that produces Swift code defining a test function
 /// based on a provided OpenAPI example and some API parameters.
-public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
+public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
     public let decls: [Decl]
-    public let functionName: String
+    public let testFunctionContext: TestFunctionLocalContext
 
     /// Create a generator that creates Swift code for a test that makes an API request and
     ///  checks that the response parses as the documented schema and that the response
@@ -104,11 +104,16 @@ public struct OpenAPIExampleRequestTestSwiftGen: SwiftFunctionGenerator {
             queryParamsValue
         )
 
-        functionName = "_test_example_request_\(safeForPropertyName(testProperties.name))__\(expectedHttpStatus.rawValue)"
+        let context = TestFunctionLocalContext(
+            contextPrefix: "test_example_request",
+            slug: safeForPropertyName(testProperties.name),
+            statusCode: expectedHttpStatus
+        )
+        testFunctionContext = context
 
         let functionDecl = Function(
             scoping: .init(static: true, privacy: .internal),
-            name: functionName,
+            name: context.functionName,
             specializations: nil,
             arguments: [],
             conditions: nil,

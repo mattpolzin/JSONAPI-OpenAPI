@@ -32,6 +32,16 @@ public protocol SwiftFunctionGenerator: SwiftGenerator {
     var functionName: String { get }
 }
 
+/// A Swift code generator that produces a Swift function
+/// that tests a request or response in some way.
+public protocol TestFunctionGenerator: SwiftFunctionGenerator {
+    var testFunctionContext: TestFunctionLocalContext { get }
+}
+
+extension TestFunctionGenerator {
+    public var functionName: String { testFunctionContext.functionName }
+}
+
 public protocol JSONSchemaSwiftGenerator: SwiftGenerator {
     var structure: DereferencedJSONSchema { get }
 }

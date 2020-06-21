@@ -16,7 +16,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init([]),
                 endpoint: .get,
                 direction: .request,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -25,7 +25,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init(["hello"]),
                 endpoint: .get,
                 direction: .request,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -34,7 +34,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init(["hello", "world"]),
                 endpoint: .get,
                 direction: .request,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -43,7 +43,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init([]),
                 endpoint: .post,
                 direction: .request,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -52,7 +52,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init([]),
                 endpoint: .get,
                 direction: .response,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -61,7 +61,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init(["hello"]),
                 endpoint: .patch,
                 direction: .response,
-                testName: "hello"
+                context: TestFunctionLocalContext(functionName: "_hello➎")!
             )
         )
 
@@ -70,7 +70,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init(["hello", "world"]),
                 endpoint: .get,
                 direction: .request,
-                testName: "hello_world"
+                context: TestFunctionLocalContext(functionName: "_hello_world➎")!
             )
         )
 
@@ -79,7 +79,7 @@ final class TestFunctionNameTests: XCTestCase {
                 path: .init(["hello_world", "v2"]),
                 endpoint: .get,
                 direction: .request,
-                testName: "hello_world"
+                context: TestFunctionLocalContext(functionName: "_hello_world➎")!
             )
         )
     }
@@ -89,41 +89,33 @@ final class TestFunctionNameTests: XCTestCase {
             path: .init(["hello_world", "v2"]),
             endpoint: .get,
             direction: .request,
-            testName: "hello_world"
+            context: TestFunctionLocalContext(functionName: "_hello_world➎")!
         )
-        XCTAssertNil(test1.testStatusCodeGuess)
-
-        let test2 = TestFunctionName(
-            path: .init(["hello_world", "v2"]),
-            endpoint: .get,
-            direction: .request,
-            testName: "hello_world__hi"
-        )
-        XCTAssertNil(test2.testStatusCodeGuess)
+        XCTAssertNil(test1.testStatusCode)
 
         let test3 = TestFunctionName(
             path: .init(["hello_world", "v2"]),
             endpoint: .get,
             direction: .request,
-            testName: "hello_world__404"
+            context: TestFunctionLocalContext(functionName: "_hello➎world__404")!
         )
-        XCTAssertEqual(test3.testStatusCodeGuess, OpenAPI.Response.StatusCode.status(code: 404))
+        XCTAssertEqual(test3.testStatusCode, OpenAPI.Response.StatusCode.status(code: 404))
 
         let test4 = TestFunctionName(
             path: .init(["hello_world", "v2"]),
             endpoint: .get,
             direction: .request,
-            testName: "hello_world__3xx"
+            context: TestFunctionLocalContext(functionName: "_hello➎world__3xx")!
         )
-        XCTAssertEqual(test4.testStatusCodeGuess, OpenAPI.Response.StatusCode.range(.redirect))
+        XCTAssertEqual(test4.testStatusCode, OpenAPI.Response.StatusCode.range(.redirect))
 
         let test5 = TestFunctionName(
             path: .init(["hello_world", "v2"]),
             endpoint: .get,
             direction: .request,
-            testName: "hello_world__default"
+            context: TestFunctionLocalContext(functionName: "_hello➎world__default")!
         )
-        XCTAssertEqual(test5.testStatusCodeGuess, OpenAPI.Response.StatusCode.default)
+        XCTAssertEqual(test5.testStatusCode, OpenAPI.Response.StatusCode.default)
     }
 
     func assertReflexiveRawValue(_ testName: TestFunctionName, file: StaticString = #file, line: UInt = #line) {

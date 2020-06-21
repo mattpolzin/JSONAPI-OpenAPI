@@ -37,7 +37,13 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     public let path: OpenAPI.Path
     public let endpoint: OpenAPI.HttpMethod
     public let direction: HttpDirection
-    public let testName: String
+    public let context: TestFunctionLocalContext
+
+    public var testName: String { context.functionName }
+
+    /// The status code being tested, if that information is relevant to the test
+    /// context.
+    public var testStatusCode: OpenAPI.Response.StatusCode? { context.statusCode }
 
     /// The raw value is the generated wrapper test function name
     /// for the given test.
@@ -55,17 +61,6 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     /// that will call this callable.
     public var fullyQualifiedTestFunctionName: String {
         return nameApplying(pathComponentTransform: Self.swiftName)
-    }
-
-    /// Will take a guess at what response status code is being tested, if applicable.
-    /// The guess is determined using a known test name pattern of the status
-    /// code being appending to the end of the test name after double underscores.
-    public var testStatusCodeGuess: OpenAPI.Response.StatusCode? {
-        let components = testName.components(separatedBy: "__")
-
-        guard components.count > 1 else { return nil }
-
-        return components.last.flatMap(OpenAPI.Response.StatusCode.init(rawValue:))
     }
 
     /// This function facilitates a split between the `rawValue` and `fullyQualifiedTestFunctionName`
@@ -94,7 +89,12 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             return nil
         }
 
-        self.testName = Self.functionDecodedName(from: String(components.removeLast()))
+        guard let localContext = TestFunctionLocalContext(
+            functionName: Self.functionDecodedName(
+                from: String(components.removeLast())
+            )
+        ) else { return nil }
+        self.context = localContext
 
         guard let direction = HttpDirection(rawValue: String(components.removeLast()).lowercased()) else {
             return nil
@@ -115,12 +115,12 @@ public struct TestFunctionName: Equatable, RawRepresentable {
         path: OpenAPI.Path,
         endpoint: OpenAPI.HttpMethod,
         direction: HttpDirection,
-        testName: String
+        context: TestFunctionLocalContext
     ) {
         self.path = path
         self.endpoint = endpoint
         self.direction = direction
-        self.testName = testName
+        self.context = context
     }
 
     /// For function name encoding we hold onto information like where there are
@@ -152,4 +152,88 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     private static var closeBraceReplacementCharacter: Character = "➋"
     private static var spaceReplacementCharacter: Character = "➌"
     private static var periodReplacementCharacter: Character = "➍"
+    // ➎ taken by `TestFunctionLocalContext.prefixSeparatorCharacter`.
+}
+
+public struct TestFunctionLocalContext: Equatable {
+    /// A prefix for all function names in a similar context.
+    ///
+    /// For example, you may want all request functions to
+    /// have one prefix and all response functions to have
+    /// a different prefix.
+    ///
+    /// - Important: The prefix should be a valid function
+    ///     name in and of itself (no characters that aren't allowed).
+    public let contextPrefix: String
+
+    /// Some meaningful way to describe the context.
+    ///
+    /// Called a slug because it is not a full-sentence description
+    /// or even a summary but rather some (locally) unique string
+    /// describing the context.
+    ///
+    /// - Important: The slug should be a valid function
+    ///     name in and of itself (no characters that aren't allowed).
+    public let slug: String?
+
+    /// The status code is relevant to the context of a response but
+    /// not the context of a request so it is optional.
+    ///
+    /// - Important: It is not intended that the inavailability of a
+    ///     status code be interpreted as an indication that the
+    ///     context is that of a request.
+    public let statusCode: OpenAPI.Response.StatusCode?
+
+    public init?(functionName: String) {
+        guard functionName.first == "_" else { return nil }
+        let functionName = functionName.dropFirst()
+
+        let primaryComponents = functionName.components(separatedBy: "__")
+        if primaryComponents.count > 1 {
+            guard primaryComponents.count == 2 else { return nil }
+            guard let code = OpenAPI.Response.StatusCode(rawValue: primaryComponents[1]) else { return nil }
+            statusCode = code
+        } else {
+            statusCode = nil
+        }
+
+        let prefixAndSlug = primaryComponents[0]
+
+        let prefix = prefixAndSlug.prefix(while: { $0 != Self.prefixSeparatorCharacter })
+        if prefix.count > 0 {
+            contextPrefix = String(prefix)
+        } else {
+            contextPrefix = ""
+        }
+
+        let slug = prefixAndSlug[prefixAndSlug.index(after: prefix.endIndex)...]
+        if slug.count > 0 {
+            self.slug = String(slug)
+        } else {
+            self.slug = nil
+        }
+    }
+
+    public init(
+        contextPrefix: String = "",
+        slug: String?,
+        statusCode: OpenAPI.Response.StatusCode?
+    ) {
+        self.contextPrefix = contextPrefix
+        self.slug = slug
+        self.statusCode = statusCode
+    }
+
+    public var functionName: String {
+        let statusCodeNameSuffix = statusCode.map { "__\($0.rawValue)" } ?? ""
+
+        let name = contextPrefix
+            + "\(Self.prefixSeparatorCharacter)"
+            + (slug ?? "")
+
+        return "_\(name)\(statusCodeNameSuffix)"
+    }
+
+    // ➊ through ➍ taken by `TestFunctionName`.
+    private static var prefixSeparatorCharacter: Character = "➎"
 }
