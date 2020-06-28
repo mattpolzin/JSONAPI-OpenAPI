@@ -117,7 +117,7 @@ internal func swiftType(
         typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     case .object(_)?:
         guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJsonSchema, hint: "object")
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJSONSchema, hint: "object")
         }
         typeRep = .placeholder(name: "Swift Type", typeHint: "Any")
     case .array(_)?:
@@ -137,7 +137,7 @@ internal func swiftType(
         }
 
         guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJsonSchema, hint: "array")
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJSONSchema, hint: "array")
         }
         typeRep = .placeholder(name: "Swift Type", typeHint: "[Any]")
     case .number(let format)?:
