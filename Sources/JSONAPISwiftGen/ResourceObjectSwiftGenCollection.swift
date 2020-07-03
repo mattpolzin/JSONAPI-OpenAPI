@@ -10,7 +10,7 @@ import OpenAPIKit
 public struct ResourceObjectSwiftGenCollection {
     public let resourceObjectGenerators: [ResourceObjectSwiftGen]
 
-    public init(_ doc: OpenAPI.Document, testSuiteConfiguration: TestSuiteConfiguration) throws {
+    public init(_ doc: DereferencedDocument, testSuiteConfiguration: TestSuiteConfiguration) throws {
         let pathItems = doc.paths
 
         resourceObjectGenerators = OpenAPI.HttpMethod.allCases
@@ -30,7 +30,7 @@ public struct ResourceObjectSwiftGenCollection {
                         for: httpVerb,
                         at: path,
                         on: doc.servers.first!,
-                        given: parameters.compactMap { $0.b },
+                        given: parameters,
                         testSuiteConfiguration: testSuiteConfiguration
                     ).values.flatMap { Array($0.resourceObjectGenerators) }
                 }
@@ -41,23 +41,21 @@ public struct ResourceObjectSwiftGenCollection {
 }
 
 func documents(
-    from responses: OpenAPI.Response.Map,
+    from responses: DereferencedResponse.Map,
     for httpVerb: OpenAPI.HttpMethod,
     at path: OpenAPI.Path,
     on server: OpenAPI.Server,
-    given params: [OpenAPI.Parameter],
+    given params: [DereferencedParameter],
     testSuiteConfiguration: TestSuiteConfiguration
 ) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
-        guard let jsonResponse = response.b?.content[.json] else {
+        guard let jsonResponse = response.content[.json] else {
             continue
         }
 
-        guard let responseSchema = jsonResponse.schema.b else {
-            continue
-        }
+        let responseSchema = jsonResponse.schema
 
         guard case .object = responseSchema else {
             print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: responseSchema.jsonTypeFormat?.jsonType))'.")
@@ -78,7 +76,7 @@ func documents(
             example = nil
         }
 
-        let testExampleFuncs: [SwiftFunctionGenerator]
+        let testExampleFuncs: [TestFunctionGenerator]
         do {
             let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
             if let testPropertiesDict = jsonResponse.vendorExtensions["x-tests"]?.value as? [String: Any] {

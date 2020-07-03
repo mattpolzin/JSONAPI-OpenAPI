@@ -32,8 +32,18 @@ public protocol SwiftFunctionGenerator: SwiftGenerator {
     var functionName: String { get }
 }
 
+/// A Swift code generator that produces a Swift function
+/// that tests a request or response in some way.
+public protocol TestFunctionGenerator: SwiftFunctionGenerator {
+    var testFunctionContext: TestFunctionLocalContext { get }
+}
+
+extension TestFunctionGenerator {
+    public var functionName: String { testFunctionContext.functionName }
+}
+
 public protocol JSONSchemaSwiftGenerator: SwiftGenerator {
-    var structure: JSONSchema { get }
+    var structure: DereferencedJSONSchema { get }
 }
 
 internal struct LiteralSwiftCode: SwiftCodeRepresentable, Decl, ExpressibleByStringLiteral {
@@ -89,9 +99,11 @@ enum SwiftTypeError: Swift.Error {
     case placeholderTypeNotAllowed(for: JSONSchema, hint: String)
 }
 
-internal func swiftType(from schema: JSONSchema,
-                        allowPlaceholders: Bool,
-                        handleOptionality: Bool = true) throws -> SwiftTypeRep {
+internal func swiftType(
+    from schema: DereferencedJSONSchema,
+    allowPlaceholders: Bool,
+    handleOptionality: Bool = true
+) throws -> SwiftTypeRep {
 
     let optional = handleOptionality
         ? !schema.required || schema.nullable
@@ -105,7 +117,7 @@ internal func swiftType(from schema: JSONSchema,
         typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
     case .object(_)?:
         guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "object")
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJSONSchema, hint: "object")
         }
         typeRep = .placeholder(name: "Swift Type", typeHint: "Any")
     case .array(_)?:
@@ -114,16 +126,18 @@ internal func swiftType(from schema: JSONSchema,
         if case .array(_, let arrayContext) = schema,
             let items = arrayContext.items {
             do {
-                let itemsType = try swiftType(from: items,
-                                              allowPlaceholders: allowPlaceholders,
-                                              handleOptionality: handleOptionality)
+                let itemsType = try swiftType(
+                    from: items,
+                    allowPlaceholders: allowPlaceholders,
+                    handleOptionality: handleOptionality
+                )
                 typeRep = .def(.init(name: "[\(itemsType.swiftCode)]"))
                 break
             } catch {}
         }
 
         guard allowPlaceholders else {
-            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema, hint: "array")
+            throw SwiftTypeError.placeholderTypeNotAllowed(for: schema.underlyingJSONSchema, hint: "array")
         }
         typeRep = .placeholder(name: "Swift Type", typeHint: "[Any]")
     case .number(let format)?:

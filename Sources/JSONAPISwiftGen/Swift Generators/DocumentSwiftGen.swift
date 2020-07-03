@@ -14,12 +14,12 @@ import JSONAPI
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
 public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
-    public let structure: JSONSchema
+    public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
     public let exampleGenerator: ExampleSwiftGen?
-    public let testExampleFuncs: [SwiftFunctionGenerator]
+    public let testExampleFuncs: [TestFunctionGenerator]
 
     /// Generate Swift code not just for this Document's declaration but
     /// also for all declarations required for this Document to compile.
@@ -30,23 +30,29 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             .joined(separator: "\n")
     }
 
-    public init(swiftTypeName: String,
-                structure: JSONSchema,
-                allowPlaceholders: Bool = true,
-                example: ExampleSwiftGen? = nil,
-                testExampleFuncs: [SwiftFunctionGenerator] = []) throws {
+    public init(
+        swiftTypeName: String,
+        structure: DereferencedJSONSchema,
+        allowPlaceholders: Bool = true,
+        example: ExampleSwiftGen? = nil,
+        testExampleFuncs: [TestFunctionGenerator] = []
+    ) throws {
         self.swiftTypeName = swiftTypeName
         self.structure = structure
         self.exampleGenerator = example
         self.testExampleFuncs = testExampleFuncs
 
-        (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(from: structure,
-                                                                                swiftTypeName: swiftTypeName,
-                                                                                allowPlaceholders: allowPlaceholders)
+        (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(
+            from: structure,
+            swiftTypeName: swiftTypeName,
+            allowPlaceholders: allowPlaceholders
+        )
     }
 
-    static func swiftDeclsForErrorDocument(from resourceObjectContext: JSONSchema.ObjectContext,
-                                           swiftTypeName: String) throws -> [Decl] {
+    static func swiftDeclsForErrorDocument(
+        from resourceObjectContext: DereferencedJSONSchema.ObjectContext,
+        swiftTypeName: String
+    ) throws -> [Decl] {
         guard let errorsSchema = resourceObjectContext.properties["errors"],
             case .array(_, let arrayContext) = errorsSchema,
             let errorsItems = arrayContext.items else {
@@ -58,35 +64,53 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
 
         let errorsItemsDecls: [Decl]
         do { //GenericJSONAPIError<ErrorPayload>
-            let errorTypealias = Typealias(alias: .def(.init(name: errorTypeName)),
-                                           existingType: .def(.init(name: "GenericJSONAPIError",
-                                                                    specializationReps: [.def(.init(name: errorPayloadTypeName))])))
+            let errorTypealias = Typealias(
+                alias: .def(
+                    .init(name: errorTypeName)
+                ),
+                existingType: .def(
+                    .init(
+                        name: "GenericJSONAPIError",
+                        specializationReps: [.def(.init(name: errorPayloadTypeName))]
+                    )
+                )
+            )
 
-            errorsItemsDecls = try StructureSwiftGen(swiftTypeName: errorPayloadTypeName,
-                                                     structure: errorsItems,
-                                                     cascadingConformances: ["Codable", "Equatable"]).decls
+            errorsItemsDecls = try StructureSwiftGen(
+                swiftTypeName: errorPayloadTypeName,
+                structure: errorsItems,
+                cascadingConformances: ["Codable", "Equatable"]
+            ).decls
                 + [errorTypealias]
         } catch let error {
             throw Error.failedToCreateErrorsStructure(underlyingError: error)
         }
 
-        let documentTypealiasDecl = Typealias(alias: .def(.init(name: swiftTypeName)),
-                                              existingType: .def(.init(name: "JSONAPI.Document",
-                                                                       specializationReps: [
-                                                                        .init(NoResourceBody.self),
-                                                                        .init(NoMetadata.self),
-                                                                        .init(NoLinks.self),
-                                                                        .init(NoIncludes.self),
-                                                                        .init(NoAPIDescription.self),
-                                                                        .def(.init(name: errorTypeName))
-                                              ])))
+        let documentTypealiasDecl = Typealias(
+            alias: .def(.init(name: swiftTypeName)),
+            existingType: .def(
+                .init(
+                    name: "JSONAPI.Document",
+                    specializationReps: [
+                        .init(NoResourceBody.self),
+                        .init(NoMetadata.self),
+                        .init(NoLinks.self),
+                        .init(NoIncludes.self),
+                        .init(NoAPIDescription.self),
+                        .def(.init(name: errorTypeName))
+                    ]
+                )
+            )
+        )
 
         return errorsItemsDecls + [documentTypealiasDecl]
     }
 
-    static func swiftDecls(from structure: JSONSchema,
-                           swiftTypeName: String,
-                           allowPlaceholders: Bool) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {
+    static func swiftDecls(
+        from structure: DereferencedJSONSchema,
+        swiftTypeName: String,
+        allowPlaceholders: Bool
+    ) throws -> ([Decl], Set<ResourceObjectSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
@@ -115,19 +139,29 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         let primaryResourceTypeName: String
         switch data {
         case .object:
-            let resourceObject = try ResourceObjectSwiftGen(structure: data,
-                                                            allowPlaceholders: allowPlaceholders)
+            let resourceObject = try ResourceObjectSwiftGen(
+                structure: data,
+                allowPlaceholders: allowPlaceholders
+            )
             primaryResourceTypeName = resourceObject.resourceTypeName
 
             let isNullablePrimaryResource = data.nullable
 
             // SingleResourceBody<PrimaryResource>
-            primaryResourceBodyType = .def(.init(name: "SingleResourceBody",
-                                             specializationReps: [
-                                                .def(.init(name: primaryResourceTypeName,
-                                                           specializationReps: [],
-                                                           optional: isNullablePrimaryResource))
-                ]))
+            primaryResourceBodyType = .def(
+                .init(
+                    name: "SingleResourceBody",
+                    specializationReps: [
+                        .def(
+                            .init(
+                                name: primaryResourceTypeName,
+                                specializationReps: [],
+                                optional: isNullablePrimaryResource
+                            )
+                        )
+                    ]
+                )
+            )
 
             allResourceObjectGenerators.insert(resourceObject)
 
@@ -137,15 +171,25 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
                     throw Error.expectedDataArrayToDefineItems
             }
 
-            let resourceObject = try ResourceObjectSwiftGen(structure: dataItem,
-                                                            allowPlaceholders: allowPlaceholders)
+            let resourceObject = try ResourceObjectSwiftGen(
+                structure: dataItem,
+                allowPlaceholders: allowPlaceholders
+            )
             primaryResourceTypeName = resourceObject.resourceTypeName
 
-            primaryResourceBodyType = .def(.init(name: "ManyResourceBody",
-                                             specializationReps: [
-                                                .def(.init(name: primaryResourceTypeName,
-                                                           specializationReps: []))
-                ]))
+            primaryResourceBodyType = .def(
+                .init(
+                    name: "ManyResourceBody",
+                    specializationReps: [
+                        .def(
+                            .init(
+                                name: primaryResourceTypeName,
+                                specializationReps: []
+                            )
+                        )
+                    ]
+                )
+            )
 
             allResourceObjectGenerators.insert(resourceObject)
 
@@ -169,18 +213,28 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             switch items {
             case .one(of: let resourceTypeSchemas, _):
                 resources = try Array(Set(resourceTypeSchemas.map {
-                    try ResourceObjectSwiftGen(structure: $0,
-                                               allowPlaceholders: allowPlaceholders)
+                    try ResourceObjectSwiftGen(
+                        structure: $0,
+                        allowPlaceholders: allowPlaceholders
+                    )
                 })).sorted { $0.resourceTypeName < $1.resourceTypeName }
             default:
-                resources = [try ResourceObjectSwiftGen(structure: items,
-                                                        allowPlaceholders: allowPlaceholders)]
+                resources = [
+                    try ResourceObjectSwiftGen(
+                        structure: items,
+                        allowPlaceholders: allowPlaceholders
+                    )
+                ]
             }
 
             let resourceTypes = resources.map { SwiftTypeRep.def(.init(name: $0.resourceTypeName)) }
 
-            includeType = .def(.init(name: "Include\(resourceTypes.count)",
-                                      specializationReps: resourceTypes))
+            includeType = .def(
+                .init(
+                    name: "Include\(resourceTypes.count)",
+                    specializationReps: resourceTypes
+                )
+            )
 
 
             allResourceObjectGenerators = allResourceObjectGenerators.union(resources)
@@ -188,16 +242,24 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
             includeType = .rep(NoIncludes.self)
         }
 
-        allDecls.append(Typealias(alias: .def(.init(name: swiftTypeName)),
-                                  existingType: .def(.init(name: "JSONAPI.Document",
-                                                           specializationReps: [
-                                                            primaryResourceBodyType,
-                                                            .init(NoMetadata.self),
-                                                            .init(NoLinks.self),
-                                                            includeType,
-                                                            .init(NoAPIDescription.self),
-                                                            "BasicJSONAPIError<AnyCodable>"
-                                    ]))))
+        allDecls.append(
+            Typealias(
+                alias: .def(.init(name: swiftTypeName)),
+                existingType: .def(
+                    .init(
+                        name: "JSONAPI.Document",
+                        specializationReps: [
+                            primaryResourceBodyType,
+                            .init(NoMetadata.self),
+                            .init(NoLinks.self),
+                            includeType,
+                            .init(NoAPIDescription.self),
+                            "BasicJSONAPIError<AnyCodable>"
+                        ]
+                    )
+                )
+            )
+        )
 
         return (allDecls, allResourceObjectGenerators)
     }

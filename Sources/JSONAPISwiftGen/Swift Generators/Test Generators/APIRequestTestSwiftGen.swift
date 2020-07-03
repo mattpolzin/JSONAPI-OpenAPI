@@ -22,9 +22,11 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     public static var testFuncDecl: Decl { makeTestRequestFunc }
 
-    public init(server: OpenAPI.Server,
-                pathComponents: OpenAPI.Path,
-                parameters: [OpenAPI.Parameter]) throws {
+    public init(
+        server: OpenAPI.Server,
+        pathComponents: OpenAPI.Path,
+        parameters: [DereferencedParameter]
+    ) throws {
 
         let parameterArgs = try parameters
             .filter { !$0.context.inQuery } // for now these are handled as a block rather than each as separate args
@@ -83,17 +85,21 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                                             swiftType: .def(.init(name: "[(name: String, value: String)]")),
                                             headersValue)
 
-        let functionDecl = Function(scoping: .init(static: true, privacy: .internal),
-                                    name: "test_request",
-                                    specializations: specializations,
-                                    arguments: allArgs,
-                                    conditions: conditions,
-                                    body: [
-                                        APIRequestTestSwiftGen.urlSnippet(from: pathComponents,
-                                                                          originatingAt: server),
-                                        headerParamsDecl,
-                                        APIRequestTestSwiftGen.requestFuncCallSnippet
-        ])
+        let functionDecl = Function(
+            scoping: .init(static: true, privacy: .internal),
+            name: "test_request",
+            specializations: specializations,
+            arguments: allArgs,
+            conditions: conditions,
+            body: [
+                APIRequestTestSwiftGen.urlSnippet(
+                    from: pathComponents,
+                    originatingAt: server
+                ),
+                headerParamsDecl,
+                APIRequestTestSwiftGen.requestFuncCallSnippet
+            ]
+        )
 
         decls = [
             functionDecl
@@ -114,16 +120,20 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             """ as LiteralSwiftCode
     }
 
-    static func urlSnippet(from path: OpenAPI.Path,
-                           originatingAt server: OpenAPI.Server) -> Decl {
+    static func urlSnippet(
+        from path: OpenAPI.Path,
+        originatingAt server: OpenAPI.Server
+    ) -> Decl {
 
         let host = server.url
 
         return urlSnippet(from: path, originatingAt: host)
     }
 
-    static func urlSnippet(from path: OpenAPI.Path,
-                           originatingAt hostUrl: URL) -> Decl {
+    static func urlSnippet(
+        from path: OpenAPI.Path,
+        originatingAt hostUrl: URL
+    ) -> Decl {
         let pathString = path.components.map { component in
             guard component.first == "{",
                 component.last == "}" else {
@@ -134,20 +144,24 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 + ")"
         }.joined(separator: "/")
 
-        return PropDecl.let(propName: "requestUrl",
-                            swiftType: .rep(URL.self),
-                            .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!"))
+        return PropDecl.let(
+            propName: "requestUrl",
+            swiftType: .rep(URL.self),
+            .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!")
+        )
     }
 
-    private static func parameterSnippet(from parameter: OpenAPI.Parameter) throws -> Decl {
+    private static func parameterSnippet(from parameter: DereferencedParameter) throws -> Decl {
         let (parameterName, parameterType) = try argument(for: parameter)
 
-        return PropDecl.let(propName: parameterName,
-                            swiftType: parameterType,
-                            .placeholder(name: parameter.name, type: parameterType))
+        return PropDecl.let(
+            propName: parameterName,
+            swiftType: parameterType,
+            .placeholder(name: parameter.name, type: parameterType)
+        )
     }
 
-    static func argument(for parameter: OpenAPI.Parameter) throws -> (name: String, type: SwiftTypeRep) {
+    static func argument(for parameter: DereferencedParameter) throws -> (name: String, type: SwiftTypeRep) {
         let parameterName = propertyCased(parameter.name)
         let isParamRequired = parameter.required
         let parameterType = try type(from: parameter.schemaOrContent)
@@ -155,16 +169,17 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return (name: parameterName, type: isParamRequired ? parameterType : parameterType.optional)
     }
 
-    private static func type(from parameterSchemaOrContent: Either<OpenAPI.Parameter.SchemaContext, OpenAPI.Content.Map>) throws -> SwiftTypeRep {
+    private static func type(
+        from parameterSchemaOrContent: Either<DereferencedSchemaContext, DereferencedContent.Map>
+    ) throws -> SwiftTypeRep {
         switch parameterSchemaOrContent {
         case .a(let paramSchema):
-            guard let schema = paramSchema.schema.b else {
-                throw Error.parameterSchemaByReferenceNotSupported
-            }
             do {
-                return try swiftType(from: schema,
-                                     allowPlaceholders: false,
-                                     handleOptionality: false)
+                return try swiftType(
+                    from: paramSchema.schema,
+                    allowPlaceholders: false,
+                    handleOptionality: false
+                )
             } catch {
                 throw Error.unsupportedParameterSchema
             }
@@ -175,7 +190,6 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
 
     public enum Error: Swift.Error {
         case parameterContentMapNotSupported
-        case parameterSchemaByReferenceNotSupported
         case unsupportedParameterSchema
 
         case duplicateFunctionArgumentDetected

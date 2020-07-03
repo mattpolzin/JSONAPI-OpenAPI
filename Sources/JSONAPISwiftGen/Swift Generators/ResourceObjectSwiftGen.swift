@@ -22,7 +22,7 @@ extension ResourceTypeSwiftGenerator {
 /// A Swift generator that produces code for the types needed
 /// by a JSONAPI ResourceObject.
 public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwiftGenerator {
-    public let structure: JSONSchema
+    public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let resourceTypeName: String
     public let exportedSwiftTypeNames: Set<String>
@@ -35,12 +35,16 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     ///     - allowPlaceholders: If true (default) then placeholders will be used for the Swift
     ///         types of things the generator cannot determine the type or structure of. If false, the
     ///         generator will throw an error in those situations.
-    public init(structure: JSONSchema,
-                allowPlaceholders: Bool = true) throws {
+    public init(
+        structure: DereferencedJSONSchema,
+        allowPlaceholders: Bool = true
+    ) throws {
         self.structure = structure
 
-        (decls, relatives, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(from: structure,
-                                                                                    allowPlaceholders: allowPlaceholders)
+        (decls, relatives, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(
+            from: structure,
+            allowPlaceholders: allowPlaceholders
+        )
 
         let typealiases = decls.compactMap { $0 as? Typealias }
 
@@ -49,51 +53,73 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         exportedSwiftTypeNames = Set(decls.compactMap { $0 as? Typealias }.map { $0.alias.swiftCode })
     }
 
-    static func swiftDecls(from structure: JSONSchema,
-                           allowPlaceholders: Bool)  throws -> (decls: [Decl], relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
+    static func swiftDecls(
+        from structure: DereferencedJSONSchema,
+        allowPlaceholders: Bool
+    )  throws -> (decls: [Decl], relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
 
-        let (typeName, typeNameDecl) = try typeNameSnippet(contextB: resourceObjectContextB,
-                                                           allowPlaceholders: allowPlaceholders)
+        let (typeName, typeNameDecl) = try typeNameSnippet(
+            contextB: resourceObjectContextB,
+            allowPlaceholders: allowPlaceholders
+        )
 
         let identified = resourceObjectContextB.properties[Key.id.rawValue] != nil
 
-        let attributesDecl = try attributesSnippet(contextB: resourceObjectContextB,
-                                                   allowPlaceholders: allowPlaceholders)
+        let attributesDecl = try attributesSnippet(
+            contextB: resourceObjectContextB,
+            allowPlaceholders: allowPlaceholders
+        )
 
-        let relationships = try relationshipsSnippet(contextB: resourceObjectContextB,
-                                                     allowPlaceholders: allowPlaceholders)
+        let relationships = try relationshipsSnippet(
+            contextB: resourceObjectContextB,
+            allowPlaceholders: allowPlaceholders
+        )
 
         let descriptionTypeName = "\(typeName)Description"
 
-        let identifiedTypealias = Typealias(alias: .init(typeName),
-                                            existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
-                                                                             specializationReps: [
-                                                                                .init(descriptionTypeName),
-                                                                                .init(NoMetadata.self),
-                                                                                .init(NoLinks.self),
-                                                                                .init(String.self)
-                                            ])))
+        let identifiedTypealias = Typealias(
+            alias: .init(typeName),
+            existingType: .init(
+                SwiftTypeDef(
+                    name: "JSONAPI.ResourceObject",
+                    specializationReps: [
+                        .init(descriptionTypeName),
+                        .init(NoMetadata.self),
+                        .init(NoLinks.self),
+                        .init(String.self)
+                    ]
+                )
+            )
+        )
 
-        let unidenfitiedTypealias = Typealias(alias: .init("Unidentified" + typeName),
-                                              existingType: .init(SwiftTypeDef(name: "JSONAPI.ResourceObject",
-                                                                               specializationReps: [
-                                                                                .init(descriptionTypeName),
-                                                                                .init(NoMetadata.self),
-                                                                                .init(NoLinks.self),
-                                                                                .init(Unidentified.self)
-                                              ])))
+        let unidenfitiedTypealias = Typealias(
+            alias: .init("Unidentified" + typeName),
+            existingType: .init(
+                SwiftTypeDef(
+                    name: "JSONAPI.ResourceObject",
+                    specializationReps: [
+                        .init(descriptionTypeName),
+                        .init(NoMetadata.self),
+                        .init(NoLinks.self),
+                        .init(Unidentified.self)
+                    ]
+                )
+            )
+        )
 
         let decls = [
-            BlockTypeDecl.enum(typeName: descriptionTypeName,
-                               conformances: ["JSONAPI.ResourceObjectDescription"],
-                               [
-                                typeNameDecl,
-                                attributesDecl.attributes,
-                                relationships.relationshipsDecl
-                                ] + attributesDecl.dependencies),
+            BlockTypeDecl.enum(
+                typeName: descriptionTypeName,
+                conformances: ["JSONAPI.ResourceObjectDescription"],
+                [
+                    typeNameDecl,
+                    attributesDecl.attributes,
+                    relationships.relationshipsDecl
+                ] + attributesDecl.dependencies
+            ),
             (identified ? nil : unidenfitiedTypealias) as Decl?, // only include unidentified typealias if identified is false
             identifiedTypealias
         ].compactMap { $0 }
@@ -108,17 +134,25 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func typeNameSnippet(contextB: JSONSchema.ObjectContext,
-                                        allowPlaceholders: Bool) throws -> (typeName: String, typeNameDeclCode: Decl) {
-        let typeNameString = try typeName(from: contextB,
-                                          allowPlaceholders: allowPlaceholders)
+    private static func typeNameSnippet(
+        contextB: DereferencedJSONSchema.ObjectContext,
+        allowPlaceholders: Bool
+    ) throws -> (typeName: String, typeNameDeclCode: Decl) {
+        let typeNameString = try typeName(
+            from: contextB,
+            allowPlaceholders: allowPlaceholders
+        )
 
-        return (typeName: typeCased(typeNameString),
-                typeNameDeclCode: StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(typeNameString)\""))))
+        return (
+            typeName: typeCased(typeNameString),
+            typeNameDeclCode: StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(typeNameString)\"")))
+        )
     }
 
-    private static func typeName(from resourceIdentifierContext: JSONSchema.ObjectContext,
-                                 allowPlaceholders: Bool) throws -> String {
+    private static func typeName(
+        from resourceIdentifierContext: DereferencedJSONSchema.ObjectContext,
+        allowPlaceholders: Bool
+    ) throws -> String {
         guard case let .string(typeNameContextA, _)? = resourceIdentifierContext.properties[Key.type.rawValue] else {
             throw Error.jsonAPITypeNotFound
         }
@@ -150,8 +184,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func attributesSnippet(contextB: JSONSchema.ObjectContext,
-                                          allowPlaceholders: Bool) throws -> (attributes: Decl, dependencies: [Decl]) {
+    private static func attributesSnippet(
+        contextB: DereferencedJSONSchema.ObjectContext,
+        allowPlaceholders: Bool
+    ) throws -> (attributes: Decl, dependencies: [Decl]) {
 
         let attributeTypeName = "Attributes"
 
@@ -164,9 +200,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
-            return try attributeSnippet(name: propertyCased(keyValue.key),
-                                        schema: keyValue.value,
-                                        allowPlaceholders: allowPlaceholders)
+            return try attributeSnippet(
+                name: propertyCased(keyValue.key),
+                schema: keyValue.value,
+                allowPlaceholders: allowPlaceholders
+                )
         }
 
         let codingKeyCaseDecls = attributesContextB
@@ -178,9 +216,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
         let hasAttributes = codingKeyCaseDecls.count > 0
 
-        let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
-                                                conformances: ["String", "CodingKey, Equatable"],
-                                                codingKeyCaseDecls)
+        let codingKeyDecl = BlockTypeDecl.enum(
+            typeName: "CodingKeys",
+            conformances: ["String", "CodingKey, Equatable"],
+            codingKeyCaseDecls
+        )
 
         let attributesAndCodingKeys = attributeDecls
             .map { $0.0 }
@@ -190,16 +230,20 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             ? ["JSONAPI.SparsableAttributes"]
             : ["JSONAPI.Attributes"] // only make sparsable if non-zero count of attributes
 
-        let attributesDecl = BlockTypeDecl.struct(typeName: attributeTypeName,
-                                                  conformances: conformances,
-                                                   attributesAndCodingKeys)
+        let attributesDecl = BlockTypeDecl.struct(
+            typeName: attributeTypeName,
+            conformances: conformances,
+            attributesAndCodingKeys
+        )
 
         return (attributes: attributesDecl, dependencies: attributeDecls.flatMap { $0.1 })
     }
 
-    private static func attributeSnippet(name: String,
-                                         schema: JSONSchema,
-                                         allowPlaceholders: Bool) throws -> (property: Decl, dependencies: [Decl]) {
+    private static func attributeSnippet(
+        name: String,
+        schema: DereferencedJSONSchema,
+        allowPlaceholders: Bool
+    ) throws -> (property: Decl, dependencies: [Decl]) {
 
         let isOmittable = !schema.required
         let isNullable = schema.nullable
@@ -209,15 +253,19 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
         switch schema {
         case .object:
-            let structureGen = try StructureSwiftGen(swiftTypeName: typeCased(name),
-                                                     structure: schema,
-                                                     cascadingConformances: ["Codable", "Equatable"])
+            let structureGen = try StructureSwiftGen(
+                swiftTypeName: typeCased(name),
+                structure: schema,
+                cascadingConformances: ["Codable", "Equatable"]
+            )
             attributeRawTypeRep = .def(.init(name: structureGen.swiftTypeName))
             dependencies = structureGen.decls
         default:
-            attributeRawTypeRep = try swiftType(from: schema,
-                                                allowPlaceholders: allowPlaceholders,
-                                                handleOptionality: false)
+            attributeRawTypeRep = try swiftType(
+                from: schema,
+                allowPlaceholders: allowPlaceholders,
+                handleOptionality: false
+            )
             dependencies = []
         }
 
@@ -225,17 +273,26 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             ? attributeRawTypeRep.optional
             : attributeRawTypeRep
 
-        let attributePropertyDecl = PropDecl.let(propName: name,
-                                                 swiftType: .init(SwiftTypeDef(name: "Attribute",
-                                                                               specializationReps: [finalAttributeRawTypeRep],
-                                                                               optional: isOmittable)), nil)
+        let attributePropertyDecl = PropDecl.let(
+            propName: name,
+            swiftType: .init(
+                SwiftTypeDef(
+                    name: "Attribute",
+                    specializationReps: [finalAttributeRawTypeRep],
+                    optional: isOmittable
+                )
+            ),
+            nil
+        )
 
         return  (property: attributePropertyDecl, dependencies: dependencies)
     }
 
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func relationshipsSnippet(contextB: JSONSchema.ObjectContext,
-                                             allowPlaceholders: Bool) throws -> (relatives: [Relative], relationshipsDecl: Decl) {
+    private static func relationshipsSnippet(
+        contextB: DereferencedJSONSchema.ObjectContext,
+        allowPlaceholders: Bool
+    ) throws -> (relatives: [Relative], relationshipsDecl: Decl) {
 
         let relationshipTypeName = "Relationships"
 
@@ -247,9 +304,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
-                return try relationshipSnippet(name: propertyCased(keyValue.key),
-                                               schema: keyValue.value,
-                                               allowPlaceholders: allowPlaceholders)
+                return try relationshipSnippet(
+                    name: propertyCased(keyValue.key),
+                    schema: keyValue.value,
+                    allowPlaceholders: allowPlaceholders
+                )
         }
 
         let codingKeyCaseDecls = relationshipsContextB
@@ -261,9 +320,11 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
         let hasRelationships = codingKeyCaseDecls.count > 0
 
-        let codingKeyDecl = BlockTypeDecl.enum(typeName: "CodingKeys",
-                                               conformances: ["String", "CodingKey, Equatable"],
-                                               codingKeyCaseDecls)
+        let codingKeyDecl = BlockTypeDecl.enum(
+            typeName: "CodingKeys",
+            conformances: ["String", "CodingKey, Equatable"],
+            codingKeyCaseDecls
+        )
 
         let relationshipsAndCodingKeys = relationshipDecls
             .map { $0.decl }
@@ -271,17 +332,21 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
         let relatives = relationshipDecls.map { $0.relative }
 
-        let decl = BlockTypeDecl.struct(typeName: relationshipTypeName,
-                                        conformances: ["JSONAPI.\(relationshipTypeName)"],
-                                        relationshipsAndCodingKeys)
+        let decl = BlockTypeDecl.struct(
+            typeName: relationshipTypeName,
+            conformances: ["JSONAPI.\(relationshipTypeName)"],
+            relationshipsAndCodingKeys
+        )
 
         return (relatives: relatives,
                 relationshipsDecl: decl)
     }
 
-    private static func relationshipSnippet(name: String,
-                                            schema: JSONSchema,
-                                            allowPlaceholders: Bool) throws -> (relative: Relative, typeNameDeclCode: Decl) {
+    private static func relationshipSnippet(
+        name: String,
+        schema: DereferencedJSONSchema,
+        allowPlaceholders: Bool
+    ) throws -> (relative: Relative, typeNameDeclCode: Decl) {
 
         guard case let .object(_, relationshipContextB) = schema,
             let dataSchema = relationshipContextB.properties[Key.data.rawValue] else {
@@ -306,8 +371,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         case .object(_, let contextB):
             oneOrManyName = "ToOneRelationship"
 
-            relatedJSONTypeName = try typeName(from: contextB,
-                                               allowPlaceholders: allowPlaceholders)
+            relatedJSONTypeName = try typeName(
+                from: contextB,
+                allowPlaceholders: allowPlaceholders
+            )
 
             relatedSwiftTypeName = typeCased(relatedJSONTypeName)
             let tmpRelTypeRep = SwiftTypeRep(relatedSwiftTypeName)
@@ -329,8 +396,10 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                     throw Error.toManyRelationshipNotDefined
             }
 
-            relatedJSONTypeName = try typeName(from: relationshipObjectContext,
-                                               allowPlaceholders: allowPlaceholders)
+            relatedJSONTypeName = try typeName(
+                from: relationshipObjectContext,
+                allowPlaceholders: allowPlaceholders
+            )
 
             relatedSwiftTypeName = typeCased(relatedJSONTypeName)
             relationshipTypeRep = SwiftTypeRep(relatedSwiftTypeName)
@@ -341,14 +410,20 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             throw Error.relationshipMalformed
         }
 
-        let typeDecl = PropDecl.let(propName: name,
-                                    swiftType: .init(SwiftTypeDef(name: oneOrManyName,
-                                                                  specializationReps: [
-                                                                    relationshipTypeRep,
-                                                                    .init(NoMetadata.self),
-                                                                    .init(NoLinks.self)
-                                    ], optional: isOmittable)),
-                                    nil)
+        let typeDecl = PropDecl.let(
+            propName: name,
+            swiftType: .init(
+                SwiftTypeDef(
+                    name: oneOrManyName,
+                    specializationReps: [
+                        relationshipTypeRep,
+                        .init(NoMetadata.self),
+                        .init(NoLinks.self)
+                    ], optional: isOmittable
+                )
+            ),
+            nil
+        )
 
         return (
             relative: .init(
