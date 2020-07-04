@@ -61,7 +61,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             throw Error.rootNotJSONObject
         }
 
-        let (typeName, typeNameDecl) = try typeNameSnippet(
+        let (typeName, typeNameDecl) = try jsonAPITypeNameSnippet(
             contextB: resourceObjectContextB,
             allowPlaceholders: allowPlaceholders
         )
@@ -133,12 +133,15 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         return (decls: decls, relatives: Set(relationships.relatives), relationshipStubs: relationshipStubs)
     }
 
+    /// Creates a snippet of code that declares the static Swift property
+    /// containing the JSON:API type name.
+    ///
     /// Takes the second context of the root of the JSON Schema for a Resource Object.
-    private static func typeNameSnippet(
+    private static func jsonAPITypeNameSnippet(
         contextB: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> (typeName: String, typeNameDeclCode: Decl) {
-        let typeNameString = try typeName(
+        let typeNameString = try jsonAPITypeName(
             from: contextB,
             allowPlaceholders: allowPlaceholders
         )
@@ -149,7 +152,36 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         )
     }
 
-    private static func typeName(
+    /// Get the JSON:API type name generated for this JSON:API type.
+    ///
+    /// If the JSON:API resource is documented as having
+    ///
+    ///     type:
+    ///         type: string
+    ///         enum:
+    ///             - widget
+    ///
+    /// then the JSON:API type name will be "widget".
+    ///
+    /// If the JSON:API resource is documented as having
+    ///
+    ///     type:
+    ///         type: string
+    ///         enum:
+    ///             - widget
+    ///             - cog
+    ///
+    /// then the JSON:API type is polymorphic. This is not currently supported so it will
+    /// throw an error.
+    ///
+    /// Similarly, if the JSON:API resource is documented as having
+    ///
+    ///     type:
+    ///         type: string
+    ///
+    /// then the JSON:API type is unspecified. This is not currently supported so it will
+    /// throw an error.
+    private static func jsonAPITypeName(
         from resourceIdentifierContext: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
     ) throws -> String {
@@ -160,7 +192,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         guard let possibleTypeNames = typeNameContextA.allowedValues else {
             let placeholder = swiftPlaceholder(name: "JSON:API type", type: .init(String.self))
             guard allowPlaceholders else {
-                throw Error.attributeTypeUnspecified(placeholder: placeholder)
+                throw Error.jsonAPITypeUnspecified(placeholder: placeholder)
             }
             return placeholder
         }
@@ -174,7 +206,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                 let placeholder = swiftPlaceholder(name: typeNames, type: .def(.init(name: "Either<\(typeNames)>")))
 
                 guard allowPlaceholders else {
-                    throw Error.attributeTypePolymorphismUnsupported(placeholder: placeholder)
+                    throw Error.jsonAPITypePolymorphismUnsupported(placeholder: placeholder)
                 }
 
                 return placeholder
@@ -371,7 +403,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         case .object(_, let contextB):
             oneOrManyName = "ToOneRelationship"
 
-            relatedJSONTypeName = try typeName(
+            relatedJSONTypeName = try jsonAPITypeName(
                 from: contextB,
                 allowPlaceholders: allowPlaceholders
             )
@@ -396,7 +428,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                     throw Error.toManyRelationshipNotDefined
             }
 
-            relatedJSONTypeName = try typeName(
+            relatedJSONTypeName = try jsonAPITypeName(
                 from: relationshipObjectContext,
                 allowPlaceholders: allowPlaceholders
             )
@@ -452,14 +484,13 @@ public extension ResourceObjectSwiftGen {
         case rootNotJSONObject
 
         case jsonAPITypeNotFound
+        case jsonAPITypeUnspecified(placeholder: String)
+        case jsonAPITypePolymorphismUnsupported(placeholder: String)
 
         case relationshipMalformed
         case relationshipMissingDataObject
         case toManyRelationshipCannotBeNullable
         case toManyRelationshipNotDefined
-
-        case attributeTypeUnspecified(placeholder: String)
-        case attributeTypePolymorphismUnsupported(placeholder: String)
 
         public var debugDescription: String {
             switch self {
@@ -467,6 +498,10 @@ public extension ResourceObjectSwiftGen {
                 return "Tried to parse a JSON:API Resource Object schema that did not have a JSON Schema 'object' type at its root."
             case .jsonAPITypeNotFound:
                 return "Tried to parse a JSON:API Resource Object schema that did not have a JSON:API 'type' property."
+            case .jsonAPITypeUnspecified(placeholder: let placeholder):
+                return "Encountered an JSON:API type that was not specified. Make sure that your resource `type` properties have `enum` declarations that define the allowed values for the JSON:API type of the given resource. With `allowPlaceholders: true`, this type would have been: \(placeholder)."
+            case .jsonAPITypePolymorphismUnsupported(placeholder: let placeholder):
+                return "Encountered a resource with a polymorphic type. Generation on polymorphic types is not supported. Make sure that your resource `type` properties have `enum` declarations with only one allowed JSON:API type value. With `allowPlaceholders: true`, this type would have been: \(placeholder)."
             case .relationshipMalformed:
                 return "Encountered an unexpected schema when parsing a JSON:API Resource Object's Relationships Object."
             case .relationshipMissingDataObject:
@@ -475,10 +510,6 @@ public extension ResourceObjectSwiftGen {
                 return "Encountered a nullable to-many JSON:API Relationship in schema. This is not allowed by the spec."
             case .toManyRelationshipNotDefined:
                 return "Tried to parse a to-many JSON:API Relationship schema and did not find an 'items' property defining the Relationship type/id."
-            case .attributeTypeUnspecified(placeholder: let placeholder):
-                return "Encountered an Attribute type that was not specified (no enumerated list of allowed values). With `allowPlaceholders: true`, this type would have been: \(placeholder)."
-            case .attributeTypePolymorphismUnsupported(placeholder: let placeholder):
-                return "Encountered an Attribute with a polymorphic type. Generation on polymorphic types is not supported. With `allowPlaceholders: true`, this type would have been: \(placeholder)."
             }
         }
     }
