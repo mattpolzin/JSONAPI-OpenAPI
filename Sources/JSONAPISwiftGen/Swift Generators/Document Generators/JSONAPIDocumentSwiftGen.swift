@@ -1,5 +1,5 @@
 //
-//  DocumentSwiftGen.swift
+//  JSONAPIDocumentSwiftGen.swift
 //  JSONAPISwiftGen
 //
 //  Created by Mathew Polzin on 9/7/19.
@@ -13,7 +13,7 @@ import JSONAPI
 /// Eventually I would like to expand this to read through multiple OpenAPI responses
 /// and build a representation of a JSON:API Document that can handle both
 /// Data and Error cases.
-public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
+public struct JSONAPIDocumentSwiftGen: DocumentSwiftGenerator {
     public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let swiftTypeName: String
@@ -21,13 +21,8 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     public let exampleGenerator: ExampleSwiftGen?
     public let testExampleFuncs: [TestFunctionGenerator]
 
-    /// Generate Swift code not just for this Document's declaration but
-    /// also for all declarations required for this Document to compile.
-    public var swiftCodeWithDependencies: String {
-        return (resourceObjectGenerators
-            .map { $0.swiftCode }
-            + [swiftCode])
-            .joined(separator: "\n")
+    public var swiftCodeDependencies: [SwiftGenerator] {
+        Array(resourceObjectGenerators)
     }
 
     public init(
@@ -42,7 +37,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         self.exampleGenerator = example
         self.testExampleFuncs = testExampleFuncs
 
-        (decls, resourceObjectGenerators) = try DataDocumentSwiftGen.swiftDecls(
+        (decls, resourceObjectGenerators) = try JSONAPIDocumentSwiftGen.swiftDecls(
             from: structure,
             swiftTypeName: swiftTypeName,
             allowPlaceholders: allowPlaceholders
@@ -120,7 +115,10 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
         guard let data = rootProperties["data"] else {
             if rootProperties["errors"] != nil {
                 return (
-                    try swiftDeclsForErrorDocument(from: resourceObjectContextB, swiftTypeName: swiftTypeName),
+                    try swiftDeclsForErrorDocument(
+                        from: resourceObjectContextB,
+                        swiftTypeName: swiftTypeName
+                    ),
                     Set()
                 )
             }
@@ -265,7 +263,7 @@ public struct DataDocumentSwiftGen: JSONSchemaSwiftGenerator {
     }
 }
 
-public extension DataDocumentSwiftGen {
+public extension JSONAPIDocumentSwiftGen {
     enum Error: Swift.Error, CustomDebugStringConvertible {
         case rootNotJSONObject
         case expectedDataArrayToDefineItems

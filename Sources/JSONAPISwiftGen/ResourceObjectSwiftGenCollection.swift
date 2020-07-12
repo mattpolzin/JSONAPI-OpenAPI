@@ -47,8 +47,8 @@ func documents(
     on server: OpenAPI.Server,
     given params: [DereferencedParameter],
     testSuiteConfiguration: TestSuiteConfiguration
-) -> [OpenAPI.Response.StatusCode: DataDocumentSwiftGen] {
-    var responseDocuments = [OpenAPI.Response.StatusCode: DataDocumentSwiftGen]()
+) -> [OpenAPI.Response.StatusCode: JSONAPIDocumentSwiftGen] {
+    var responseDocuments = [OpenAPI.Response.StatusCode: JSONAPIDocumentSwiftGen]()
     for (statusCode, response) in responses {
 
         guard let jsonResponse = response.content[.json] else {
@@ -115,7 +115,7 @@ func documents(
         }
 
         do {
-            responseDocuments[statusCode] = try DataDocumentSwiftGen(
+            responseDocuments[statusCode] = try JSONAPIDocumentSwiftGen(
                 swiftTypeName: responseBodyTypeName,
                 structure: responseSchema,
                 example: example,
