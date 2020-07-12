@@ -116,6 +116,18 @@ public struct PublicDecl: Decl {
     }
 }
 
+public struct PrivateDecl: Decl {
+    public let decl: Decl
+
+    public init(_ decl: Decl) {
+        self.decl = decl
+    }
+
+    public var swiftCode: String {
+        return "private \(decl.swiftCode)"
+    }
+}
+
 public struct StaticDecl: Decl {
     public let decl: PropDecl
 
@@ -271,13 +283,15 @@ public struct Function: Decl {
     public let body: [Decl]
     public let returnType: SwiftTypeRep?
 
-    public init(scoping: Scoping = .default,
-                name: String,
-                specializations: [SwiftTypeDef]? = nil,
-                arguments: [(name: String, type: SwiftTypeRep)] = [],
-                conditions: [(type: SwiftTypeDef, conformance: String)]? = nil,
-                body: [Decl],
-                returnType: SwiftTypeRep? = nil) {
+    public init(
+        scoping: Scoping = .default,
+        name: String,
+        specializations: [SwiftTypeDef]? = nil,
+        arguments: [(name: String, type: SwiftTypeRep)] = [],
+        conditions: [(type: SwiftTypeDef, conformance: String)]? = nil,
+        body: [Decl],
+        returnType: SwiftTypeRep? = nil
+    ) {
         self.scoping = scoping
         self.name = name
         self.specializations = specializations
@@ -375,6 +389,7 @@ public struct Import: Decl {
     public static let AnyCodable: Import = .init(module: "AnyCodable")
     public static let JSONAPI: Import = .init(module: "JSONAPI")
     public static let JSONAPITesting: Import = .init(module: "JSONAPITesting")
+    public static let OpenAPIKit: Import = .init(module: "OpenAPIKit")
 
     public static let FoundationNetworking: Decl = """
 #if canImport(FoundationNetworking)

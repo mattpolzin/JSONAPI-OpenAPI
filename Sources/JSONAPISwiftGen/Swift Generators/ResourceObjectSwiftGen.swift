@@ -50,7 +50,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
 
         resourceTypeName = typealiases.first.map { $0.alias.swiftCode }!
 
-        exportedSwiftTypeNames = Set(decls.compactMap { $0 as? Typealias }.map { $0.alias.swiftCode })
+        exportedSwiftTypeNames = Set(typealiases.map { $0.alias.swiftCode })
     }
 
     static func swiftDecls(

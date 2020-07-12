@@ -15,6 +15,10 @@ public extension OpenAPI.Parameter {
 
 /// A Generator that produces Swift code defining a test function
 /// based on a provided OpenAPI example and some API parameters.
+///
+/// The generated test makes an API request, confirms the response code if desired,
+/// parses the response, and compares the response for equality to an example if
+/// desired.
 public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
     public let decls: [Decl]
     public let testFunctionContext: TestFunctionLocalContext
@@ -142,16 +146,20 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
                 .map { "testDecodable(\(responseBodyType.swiftCode).self, from: \($0))" }
                 ?? "nil"
         )
-        return PropDecl.let(propName: "expectedResponseBody",
-                            swiftType: responseBodyType.optional,
-                            value)
+        return PropDecl.let(
+            propName: "expectedResponseBody",
+            swiftType: responseBodyType.optional,
+            value
+        )
     }
 
     static func hostSnippet(from server: OpenAPI.Server) -> Decl {
         let hostUrl = server.url
-        return PropDecl.let(propName: "defaultHost",
-                            swiftType: .rep(String.self),
-                            Value(value: hostUrl.absoluteString))
+        return PropDecl.let(
+            propName: "defaultHost",
+            swiftType: .rep(String.self),
+            Value(value: hostUrl.absoluteString)
+        )
     }
 
     static func headersSnippet(
