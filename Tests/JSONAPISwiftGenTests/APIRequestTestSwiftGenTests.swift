@@ -127,8 +127,16 @@ func makeTestRequest<RequestBody>(
     let completionExpectation = XCTestExpectation()
 
     let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
-        XCTAssertNil(error)
-        XCTAssertNotNil(data)
+        if let error = error as? URLError {
+            XCTFail("\(error.localizedDescription) (\(error.code.rawValue)) [\(error.failureURLString ?? "unknown URL")]")
+            return
+        }
+
+        guard error == nil else {
+            XCTFail("Encountered an unexpected error. \(String(describing: error))")
+            return
+        }
+        XCTAssertNotNil(data, "Expected non-nil data in response.")
 
         if let expectedStatusCode = expectedResponseStatusCode, let actualCode = (response as? HTTPURLResponse)?.statusCode {
             XCTAssertEqual(actualCode, expectedStatusCode, "The response HTTP status code did not match the expected status code.")
