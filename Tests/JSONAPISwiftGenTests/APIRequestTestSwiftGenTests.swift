@@ -128,7 +128,8 @@ func makeTestRequest<RequestBody>(
 
     let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
         if let error = error as? URLError {
-            XCTFail("\(error.localizedDescription) (\(error.code.rawValue)) [\(error.failureURLString ?? "unknown URL")]")
+            let urlString = error.failureURLString.map { " \($0)" } ?? ""
+            XCTFail("\(error.localizedDescription) (\(error.code.rawValue))\(urlString)")
             return
         }
 
