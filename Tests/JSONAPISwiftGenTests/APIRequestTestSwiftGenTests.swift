@@ -128,7 +128,7 @@ func makeTestRequest<RequestBody>(
 
     let taskCompletion = { (data: Data?, response: URLResponse?, error: Error?) in
         if let error = error as? URLError {
-            let urlString = error.failureURLString.map { " \($0)" } ?? ""
+            let urlString = error.failureURLString.map { " \($0)" } ?? " originally requested: \(requestUrl.absoluteString)"
             XCTFail("\(error.localizedDescription) (\(error.code.rawValue))\(urlString)")
             return
         }
