@@ -23,10 +23,13 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     public static var testFuncDecl: Decl { makeTestRequestFunc }
 
     public init(
+        method: OpenAPI.HttpMethod,
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
         parameters: [DereferencedParameter]
     ) throws {
+
+        let methodDecl = Self.methodSnippet(from: method)
 
         let parameterArgs = try parameters
             .filter { !$0.context.inQuery } // for now these are handled as a block rather than each as separate args
@@ -92,6 +95,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             arguments: allArgs,
             conditions: conditions,
             body: [
+                methodDecl,
                 APIRequestTestSwiftGen.urlSnippet(
                     from: pathComponents,
                     originatingAt: server
@@ -110,6 +114,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         return """
 
             makeTestRequest(
+                method: method,
                 requestBody: requestBody,
                 expectedResponseBody: expectedResponseBody,
                 expectedResponseStatusCode: expectedResponseStatusCode,
@@ -118,6 +123,35 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
                 queryParams: queryParams
             )
             """ as LiteralSwiftCode
+    }
+
+    static func methodSnippet(from method: OpenAPI.HttpMethod) -> Decl {
+        let methodString: String = {
+            switch method {
+            case .get:
+                return ".get"
+            case .put:
+                return ".put"
+            case .delete:
+                return ".delete"
+            case .options:
+                return ".options"
+            case .patch:
+                return ".patch"
+            case .head:
+                return ".head"
+            case .post:
+                return ".post"
+            case .trace:
+                return ".trace"
+            }
+        }()
+
+        return PropDecl.let(
+            propName: "method",
+            swiftType: "HttpMethod",
+            .init(value: methodString)
+        )
     }
 
     static func urlSnippet(
@@ -212,8 +246,20 @@ func XCTWarn(_ message: String, at url: URL) {
     print("[\(url.absoluteString)] : warning - \(message)")
 }
 
+enum HttpMethod: String, CaseIterable, Equatable {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case patch = "PATCH"
+    case delete = "DELETE"
+    case options = "OPTIONS"
+    case head = "HEAD"
+    case trace = "TRACE"
+}
+
 /// JSONAPI Document Response request test
 func makeTestRequest<RequestBody, ResponseBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
     expectedResponseStatusCode: Int? = nil,
@@ -243,6 +289,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     }
 
     makeTestRequest(
+        method: method,
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
         expectedResponseStatusCode: expectedResponseStatusCode,
@@ -255,6 +302,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
 
 /// General purpose request test
 func makeTestRequest<RequestBody, ResponseBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
     expectedResponseStatusCode: Int? = nil,
@@ -281,6 +329,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     }
 
     makeTestRequest(
+        method: method,
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
         expectedResponseStatusCode: expectedResponseStatusCode,
@@ -292,6 +341,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
 }
 
 func makeTestRequest<RequestBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     successResponseHandler: @escaping (Data) -> Void,
     expectedResponseStatusCode: Int? = nil,
@@ -308,6 +358,8 @@ func makeTestRequest<RequestBody>(
     }
 
     var request: URLRequest = URLRequest(url: urlComponents.url!)
+
+    request.httpMethod = method.rawValue
 
     for header in headers {
         request.setValue(header.value, forHTTPHeaderField: header.name)

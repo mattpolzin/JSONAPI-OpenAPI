@@ -31,6 +31,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
     ///         If specified, must be the name of a property containing `Data` that will be compared to the response data.
     ///
     public init(
+        method: OpenAPI.HttpMethod,
         server: OpenAPI.Server,
         pathComponents: OpenAPI.Path,
         parameters: [DereferencedParameter],
@@ -40,6 +41,8 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
         responseBodyType: SwiftTypeRep,
         expectedHttpStatus: OpenAPI.Response.StatusCode
     ) throws {
+
+        let methodDecl = APIRequestTestSwiftGen.methodSnippet(from: method)
 
         let pathParamDecls: [PropDecl] = try parameters
             .filter { $0.location == .path }
@@ -122,6 +125,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
             arguments: [],
             conditions: nil,
             body: pathParamDecls + [
+                methodDecl,
                 requestUrlDecl,
                 headersDecl,
                 requestBodyDecl,
@@ -178,7 +182,13 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
             "Session-Token",
             "Authorization",
             "Content-Type",
-            "User-Agent"
+            "Content-Encoding",
+            "Content-Length",
+            "Cookie",
+            "User-Agent",
+            "Accept",
+            "Accept-Encoding",
+            "Cache-Control"
         ].map { HeaderOption(name: $0, required: false) }
 
         let parameterHeaders = parameters.filter { $0.context.inHeader }

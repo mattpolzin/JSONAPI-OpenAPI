@@ -23,8 +23,20 @@ func XCTWarn(_ message: String, at url: URL) {
     print("[\(url.absoluteString)] : warning - \(message)")
 }
 
+enum HttpMethod: String, CaseIterable, Equatable {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case patch = "PATCH"
+    case delete = "DELETE"
+    case options = "OPTIONS"
+    case head = "HEAD"
+    case trace = "TRACE"
+}
+
 /// JSONAPI Document Response request test
 func makeTestRequest<RequestBody, ResponseBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
     expectedResponseStatusCode: Int? = nil,
@@ -54,6 +66,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     }
 
     makeTestRequest(
+        method: method,
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
         expectedResponseStatusCode: expectedResponseStatusCode,
@@ -66,6 +79,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
 
 /// General purpose request test
 func makeTestRequest<RequestBody, ResponseBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     expectedResponseBody optionallyExpectedResponseBody: ResponseBody? = nil,
     expectedResponseStatusCode: Int? = nil,
@@ -92,6 +106,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
     }
 
     makeTestRequest(
+        method: method,
         requestBody: requestBody,
         successResponseHandler: successResponseHandler,
         expectedResponseStatusCode: expectedResponseStatusCode,
@@ -103,6 +118,7 @@ func makeTestRequest<RequestBody, ResponseBody>(
 }
 
 func makeTestRequest<RequestBody>(
+    method: HttpMethod,
     requestBody: RequestBody,
     successResponseHandler: @escaping (Data) -> Void,
     expectedResponseStatusCode: Int? = nil,
@@ -119,6 +135,8 @@ func makeTestRequest<RequestBody>(
     }
 
     var request: URLRequest = URLRequest(url: urlComponents.url!)
+
+    request.httpMethod = method.rawValue
 
     for header in headers {
         request.setValue(header.value, forHTTPHeaderField: header.name)

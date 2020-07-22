@@ -85,6 +85,7 @@ func documents(
                     .properties(for: testPropertiesDict, server: server)
                     .map { testProps in
                         try OpenAPIExampleRequestTestSwiftGen(
+                            method: httpVerb,
                             server: server,
                             pathComponents: path,
                             parameters: params,

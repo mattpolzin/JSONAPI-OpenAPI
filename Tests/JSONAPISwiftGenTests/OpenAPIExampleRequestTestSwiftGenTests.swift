@@ -14,6 +14,7 @@ final class OpenAPIExampleRequestTestSwiftGenTests: XCTestCase {
     func test_statusCodeDefined() throws {
         let server = OpenAPI.Server(url: URL(string: "http://website.com")!)
         let gen = try OpenAPIExampleRequestTestSwiftGen(
+            method: .get,
             server: server,
             pathComponents: "/hello/world",
             parameters: [],
@@ -37,6 +38,7 @@ final class OpenAPIExampleRequestTestSwiftGenTests: XCTestCase {
     func test_statusCodeUndefined() throws {
         let server = OpenAPI.Server(url: URL(string: "http://website.com")!)
         let gen = try OpenAPIExampleRequestTestSwiftGen(
+            method: .get,
             server: server,
             pathComponents: "/hello/world",
             parameters: [],
@@ -60,6 +62,7 @@ final class OpenAPIExampleRequestTestSwiftGenTests: XCTestCase {
     func test_hostNotOverridden() throws {
         let server = OpenAPI.Server(url: URL(string: "http://website.com")!)
         let gen = try OpenAPIExampleRequestTestSwiftGen(
+            method: .get,
             server: server,
             pathComponents: "/hello/world",
             parameters: [],
@@ -84,6 +87,7 @@ final class OpenAPIExampleRequestTestSwiftGenTests: XCTestCase {
         let server = OpenAPI.Server(url: URL(string: "http://website.com")!)
         let serverOverride = OpenAPI.Server(url: URL(string: "http://hi.hello")!)
         let gen = try OpenAPIExampleRequestTestSwiftGen(
+            method: .get,
             server: server,
             pathComponents: "/hello/world",
             parameters: [],
@@ -109,6 +113,7 @@ final class OpenAPIExampleRequestTestSwiftGenTests: XCTestCase {
         let serverOverride = OpenAPI.Server(url: URL(string: "http://hi.hello")!)
         let suiteServerOverride = URL(string: "http://cool.beans")!
         let gen = try OpenAPIExampleRequestTestSwiftGen(
+            method: .get,
             server: server,
             pathComponents: "/hello/world",
             parameters: [],
