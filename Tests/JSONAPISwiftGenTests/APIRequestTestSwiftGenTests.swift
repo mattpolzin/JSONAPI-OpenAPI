@@ -18,6 +18,11 @@ final class APIRequestTestSwiftGenTests: XCTestCase {
 }
 
 // MARK: - START - Function written to generated test suites
+/// A session stored globally that does not cache responses on disk.
+let session = URLSession(
+    configuration: .ephemeral
+)
+
 /// Log warning after test case logs
 func XCTWarn(_ message: String, at url: URL) {
     print("[\(url.absoluteString)] : warning - \(message)")
@@ -178,7 +183,7 @@ func makeTestRequest<RequestBody>(
         completionExpectation.fulfill()
     }
 
-    let task = URLSession.shared.dataTask(with: request, completionHandler: taskCompletion)
+    let task = session.dataTask(with: request, completionHandler: taskCompletion)
     task.resume()
 
     XCTWaiter().wait(for: [completionExpectation], timeout: 5)
