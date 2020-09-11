@@ -20,6 +20,15 @@
         }
       },
       {
+        "package": "FineJSON",
+        "repositoryURL": "https://github.com/omochi/FineJSON.git",
+        "state": {
+          "branch": null,
+          "revision": "05101709243cb66d80c92e645210a3b80cf4e17f",
+          "version": "1.14.0"
+        }
+      },
+      {
         "package": "JSONAPI",
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
@@ -62,6 +71,15 @@
           "branch": null,
           "revision": "36ba3f624bffa34f5f9b9c7648eab3cfdcab4748",
           "version": "2.5.0"
+        }
+      },
+      {
+        "package": "RichJSONParser",
+        "repositoryURL": "https://github.com/omochi/RichJSONParser.git",
+        "state": {
+          "branch": null,
+          "revision": "263e2ecfe88d0500fa99e4cbc8c948529d335534",
+          "version": "3.0.0"
         }
       },
       {
@@ -125,6 +143,15 @@
           "branch": null,
           "revision": "077c096c3ddfc38db223ac8e525ad16ffb987138",
           "version": "0.12.0"
+        }
+      },
+      {
+        "package": "Yams",
+        "repositoryURL": "https://github.com/jpsim/Yams.git",
+        "state": {
+          "branch": null,
+          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
+          "version": "3.0.1"
         }
       }
     ]
