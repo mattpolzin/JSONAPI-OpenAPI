@@ -20,17 +20,8 @@
         }
       },
       {
-        "package": "FineJSON",
-        "repositoryURL": "https://github.com/omochi/FineJSON.git",
-        "state": {
-          "branch": null,
-          "revision": "05101709243cb66d80c92e645210a3b80cf4e17f",
-          "version": "1.14.0"
-        }
-      },
-      {
         "package": "JSONAPI",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPI",
+        "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
           "branch": null,
           "revision": "51cb140ebf27949d1185227e3eaef5a54d9a3bee",
@@ -39,7 +30,7 @@
       },
       {
         "package": "JSONAPIViz",
-        "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz",
+        "repositoryURL": "https://github.com/mattpolzin/JSONAPIViz.git",
         "state": {
           "branch": null,
           "revision": "95b14e304459038ae63a7c3518abf5ea390cdee8",
@@ -48,20 +39,20 @@
       },
       {
         "package": "OpenAPIKit",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIKit.git",
         "state": {
           "branch": null,
-          "revision": "201586db9dcce99d148eed12cc556a0c86c3355e",
-          "version": "1.4.0"
+          "revision": "d7a08cb788e77e7a0d9ccb4dad93992a4eaeb4d1",
+          "version": "2.0.0-alpha.4"
         }
       },
       {
         "package": "OpenAPIReflection",
-        "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection",
+        "repositoryURL": "https://github.com/mattpolzin/OpenAPIReflection.git",
         "state": {
           "branch": null,
-          "revision": "34eb557d0ab49a95d3a39e7a821fcb12ff50ba8a",
-          "version": "0.3.0"
+          "revision": "5130d88f67bac650b7be6a6797928e6c8d5a60fb",
+          "version": "1.0.0-alpha.1"
         }
       },
       {
@@ -74,17 +65,8 @@
         }
       },
       {
-        "package": "RichJSONParser",
-        "repositoryURL": "https://github.com/omochi/RichJSONParser.git",
-        "state": {
-          "branch": null,
-          "revision": "263e2ecfe88d0500fa99e4cbc8c948529d335534",
-          "version": "3.0.0"
-        }
-      },
-      {
         "package": "Sampleable",
-        "repositoryURL": "https://github.com/mattpolzin/Sampleable",
+        "repositoryURL": "https://github.com/mattpolzin/Sampleable.git",
         "state": {
           "branch": null,
           "revision": "df44bf1a860481109dcf455e3c6daf0a0f1bc259",
@@ -102,7 +84,7 @@
       },
       {
         "package": "swift-format",
-        "repositoryURL": "https://github.com/apple/swift-format",
+        "repositoryURL": "https://github.com/apple/swift-format.git",
         "state": {
           "branch": null,
           "revision": "f22aade8a6ee061b4a7041601ededd8ad7bc2122",
@@ -111,7 +93,7 @@
       },
       {
         "package": "NonEmpty",
-        "repositoryURL": "https://github.com/pointfreeco/swift-nonempty",
+        "repositoryURL": "https://github.com/pointfreeco/swift-nonempty.git",
         "state": {
           "branch": null,
           "revision": "9ef8c4aea57b8da7fedd5303d29470ea2a00c08d",
@@ -138,20 +120,11 @@
       },
       {
         "package": "SwiftCheck",
-        "repositoryURL": "https://github.com/typelift/SwiftCheck",
+        "repositoryURL": "https://github.com/typelift/SwiftCheck.git",
         "state": {
           "branch": null,
           "revision": "077c096c3ddfc38db223ac8e525ad16ffb987138",
           "version": "0.12.0"
-        }
-      },
-      {
-        "package": "Yams",
-        "repositoryURL": "https://github.com/jpsim/Yams.git",
-        "state": {
-          "branch": null,
-          "revision": "81a65c4069c28011ee432f2858ba0de49b086677",
-          "version": "3.0.1"
         }
       }
     ]
