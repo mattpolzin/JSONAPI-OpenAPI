@@ -14,13 +14,13 @@ class StructureSwiftGenTests: XCTestCase {
     func test_nonObjects() {
         XCTAssertThrowsError(try StructureSwiftGen(
             swiftTypeName: "hello",
-            structure: JSONSchema.string.dereferencedSchemaObject()!,
+            structure: JSONSchema.string.dereferenced()!,
             cascadingConformances: ["Codable"])
         )
 
         XCTAssertThrowsError(try StructureSwiftGen(
             swiftTypeName: "hello",
-            structure: JSONSchema.array(items: .object).dereferencedSchemaObject()!,
+            structure: JSONSchema.array(items: .object).dereferenced()!,
             cascadingConformances: ["Codable"])
         )
     }
@@ -30,7 +30,7 @@ class StructureSwiftGenTests: XCTestCase {
             properties: [
                 "hello": .string
             ]
-        ).dereferencedSchemaObject()!
+        ).dereferenced()!
 
         let swiftCodeNoConformances = try? StructureSwiftGen(
             swiftTypeName: "GeneratedType",
@@ -67,7 +67,7 @@ struct GeneratedType: Codable, Equatable {
                 "world": .integer,
                 "fancy": .array(items: .number)
             ]
-        ).dereferencedSchemaObject()!
+        ).dereferenced()!
 
         let simpleObjectSwiftCode = try? StructureSwiftGen(
             swiftTypeName: "GeneratedType",
@@ -93,12 +93,12 @@ struct GeneratedType: Codable {
                 properties: [
                     "hello": .string(required: false)
                 ]
-            ).dereferencedSchemaObject()!,
+            ).dereferenced()!,
             JSONSchema.object(
                 properties: [
                     "hello": .string(nullable: true)
                 ]
-            ).dereferencedSchemaObject()!
+            ).dereferenced()!
         ]
 
         let swiftCodes = structures.map {
@@ -150,7 +150,7 @@ struct GeneratedType: Codable {
                     ]
                 )
             ]
-        ).dereferencedSchemaObject()!
+        ).dereferenced()!
 
         let simpleObjectSwiftCode = try? StructureSwiftGen(
             swiftTypeName: "GeneratedType",

@@ -12,7 +12,7 @@ import JSONAPISwiftGen
 
 class DocumentSwiftGenTests: XCTestCase {
     func test_singleViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferencedSchemaObject()!
+        let openAPIStructure = try! TestPersonSingleDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferenced()!
 
         let testDocumentSwiftGen = try! JSONAPIDocumentSwiftGen(
             swiftTypeName: "TestPersonSingleDocument",
@@ -24,7 +24,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_singleInclude1ViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleInclude1Document.SuccessDocument.openAPISchema(using: testEncoder).dereferencedSchemaObject()!
+        let openAPIStructure = try! TestPersonSingleInclude1Document.SuccessDocument.openAPISchema(using: testEncoder).dereferenced()!
 
         let testDocumentSwiftGen = try! JSONAPIDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -34,7 +34,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_singleInclude2ViaOpenAPI() {
-        let openAPIStructure = try! TestPersonSingleInclude2Document.SuccessDocument.openAPISchema(using: testEncoder).dereferencedSchemaObject()!
+        let openAPIStructure = try! TestPersonSingleInclude2Document.SuccessDocument.openAPISchema(using: testEncoder).dereferenced()!
 
         let testDocumentSwiftGen = try! JSONAPIDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -44,7 +44,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_nullableSingleViaOpenAPI() {
-        let openAPIStructure = try! TestPersonNullableSingleDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferencedSchemaObject()!
+        let openAPIStructure = try! TestPersonNullableSingleDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferenced()!
 
         let testDocumentSwiftGen = try! JSONAPIDocumentSwiftGen(swiftTypeName: "TestPersonSingleDocument",
                                                              structure: openAPIStructure)
@@ -54,7 +54,7 @@ class DocumentSwiftGenTests: XCTestCase {
     }
 
     func test_collectionViaOpenAPI() {
-        let openAPIStructure = try! TestPersonBatchDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferencedSchemaObject()!
+        let openAPIStructure = try! TestPersonBatchDocument.SuccessDocument.openAPISchema(using: testEncoder).dereferenced()!
 
         let testDocumentSwiftGen = try! JSONAPIDocumentSwiftGen(swiftTypeName: "TestPersonBatchDocument",
                                                              structure: openAPIStructure)

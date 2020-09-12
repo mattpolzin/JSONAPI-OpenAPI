@@ -159,7 +159,7 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         originatingAt server: OpenAPI.Server
     ) -> Decl {
 
-        let host = server.url
+        let host = server.urlTemplate.url!
 
         return urlSnippet(from: path, originatingAt: host)
     }
