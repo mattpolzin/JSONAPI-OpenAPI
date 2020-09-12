@@ -18,7 +18,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "4.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "2.0.0-alpha.4"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "2.0.0-beta.2"),
         .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "1.0.0-alpha.1"),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/apple/swift-format.git", from: "0.50200.1"),
