@@ -833,10 +833,14 @@ extension JSONAPIAttributeOpenAPITests {
 				return
 			}
 
-			XCTAssertEqual(contextA, .init(format: .dateTime,
-										   required: true,
-										   nullable: false,
-										   allowedValues: nil))
+			XCTAssertEqual(
+                contextA,
+                .init(
+                    format: .dateTime,
+                    required: true,
+                    allowedValues: nil
+                )
+            )
 
 			XCTAssertEqual(stringContext, .init())
 		}
@@ -864,10 +868,14 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
@@ -892,10 +900,14 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
@@ -933,10 +945,14 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
@@ -958,10 +974,15 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: true,
-									   nullable: true,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: true,
+                nullable: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
@@ -983,10 +1004,14 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: false,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
@@ -1008,10 +1033,15 @@ extension JSONAPIAttributeOpenAPITests {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .double,
-									   required: false,
-									   nullable: true,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .double,
+                required: false,
+                nullable: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(numberContext, .init())
 	}
