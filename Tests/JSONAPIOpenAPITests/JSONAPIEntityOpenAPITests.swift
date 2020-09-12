@@ -316,137 +316,78 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
             Set(["toOne", "optionalTooOne", "nullableToOne", "nullableOptionalToOne", "toMany", "optionalToMany"])
         )
 
-		let pointerDataContext = JSONSchema.ObjectContext(
-            properties: [
-                "id": .string(
-                    .init(
-                        format: .generic,
-                        required: true
-                    ),
-                    .init()
-                ),
-                "type": .string(
-                    .init(
-                        format: .generic,
-                        required: true,
-                        allowedValues: [.init(TestType1.jsonType)]
-                    ),
-                    .init()
-                )
-            ]
-        )
+        let pointerDataProperties: [String: JSONSchema] = [
+            "id": .string,
+            "type": .string(
+                allowedValues: [.init(TestType1.jsonType)]
+            )
+        ]
 
-		let pointerContext = JSONSchema.ObjectContext(
-            properties: [
-                "data": .object(
-                    .init(
-                        format: .generic,
-                        required: true
-                    ),
-                    pointerDataContext
-                )
-            ]
-        )
+        let pointerProperties: [String: JSONSchema] = [
+            "data": .object(
+                nullable: false,
+                properties: pointerDataProperties
+            )
+        ]
 
-		let nullablePointerContext = JSONSchema.ObjectContext(
-            properties: [
-                "data": .object(
-                    .init(
-                        format: .generic,
-                        required: true,
-                        nullable: true
-                    ),
-                    pointerDataContext
-                )
-            ]
-        )
+        let nullablePointerProperties: [String: JSONSchema] = [
+            "data": .object(
+                nullable: true,
+                properties: pointerDataProperties
+            )
+        ]
 
-		let manyPointerContext = JSONSchema.ObjectContext(
-            properties: [
-                "data": .array(
-                    .init(
-                        format: .generic,
-                        required: true
-                    ),
-                    .init(
-                        items: .object(
-                            .init(
-                                format: .generic,
-                                required: true
-                            ),
-                            pointerDataContext
-                        )
-                    )
+        let manyPointerProperties: [String: JSONSchema] = [
+            "data": .array(
+                items: .object(
+                    nullable: false,
+                    properties: pointerDataProperties
                 )
-            ]
-        )
+            )
+        ]
 
 		XCTAssertEqual(
             relationshipsContext.properties["toOne"],
             .object(
-                .init(
-                    format: .generic,
-                    required: true
-                ),
-                pointerContext
+                properties: pointerProperties
             )
         )
 
 		XCTAssertEqual(
             relationshipsContext.properties["optionalTooOne"],
             .object(
-                .init(
-                    format: .generic,
-                    required: false,
-                    allowedValues: nil
-                ),
-                pointerContext
+                required: false,
+                properties: pointerProperties
             )
         )
 
 		XCTAssertEqual(
             relationshipsContext.properties["nullableToOne"],
             .object(
-                .init(
-                    format: .generic,
-                    required: true,
-                    allowedValues: nil
-                ),
-                nullablePointerContext
+                properties: nullablePointerProperties
             )
         )
 
 		XCTAssertEqual(
             relationshipsContext.properties["nullableOptionalToOne"],
             .object(
-                .init(
-                    format: .generic,
-                    required: false,
-                    allowedValues: nil
-                ),
-                nullablePointerContext
+                required: false,
+                properties: nullablePointerProperties
             )
         )
 
 		XCTAssertEqual(
             relationshipsContext.properties["toMany"],
             .object(
-                .init(
-                    format: .generic,
-                    required: true
-                ),
-                manyPointerContext
+                properties: manyPointerProperties
             )
         )
 
 		XCTAssertEqual(
             relationshipsContext.properties["optionalToMany"],
             .object(
-                .init(
-                    format: .generic,
-                    required: false
-                ),
-                manyPointerContext
+                required: false,
+                properties: manyPointerProperties
             )
         )
 	}

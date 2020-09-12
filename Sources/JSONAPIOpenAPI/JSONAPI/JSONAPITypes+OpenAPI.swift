@@ -22,15 +22,13 @@ extension Optional: Wrapper {}
 extension RelationshipType {
 	static func relationshipNode(nullable: Bool, jsonType: String) -> JSONSchema {
 		let propertiesDict: [String: JSONSchema] = [
-			"id": .string(required: true),
+			"id": .string,
 			"type": .string(
-                required: true,
                 allowedValues: [.init(jsonType)]
             )
 		]
 
 		return .object(
-            required: true,
             nullable: nullable,
             properties: propertiesDict
         )
@@ -45,7 +43,6 @@ extension ToOneRelationship: OpenAPISchemaType {
     static public var openAPISchema: JSONSchema {
 		let nullable = Identifiable.self is _Optional.Type
         return .object(
-            required: true,
             properties: [
                 "data": ToOneRelationship.relationshipNode(nullable: nullable, jsonType: Identifiable.jsonType)
             ]
@@ -60,10 +57,8 @@ extension ToManyRelationship: OpenAPISchemaType {
 	// TODO: metadata & links
     static public var openAPISchema: JSONSchema {
 		return .object(
-            required: true,
             properties: [
                 "data": .array(
-                    required: true,
                     items: ToManyRelationship.relationshipNode(nullable: false, jsonType: Relatable.jsonType)
                 )
             ]
