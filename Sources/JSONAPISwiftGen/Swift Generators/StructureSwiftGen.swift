@@ -54,7 +54,6 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         cascadingConformances: [String],
         rootConformances: [String]? = nil
     ) throws -> BlockTypeDecl {
-
         let decls = try context
             .properties
             .sorted { $0.key < $1.key  }

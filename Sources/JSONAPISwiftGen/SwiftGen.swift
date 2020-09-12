@@ -94,9 +94,18 @@ internal func safeForPropertyName(_ name: String) -> String {
         .replacingOccurrences(of: "-", with: "_")
 }
 
-enum SwiftTypeError: Swift.Error {
+enum SwiftTypeError: Swift.Error, CustomStringConvertible {
     case typeNotFound
     case placeholderTypeNotAllowed(for: JSONSchema, hint: String)
+
+    public var description: String {
+        switch self {
+        case .typeNotFound:
+            return "Encountered an OpenAPI type for which the library was not able to find a suitable Codable structure."
+        case .placeholderTypeNotAllowed(for: _, hint: let hint):
+            return "Would have used a placeholder for some type of \(hint) but placeholders are disallowed in the current configuration."
+        }
+    }
 }
 
 internal func swiftType(
@@ -112,6 +121,13 @@ internal func swiftType(
     let typeRep: SwiftTypeRep
     switch schema.jsonTypeFormat {
     case nil:
+        // just one-off cases handled for now:
+        if case .fragment = schema {
+            // If we don't know what type something is, just fall back
+            // to AnyCodable.
+            typeRep = SwiftTypeRep(AnyCodable.self)
+            break
+        }
         throw SwiftTypeError.typeNotFound
     case .boolean(let format)?:
         typeRep = SwiftTypeRep(type(of: format).SwiftType.self)
