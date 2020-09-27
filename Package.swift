@@ -2,7 +2,7 @@
 
 import PackageDescription
 
-var package = Package(
+let package = Package(
     name: "JSONAPI-OpenAPI",
     products: [
         .library(
@@ -21,7 +21,7 @@ var package = Package(
         .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "1.4.0"),
         .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", .upToNextMinor(from: "0.3.0")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
-        // swift format appended at bottom of file.
+        .package(url: "https://github.com/apple/swift-format.git", from: "0.50300.0"),
         .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", .exact("0.0.6"))
     ],
@@ -80,11 +80,3 @@ var package = Package(
     ],
     swiftLanguageVersions: [.v5]
 )
-
-#if swift(>=5.3)
-print("using swift-format for Swift 5.3")
-package.dependencies.append(.package(url: "https://github.com/apple/swift-format.git", from: "0.50300.0"))
-#else
-print("using swift-format for Swift 5.2")
-package.dependencies.append(.package(url: "https://github.com/apple/swift-format.git", .exact("0.50200.1")))
-#endif

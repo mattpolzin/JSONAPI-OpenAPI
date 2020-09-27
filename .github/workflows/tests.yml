@@ -13,11 +13,6 @@ jobs:
       fail-fast: false
       matrix:
         image:
-          - swift:5.2-xenial
-          - swift:5.2-bionic
-          - swift:5.2-focal
-          - swift:5.2-centos8
-          - swift:5.2-amazonlinux2
           - swift:5.3-xenial
           - swift:5.3-bionic
           - swift:5.3-focal
