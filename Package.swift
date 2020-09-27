@@ -86,5 +86,5 @@ print("using swift-format for Swift 5.3")
 package.dependencies.append(.package(url: "https://github.com/apple/swift-format.git", from: "0.50300.0"))
 #else
 print("using swift-format for Swift 5.2")
-package.dependencies.append(.package(url: "https://github.com/apple/swift-format.git", from: "0.50200.1"))
+package.dependencies.append(.package(url: "https://github.com/apple/swift-format.git", .exact("0.50200.1")))
 #endif
