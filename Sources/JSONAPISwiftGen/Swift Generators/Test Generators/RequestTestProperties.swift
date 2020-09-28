@@ -34,11 +34,14 @@ extension OpenAPIExampleRequestTestSwiftGen {
 
             ignoreMissingParameterWarnings = (testProps["ignore_missing_parameter_warnings"] as? Bool) ?? false
 
+            // TODO: Once the URLTemplate type can be resolved against the
+            //  server variables, don't just force unwrap the URL property
+            // like this:
             let hostParam = testProps["test_host"]
                 .flatMap { $0 as? String }
             host =  try hostParam
                 .flatMap { try Self.hostOverride(from: $0, inTest: name) }
-                ?? server.url
+                ?? server.urlTemplate.url!
 
             skipExample = testProps["skip_example"]
                 .flatMap { $0 as? Bool }

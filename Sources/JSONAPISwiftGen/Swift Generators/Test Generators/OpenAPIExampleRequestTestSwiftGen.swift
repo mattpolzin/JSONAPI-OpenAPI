@@ -158,7 +158,7 @@ public struct OpenAPIExampleRequestTestSwiftGen: TestFunctionGenerator {
     }
 
     static func hostSnippet(from server: OpenAPI.Server) -> Decl {
-        let hostUrl = server.url
+        let hostUrl = server.urlTemplate.url!
         return PropDecl.let(
             propName: "defaultHost",
             swiftType: .rep(String.self),

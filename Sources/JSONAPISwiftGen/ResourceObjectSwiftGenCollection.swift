@@ -55,10 +55,9 @@ func documents(
             continue
         }
 
-        let responseSchema = jsonResponse.schema
-
-        guard case .object = responseSchema else {
-            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: responseSchema.jsonTypeFormat?.jsonType))'.")
+        guard let responseSchema = jsonResponse.schema,
+              case .object = responseSchema else {
+            print("Found non-object response schema root (expected JSON:API 'data' object). Skipping '\(String(describing: jsonResponse.schema?.jsonTypeFormat?.jsonType))'.")
             continue
         }
 

@@ -23,21 +23,37 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(objectContext1.minProperties, 2)
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["id", "type"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["id", "type"]))
-		XCTAssertEqual(objectContext1.properties["id"], .string(.init(format: .generic,
-																	  required: true),
-																.init()))
-		XCTAssertEqual(objectContext1.properties["type"], .string(.init(format: .generic,
-																	  required: true,
-																	  allowedValues: [.init(TestType1.jsonType)]),
-																.init()))
+		XCTAssertEqual(
+            objectContext1.properties["id"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true),
+                .init()
+            )
+        )
+		XCTAssertEqual(
+            objectContext1.properties["type"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: [.init(TestType1.jsonType)]),
+                .init()
+            )
+        )
 	}
 
 	func test_UnidentifiedEmptyEntity() {
@@ -51,18 +67,28 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(objectContext1.minProperties, 1)
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["type"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["type"]))
-		XCTAssertEqual(objectContext1.properties["type"], .string(.init(format: .generic,
-																		required: true,
-																		allowedValues: [.init(TestType1.jsonType)]),
-																  .init()))
+		XCTAssertEqual(
+            objectContext1.properties["type"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: [.init(TestType1.jsonType)]),
+                .init()
+            )
+        )
 	}
 
 	func test_AttributesEntity() {
@@ -85,22 +111,38 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(objectContext1.minProperties, 3)
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["id", "type", "attributes"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["id", "type", "attributes"]))
 
-		XCTAssertEqual(objectContext1.properties["id"], .string(.init(format: .generic,
-																	  required: true),
-																.init()))
-		XCTAssertEqual(objectContext1.properties["type"], .string(.init(format: .generic,
-																		required: true,
-																		allowedValues: [.init(TestType2.jsonType)]),
-																  .init()))
+		XCTAssertEqual(
+            objectContext1.properties["id"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true),
+                .init()
+            )
+        )
+		XCTAssertEqual(
+            objectContext1.properties["type"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: [.init(TestType2.jsonType)]),
+                .init()
+            )
+        )
 
 		let attributesNode = objectContext1.properties["attributes"]
 
@@ -113,56 +155,92 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(attributesContext.minProperties, 4)
 		XCTAssertEqual(Set(attributesContext.requiredProperties), Set(["stringProperty", "enumProperty", "dateProperty", "nullableProperty"]))
-		XCTAssertEqual(Set(attributesContext.properties.keys), Set(["stringProperty", "enumProperty", "dateProperty", "optionalProperty", "nullableProperty", "nullableOptionalProperty"]))
+		XCTAssertEqual(
+            Set(attributesContext.properties.keys),
+            Set(["stringProperty", "enumProperty", "dateProperty", "optionalProperty", "nullableProperty", "nullableOptionalProperty"])
+        )
 
-		XCTAssertEqual(attributesContext.properties["stringProperty"],
-					   .string(.init(format: .generic,
-									 required: true),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["stringProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true),
+                .init()
+            )
+        )
 
         print(String(data: try! JSONEncoder().encode(attributesContext.properties["enumProperty"]), encoding: .utf8)!)
 
-		XCTAssertEqual(attributesContext.properties["enumProperty"],
-					   .string(.init(format: .generic,
-									 required: true,
-									 nullable: false,
-                                     allowedValues: ["one", "two"].map(AnyCodable.init(stringLiteral:))),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["enumProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: ["one", "two"].map(AnyCodable.init(stringLiteral:))
+                ),
+                .init()
+            )
+        )
 
-		XCTAssertEqual(attributesContext.properties["dateProperty"],
-					   .string(.init(format: .dateTime,
-									 required: true,
-									 nullable: false,
-									 allowedValues: nil),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["dateProperty"],
+            .string(
+                .init(
+                    format: .dateTime,
+                    required: true,
+                    allowedValues: nil
+                ),
+                .init()
+            )
+        )
 
-		XCTAssertEqual(attributesContext.properties["optionalProperty"],
-					   .string(.init(format: .generic,
-									 required: false,
-									 nullable: false,
-									 allowedValues: nil),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["optionalProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: false,
+                    allowedValues: nil),
+                .init()
+            )
+        )
 
-		XCTAssertEqual(attributesContext.properties["nullableProperty"],
-					   .string(.init(format: .generic,
-									 required: true,
-									 nullable: true,
-									 allowedValues: nil),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["nullableProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    nullable: true,
+                    allowedValues: nil),
+                .init()
+            )
+        )
 
-		XCTAssertEqual(attributesContext.properties["nullableOptionalProperty"],
-					   .string(.init(format: .generic,
-									 required: false,
-									 nullable: true,
-									 allowedValues: nil),
-							   .init()))
+		XCTAssertEqual(
+            attributesContext.properties["nullableOptionalProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: false,
+                    nullable: true,
+                    allowedValues: nil),
+                .init()
+            )
+        )
 	}
 
 	func test_RelationshipsEntity() {
@@ -176,22 +254,40 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(objectContext1.minProperties, 3)
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["id", "type", "relationships"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["id", "type", "relationships"]))
 
-		XCTAssertEqual(objectContext1.properties["id"], .string(.init(format: .generic,
-																	  required: true),
-																.init()))
-		XCTAssertEqual(objectContext1.properties["type"], .string(.init(format: .generic,
-																		required: true,
-																		allowedValues: [.init(TestType3.jsonType)]),
-																  .init()))
+		XCTAssertEqual(
+            objectContext1.properties["id"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true
+                ),
+                .init()
+            )
+        )
+		XCTAssertEqual(
+            objectContext1.properties["type"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: [.init(TestType3.jsonType)]
+                ),
+                .init()
+            )
+        )
 
 		let relationshipsNode = objectContext1.properties["relationships"]
 
@@ -204,75 +300,96 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertEqual(relationshipsContext.minProperties, 3)
 		XCTAssertEqual(Set(relationshipsContext.requiredProperties), Set(["toOne", "nullableToOne", "toMany"]))
-		XCTAssertEqual(Set(relationshipsContext.properties.keys), Set(["toOne", "optionalTooOne", "nullableToOne", "nullableOptionalToOne", "toMany", "optionalToMany"]))
+		XCTAssertEqual(
+            Set(relationshipsContext.properties.keys),
+            Set(["toOne", "optionalTooOne", "nullableToOne", "nullableOptionalToOne", "toMany", "optionalToMany"])
+        )
 
-		let pointerDataContext = JSONSchema.ObjectContext(properties: ["id": .string(.init(format: .generic,
-																						 required: true),
-																				   .init()),
-																	 "type": .string(.init(format: .generic,
-																						   required: true,
-																						   allowedValues: [.init(TestType1.jsonType)]),
-																					 .init())])
+        let pointerDataProperties: [String: JSONSchema] = [
+            "id": .string,
+            "type": .string(
+                allowedValues: [.init(TestType1.jsonType)]
+            )
+        ]
 
-		let pointerContext = JSONSchema.ObjectContext(properties: ["data": .object(.init(format: .generic,
-																					   required: true),
-																				 pointerDataContext)])
+        let pointerProperties: [String: JSONSchema] = [
+            "data": .object(
+                nullable: false,
+                properties: pointerDataProperties
+            )
+        ]
 
-		let nullablePointerContext = JSONSchema.ObjectContext(properties: ["data": .object(.init(format: .generic,
-																							   required: true,
-																							   nullable: true),
-																						 pointerDataContext)])
+        let nullablePointerProperties: [String: JSONSchema] = [
+            "data": .object(
+                nullable: true,
+                properties: pointerDataProperties
+            )
+        ]
 
-		let manyPointerContext = JSONSchema.ObjectContext(properties: ["data": .array(.init(format: .generic,
-																						  required: true),
-																					.init(items: .object(.init(format: .generic,
-																											   required: true),
-																										 pointerDataContext)))])
+        let manyPointerProperties: [String: JSONSchema] = [
+            "data": .array(
+                items: .object(
+                    nullable: false,
+                    properties: pointerDataProperties
+                )
+            )
+        ]
 
-		XCTAssertEqual(relationshipsContext.properties["toOne"],
-					   .object(.init(format: .generic,
-									 required: true),
-							   pointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["toOne"],
+            .object(
+                properties: pointerProperties
+            )
+        )
 
-		XCTAssertEqual(relationshipsContext.properties["optionalTooOne"],
-					   .object(.init(format: .generic,
-									 required: false,
-									 nullable: false,
-									 allowedValues: nil),
-							   pointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["optionalTooOne"],
+            .object(
+                required: false,
+                properties: pointerProperties
+            )
+        )
 
-		XCTAssertEqual(relationshipsContext.properties["nullableToOne"],
-					   .object(.init(format: .generic,
-									 required: true,
-									 nullable: false,
-									 allowedValues: nil),
-							   nullablePointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["nullableToOne"],
+            .object(
+                properties: nullablePointerProperties
+            )
+        )
 
-		XCTAssertEqual(relationshipsContext.properties["nullableOptionalToOne"],
-					   .object(.init(format: .generic,
-									 required: false,
-									 nullable: false,
-									 allowedValues: nil),
-							   nullablePointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["nullableOptionalToOne"],
+            .object(
+                required: false,
+                properties: nullablePointerProperties
+            )
+        )
 
-		XCTAssertEqual(relationshipsContext.properties["toMany"],
-					   .object(.init(format: .generic,
-									 required: true),
-							   manyPointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["toMany"],
+            .object(
+                properties: manyPointerProperties
+            )
+        )
 
-		XCTAssertEqual(relationshipsContext.properties["optionalToMany"],
-					   .object(.init(format: .generic,
-									 required: false,
-									 nullable: false,
-									 allowedValues: nil),
-							   manyPointerContext))
+		XCTAssertEqual(
+            relationshipsContext.properties["optionalToMany"],
+            .object(
+                required: false,
+                properties: manyPointerProperties
+            )
+        )
 	}
 
 	func test_AttributesAndRelationshipsEntity() {

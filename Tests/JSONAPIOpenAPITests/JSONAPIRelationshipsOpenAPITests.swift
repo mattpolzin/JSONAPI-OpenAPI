@@ -25,10 +25,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -58,10 +62,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: false,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -71,10 +79,15 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                nullable: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext2.additionalProperties)
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "type"]))
@@ -91,10 +104,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -104,10 +121,15 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: true,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                nullable: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext2.additionalProperties)
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "type"]))
@@ -124,10 +146,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: false,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -137,10 +163,15 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: true,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                nullable: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext2.additionalProperties)
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "type"]))
@@ -157,10 +188,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -170,20 +205,29 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
 			XCTFail("Expected object node within items")
 			return
 		}
 
-		XCTAssertEqual(contextC, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextC,
+            .init(
+                format: .generic,
+                required: true,
+                nullable: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext2.additionalProperties)
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "type"]))
@@ -200,10 +244,14 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextA, .init(format: .generic,
-									   required: false,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextA,
+            .init(
+                format: .generic,
+                required: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
@@ -213,20 +261,29 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 			return
 		}
 
-		XCTAssertEqual(contextB, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextB,
+            .init(
+                format: .generic,
+                required: true,
+                allowedValues: nil
+            )
+        )
 
 		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
 			XCTFail("Expected object node within items")
 			return
 		}
 
-		XCTAssertEqual(contextC, .init(format: .generic,
-									   required: true,
-									   nullable: false,
-									   allowedValues: nil))
+		XCTAssertEqual(
+            contextC,
+            .init(
+                format: .generic,
+                required: true,
+                nullable: false,
+                allowedValues: nil
+            )
+        )
 
 		XCTAssertNil(objectContext2.additionalProperties)
 		XCTAssertEqual(Set(objectContext2.properties.keys), Set(["id", "type"]))

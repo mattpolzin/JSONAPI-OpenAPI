@@ -22,19 +22,16 @@ extension Optional: Wrapper {}
 extension RelationshipType {
 	static func relationshipNode(nullable: Bool, jsonType: String) -> JSONSchema {
 		let propertiesDict: [String: JSONSchema] = [
-			"id": .string(.init(format: .generic,
-								required: true),
-						  .init()),
-			"type": .string(.init(format: .generic,
-								  required: true,
-								  allowedValues: [.init(jsonType)]),
-							.init())
+			"id": .string,
+			"type": .string(
+                allowedValues: [.init(jsonType)]
+            )
 		]
 
-		return .object(.init(format: .generic,
-							 required: true,
-							 nullable: nullable),
-					   .init(properties: propertiesDict))
+		return .object(
+            nullable: nullable,
+            properties: propertiesDict
+        )
 	}
 }
 
@@ -46,15 +43,9 @@ extension ToOneRelationship: OpenAPISchemaType {
     static public var openAPISchema: JSONSchema {
 		let nullable = Identifiable.self is _Optional.Type
         return .object(
-            .init(
-                format: .generic,
-                required: true
-            ),
-            .init(
-                properties: [
-                    "data": ToOneRelationship.relationshipNode(nullable: nullable, jsonType: Identifiable.jsonType)
-                ]
-            )
+            properties: [
+                "data": ToOneRelationship.relationshipNode(nullable: nullable, jsonType: Identifiable.jsonType)
+            ]
         )
 	}
 }
@@ -66,21 +57,11 @@ extension ToManyRelationship: OpenAPISchemaType {
 	// TODO: metadata & links
     static public var openAPISchema: JSONSchema {
 		return .object(
-            .init(
-                format: .generic,
-                required: true
-            ),
-            .init(
-                properties: [
-                    "data": .array(
-                        .init(
-                            format: .generic,
-                            required: true
-                        ),
-                        .init(items: ToManyRelationship.relationshipNode(nullable: false, jsonType: Relatable.jsonType))
-                    )
-                ]
-            )
+            properties: [
+                "data": .array(
+                    items: ToManyRelationship.relationshipNode(nullable: false, jsonType: Relatable.jsonType)
+                )
+            ]
         )
 	}
 }
@@ -93,16 +74,13 @@ extension ResourceObject: OpenAPIEncodedSchemaType where Description.Attributes:
 		// TODO: metadata, links
 
 		let idNode: JSONSchema? = Id.RawType.self != Unidentified.self
-			? JSONSchema.string(.init(format: .generic,
-									required: true),
-							  .init())
+			? JSONSchema.string
 			: nil
 		let idProperty = idNode.map { ("id", $0) }
 
-		let typeNode = JSONSchema.string(.init(format: .generic,
-											 required: true,
-											 allowedValues: [.init(ResourceObject.jsonType)]),
-									   .init())
+		let typeNode = JSONSchema.string(
+            allowedValues: [.init(ResourceObject.jsonType)]
+        )
 		let typeProperty = ("type", typeNode)
 
 		let attributesNode: JSONSchema? = Description.Attributes.self == NoAttributes.self
@@ -122,11 +100,9 @@ extension ResourceObject: OpenAPIEncodedSchemaType where Description.Attributes:
 			typeProperty,
 			attributesProperty,
 			relationshipsProperty
-			].compactMap { $0 }) { _, value in value }
+        ].compactMap { $0 }) { _, value in value }
 
-		return .object(.init(format: .generic,
-							 required: true),
-					   .init(properties: propertiesDict))
+		return .object(properties: propertiesDict)
 	}
 }
 
@@ -210,7 +186,7 @@ extension Document.SuccessDocument: OpenAPIEncodedSchemaType where PrimaryResour
         do {
             includeNode = try Includes<IncludeType>.openAPISchema(using: encoder)
         } catch let err as OpenAPI.TypeError {
-            guard case .invalidNode = err else {
+            guard case .invalidSchema = err else {
                 throw err
             }
             includeNode = nil
