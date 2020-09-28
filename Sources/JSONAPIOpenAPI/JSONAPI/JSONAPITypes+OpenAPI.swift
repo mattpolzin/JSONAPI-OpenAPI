@@ -186,7 +186,7 @@ extension Document.SuccessDocument: OpenAPIEncodedSchemaType where PrimaryResour
         do {
             includeNode = try Includes<IncludeType>.openAPISchema(using: encoder)
         } catch let err as OpenAPI.TypeError {
-            guard case .invalidNode = err else {
+            guard case .invalidSchema = err else {
                 throw err
             }
             includeNode = nil

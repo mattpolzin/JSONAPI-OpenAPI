@@ -15,7 +15,7 @@ import JSONAPIOpenAPI
 class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 	func test_ToOne() {
-		let node = ToOneRelationship<TestEntity1, NoMetadata, NoLinks>.openAPISchema
+		let node = ToOneRelationship<TestEntity1, NoIdMetadata, NoMetadata, NoLinks>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -52,7 +52,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 	}
 
 	func test_OptionalToOne() {
-		let node = ToOneRelationship<TestEntity1, NoMetadata, NoLinks>?.openAPISchema
+		let node = ToOneRelationship<TestEntity1, NoIdMetadata, NoMetadata, NoLinks>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -94,7 +94,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 	}
 
 	func test_NullableToOne() {
-		let node = ToOneRelationship<TestEntity1?, NoMetadata, NoLinks>.openAPISchema
+		let node = ToOneRelationship<TestEntity1?, NoIdMetadata, NoMetadata, NoLinks>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -136,7 +136,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 	}
 
 	func test_OptionalNullableToOne() {
-		let node = ToOneRelationship<TestEntity1?, NoMetadata, NoLinks>?.openAPISchema
+		let node = ToOneRelationship<TestEntity1?, NoIdMetadata, NoMetadata, NoLinks>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -178,7 +178,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 	}
 
 	func test_ToMany() {
-		let node = ToManyRelationship<TestEntity1, NoMetadata, NoLinks>.openAPISchema
+		let node = ToManyRelationship<TestEntity1, NoIdMetadata, NoMetadata, NoLinks>.openAPISchema
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -234,7 +234,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 	}
 
 	func test_OptionalToMany() {
-		let node = ToManyRelationship<TestEntity1, NoMetadata, NoLinks>?.openAPISchema
+		let node = ToManyRelationship<TestEntity1, NoIdMetadata, NoMetadata, NoLinks>?.openAPISchema
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -307,7 +307,7 @@ extension JSONAPIRelationshipsOpenAPITests {
 		typealias Attributes = NoAttributes
 
 		struct Relationships: JSONAPI.Relationships {
-			let other: ToOneRelationship<TestEntity1, NoMetadata, NoLinks>
+			let other: ToOneRelationship<TestEntity1, NoIdMetadata, NoMetadata, NoLinks>
 		}
 	}
 

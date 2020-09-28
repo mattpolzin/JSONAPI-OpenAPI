@@ -23,7 +23,7 @@ extension Includes: OpenAPIEncodedSchemaType where I: OpenAPIEncodedSchemaType {
 
 extension Include0: OpenAPIEncodedSchemaType {
 	public static func openAPISchema(using encoder: JSONEncoder) throws -> JSONSchema {
-        throw OpenAPI.TypeError.invalidNode
+        throw OpenAPI.TypeError.invalidSchema
 	}
 }
 

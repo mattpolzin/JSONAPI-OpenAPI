@@ -459,23 +459,25 @@ extension JSONAPIEntityOpenAPITests {
 		public typealias Attributes = NoAttributes
 
 		public struct Relationships: JSONAPI.Relationships, Sampleable {
-			public let toOne: ToOneRelationship<TestType1, NoMetadata, NoLinks>
-			public let optionalTooOne: ToOneRelationship<TestType1, NoMetadata, NoLinks>?
-			public let nullableToOne: ToOneRelationship<TestType1?, NoMetadata, NoLinks>
-			public let nullableOptionalToOne: ToOneRelationship<TestType1?, NoMetadata, NoLinks>?
+			public let toOne: ToOneRelationship<TestType1, NoIdMetadata, NoMetadata, NoLinks>
+			public let optionalTooOne: ToOneRelationship<TestType1, NoIdMetadata, NoMetadata, NoLinks>?
+			public let nullableToOne: ToOneRelationship<TestType1?, NoIdMetadata, NoMetadata, NoLinks>
+			public let nullableOptionalToOne: ToOneRelationship<TestType1?, NoIdMetadata, NoMetadata, NoLinks>?
 
-			public let toMany: ToManyRelationship<TestType1, NoMetadata, NoLinks>
-			public let optionalToMany: ToManyRelationship<TestType1, NoMetadata, NoLinks>?
+			public let toMany: ToManyRelationship<TestType1, NoIdMetadata, NoMetadata, NoLinks>
+			public let optionalToMany: ToManyRelationship<TestType1, NoIdMetadata, NoMetadata, NoLinks>?
 			// Note there is no such thing as nullable to-many relationships (Just use
 			// an empty array)
 
 			public static var sample: Relationships {
-				return Relationships(toOne: .init(id: .init(rawValue: "1")),
-									 optionalTooOne: nil,
-									 nullableToOne: .init(id: nil),
-									 nullableOptionalToOne: nil,
-									 toMany: .init(ids: [.init(rawValue: "1")]),
-									 optionalToMany: nil)
+				return Relationships(
+                    toOne: .init(id: .init(rawValue: "1")),
+                    optionalTooOne: nil,
+                    nullableToOne: .init(id: nil),
+                    nullableOptionalToOne: nil,
+                    toMany: .init(ids: [.init(rawValue: "1")]),
+                    optionalToMany: nil
+                )
 			}
 		}
 	}

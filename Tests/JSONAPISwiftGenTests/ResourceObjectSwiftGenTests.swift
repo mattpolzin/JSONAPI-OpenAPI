@@ -80,7 +80,7 @@ enum TestPersonDescription: JSONAPI.ResourceObjectDescription {
     }
 
     struct Relationships: JSONAPI.Relationships {
-        let friends: ToManyRelationship<TestPerson, NoMetadata, NoLinks>
+        let friends: ToManyRelationship<TestPerson, NoIdMetadata, NoMetadata, NoLinks>
     }
 }
 

@@ -24,7 +24,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-        let node = try! SingleEntityDocument.SuccessDocument.openAPINodeWithExample(using: encoder)
+        let node = try! SingleEntityDocument.SuccessDocument.openAPISchemaWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -74,7 +74,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-        let node = try! ManyEntityDocument.SuccessDocument.openAPINodeWithExample(using: encoder)
+        let node = try! ManyEntityDocument.SuccessDocument.openAPISchemaWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -135,7 +135,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-        let node = try! DocumentWithIncludes.SuccessDocument.openAPINodeWithExample(using: encoder)
+        let node = try! DocumentWithIncludes.SuccessDocument.openAPISchemaWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
@@ -215,7 +215,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
 
-        let node = try! DocumentWithMultipleTypesOfIncludes.SuccessDocument.openAPINodeWithExample(using: encoder)
+        let node = try! DocumentWithMultipleTypesOfIncludes.SuccessDocument.openAPISchemaWithExample(using: encoder)
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
