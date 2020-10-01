@@ -35,6 +35,16 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             .filter { !$0.context.inQuery } // for now these are handled as a block rather than each as separate args
             .map(APIRequestTestSwiftGen.argument)
 
+        let undefinedPaarameterArgNames = Array(
+            pathComponents.components
+            .compactMap(Self.urlParameterSwiftName)
+            .filter { !parameterArgs.lazy.map(\.name).contains($0) }
+        )
+
+        if !undefinedPaarameterArgNames.isEmpty {
+            throw Error.pathParametersNotDefined(names: undefinedPaarameterArgNames)
+        }
+
         let requestBodyTypeDef = SwiftTypeDef(name: "RequestBody", specializationReps: [])
         let responseBodyTypeDef = SwiftTypeDef(name: "ResponseBody", specializationReps: [])
 
@@ -169,12 +179,11 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
         originatingAt hostUrl: URL
     ) -> Decl {
         let pathString = path.components.map { component in
-            guard component.first == "{",
-                component.last == "}" else {
-                    return component
+            guard let swiftName = urlParameterSwiftName(component) else {
+                return component
             }
             return "\\("
-                + propertyCased(String(component.dropFirst().dropLast()))
+                + swiftName
                 + ")"
         }.joined(separator: "/")
 
@@ -183,6 +192,18 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
             swiftType: .rep(URL.self),
             .init(value: "URL(string: \"\(hostUrl.absoluteString)/\(pathString)\")!")
         )
+    }
+
+    /// Get a property-cased name if the given string is an OpenAPI path parameter variable
+    /// (which means it is enclosed in brackets `{ }`). Otherwise, returns `nil`.
+    static func urlParameterSwiftName(
+        _ pathComponent: String
+    ) -> String? {
+        guard pathComponent.first == "{",
+              pathComponent.last == "}" else {
+            return nil
+        }
+        return propertyCased(String(pathComponent.dropFirst().dropLast()))
     }
 
     private static func parameterSnippet(from parameter: DereferencedParameter) throws -> Decl {
@@ -225,6 +246,8 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     public enum Error: Swift.Error {
         case parameterContentMapNotSupported
         case unsupportedParameterSchema
+
+        case pathParametersNotDefined(names: [String])
 
         case duplicateFunctionArgumentDetected
     }
