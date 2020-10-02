@@ -8,6 +8,8 @@
 import XCTest
 import JSONAPI
 import JSONAPITesting
+import OpenAPIKit
+import JSONAPISwiftGen
 
 import Foundation
 #if canImport(FoundationNetworking)
@@ -15,6 +17,35 @@ import FoundationNetworking
 #endif
 
 final class APIRequestTestSwiftGenTests: XCTestCase {
+    func test_undefinedPathParameters() {
+        XCTAssertThrowsError(
+            try APIRequestTestSwiftGen(
+                method: .post,
+                server: OpenAPI.Server(url: URL(string: "http://website.com")!),
+                pathComponents: "/widgets/{widget_id}",
+                parameters: []
+            )
+        )
+    }
+
+    func test_noUndefinedPathParameters() throws {
+        // just prove this does not throw for now.
+
+        // TODO: test could actually test for the given parameter
+        // being part of the resulting function signature or even more.
+        _ = try APIRequestTestSwiftGen(
+            method: .post,
+            server: OpenAPI.Server(url: URL(string: "http://website.com")!),
+            pathComponents: "/widgets/{widget_id}",
+            parameters: [
+                OpenAPI.Parameter(
+                    name: "widget_id",
+                    context: .path,
+                    schema: .string
+                ).dereferenced(in: .noComponents)
+            ]
+        )
+    }
 }
 
 // MARK: - START - Function written to generated test suites
