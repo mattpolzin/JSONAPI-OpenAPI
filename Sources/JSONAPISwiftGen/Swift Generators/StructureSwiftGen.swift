@@ -90,7 +90,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         let dependencies = try schemas
             .enumerated()
             .map { (idx, schema) -> (String, [Decl]) in
-                let name = typeCased("\(name)\(idx)")
+                let name = typeCased("Poly\(name)\(idx)")
                 return (
                     name,
                     try declsForType(
