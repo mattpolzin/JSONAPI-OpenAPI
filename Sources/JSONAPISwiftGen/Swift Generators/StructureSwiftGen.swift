@@ -102,7 +102,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
             }
 
         let poly = Typealias(
-            alias: .def(.init(name: name)),
+            alias: .def(.init(name: "Poly\(name)")),
             existingType: .def(
                 .init(
                     name: "Poly\(dependencies.count)",
