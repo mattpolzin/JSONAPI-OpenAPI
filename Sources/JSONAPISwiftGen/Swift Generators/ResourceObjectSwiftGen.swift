@@ -271,6 +271,8 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         return (attributes: attributesDecl, dependencies: attributeDecls.flatMap { $0.1 })
     }
 
+    /// Takes a JSONSchema and attempts to create a single attribute's
+    /// code snippet (Decl).
     private static func attributeSnippet(
         name: String,
         schema: DereferencedJSONSchema,
@@ -284,7 +286,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         let dependencies: [Decl]
 
         switch schema {
-        case .object:
+        case .object, .one:
             let structureGen = try StructureSwiftGen(
                 swiftTypeName: typeCased(name),
                 structure: schema,
