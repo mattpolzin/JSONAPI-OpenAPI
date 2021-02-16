@@ -8,6 +8,10 @@
 import Foundation
 import OpenAPIKit
 
+fileprivate let collidingNames = [
+    "Metadata"
+]
+
 /// Given some JSON Schema, attempt to generate Swift code for
 /// a `struct` that is capable of parsing data adhering to the schema.
 public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
@@ -31,7 +35,14 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         cascadingConformances: [String] = [],
         rootConformances: [String]? = nil
     ) throws {
-        self.swiftTypeName = swiftTypeName
+        let typeName: String
+        if collidingNames.contains(swiftTypeName) {
+            typeName = "Gen" + swiftTypeName
+        } else {
+            typeName = swiftTypeName
+        }
+
+        self.swiftTypeName = typeName
         self.structure = structure
 
         switch structure {
@@ -102,7 +113,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
             }
 
         let poly = Typealias(
-            alias: .def(.init(name: "Poly\(name)")),
+            alias: .def(.init(name: name)),
             existingType: .def(
                 .init(
                     name: "Poly\(dependencies.count)",
