@@ -31,21 +31,37 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         cascadingConformances: [String] = [],
         rootConformances: [String]? = nil
     ) throws {
-        guard case .object(_, let context) = structure else {
-            throw Error.rootNotJSONObject
+        let typeName: String
+        if reservedTypeNames.contains(swiftTypeName) {
+            typeName = "Gen" + swiftTypeName
+        } else {
+            typeName = swiftTypeName
         }
 
-        self.swiftTypeName = swiftTypeName
+        self.swiftTypeName = typeName
         self.structure = structure
 
-        decls = [
-            try StructureSwiftGen.structure(
-                named: swiftTypeName,
-                forObject: context,
+        switch structure {
+        case .object(_, let context):
+            decls = [
+                try StructureSwiftGen.structure(
+                    named: typeName,
+                    forObject: context,
+                    cascadingConformances: cascadingConformances,
+                    rootConformances: rootConformances
+                )
+            ]
+        case .one(of: let schemas, core: _):
+            let poly = try StructureSwiftGen.structure(
+                named: typeName,
+                forOneOf: schemas,
                 cascadingConformances: cascadingConformances,
                 rootConformances: rootConformances
             )
-        ]
+            decls = [poly.polyDecl] + poly.dependencies
+        default:
+            throw Error.rootNotJSONObject
+        }
     }
 
     static func structure(
@@ -74,6 +90,40 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
 
     static func structure(
         named name: String,
+        forOneOf schemas: [DereferencedJSONSchema],
+        cascadingConformances: [String],
+        rootConformances: [String]? = nil
+    ) throws -> (polyDecl: Decl, dependencies: [Decl]) {
+        let dependencies = try schemas
+            .enumerated()
+            .map { (idx, schema) -> (String, [Decl]) in
+                let name = typeCased("Poly\(name)\(idx)")
+                return (
+                    name,
+                    try declsForType(
+                        named: name,
+                        for: schema,
+                        conformances: cascadingConformances
+                    )
+                )
+            }
+
+        let poly = Typealias(
+            alias: .def(.init(name: name)),
+            existingType: .def(
+                .init(
+                    name: "Poly\(dependencies.count)",
+                    specializationReps: dependencies.map{ .def(.init(name: $0.0)) },
+                    optional: false
+                )
+            )
+        )
+
+        return (polyDecl: poly, dependencies: dependencies.flatMap(\.1))
+    }
+
+    static func structure(
+        named name: String,
         forArray context: DereferencedJSONSchema.ArrayContext,
         conformances: [String]
     ) throws -> Decl {
@@ -91,6 +141,70 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         )
     }
 
+    /// Create the decls needed to represent the structures in use
+    /// by a PolyX.
+    static func declsForType(
+        named name: String,
+        for schema: DereferencedJSONSchema,
+        conformances: [String]
+    ) throws -> [Decl] {
+        let type: SwiftTypeRep
+        let structureDecl: Decl?
+
+        do {
+            type = try swiftType(from: schema, allowPlaceholders: false)
+            structureDecl = nil
+        } catch {
+            switch schema {
+            case .object(let context, let objContext):
+                let newTypeName = typeCased(name)
+
+                // TODO: ideally distinguish between these
+                //      but that requires generating Swift code
+                //      for custom encoding/decoding
+                let optional = !context.required || context.nullable
+
+                let typeIntermediate = SwiftTypeRep.def(.init(name: newTypeName))
+
+                type = optional ? typeIntermediate.optional : typeIntermediate
+
+                structureDecl = try structure(
+                    named: newTypeName,
+                    forObject: objContext,
+                    cascadingConformances: conformances
+                )
+
+            case .array(let context, let arrayContext):
+                let newTypeName = typeCased(name)
+
+                // TODO: ideally distinguish between these
+                //      but that requires generating Swift code
+                //      for custom encoding/decoding
+                let optional = !context.required || context.nullable
+
+                let typeIntermediate = SwiftTypeRep.def(SwiftTypeDef(name: newTypeName).array)
+
+                type = optional ? typeIntermediate.optional : typeIntermediate
+
+                structureDecl = try structure(
+                    named: newTypeName,
+                    forArray: arrayContext,
+                    conformances: conformances
+                )
+            default:
+                throw SwiftTypeError.typeNotFound
+            }
+        }
+        return [
+            structureDecl ?? Typealias(
+                alias: .def(.init(name: name)),
+                existingType: type
+            )
+        ].compactMap { $0 }
+    }
+
+    /// Create the decls needed to represent the substructure of
+    /// a property with the given name.
     static func declsForProp(
         named name: String,
         for schema: DereferencedJSONSchema,

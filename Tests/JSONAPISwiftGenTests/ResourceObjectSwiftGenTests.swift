@@ -7,6 +7,7 @@ import OpenAPIKit
 import JSONAPIOpenAPI
 
 let testEncoder = JSONEncoder()
+let testDecoder = JSONDecoder()
 
 class ResourceObjectSwiftGenTests: XCTestCase {
     func test_DirectConstruction() {
@@ -59,14 +60,54 @@ class ResourceObjectSwiftGenTests: XCTestCase {
         print(try! person.formattedSwiftCode())
     }
 
-    func test_ViaOpenAPI() {
-        let openAPIStructure = try! TestPerson.openAPISchema(using: testEncoder).dereferenced()!
+    func test_ViaOpenAPI() throws {
+        let openAPIStructure = try TestPerson.openAPISchema(using: testEncoder).dereferenced()!
 
-        let testPersonSwiftGen = try! ResourceObjectSwiftGen(structure: openAPIStructure)
+        let testPersonSwiftGen = try ResourceObjectSwiftGen(structure: openAPIStructure)
 
         XCTAssertEqual(testPersonSwiftGen.resourceTypeName, "TestPerson")
 
-        print(try! testPersonSwiftGen.formattedSwiftCode())
+        print(try testPersonSwiftGen.formattedSwiftCode())
+    }
+
+    func test_polyAttribute() throws {
+        let openAPIStructure = try testDecoder.decode(
+            JSONSchema.self,
+            from: """
+            {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["poly_thing"]},
+                    "id": {"type": "string"},
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "poly_property": {
+                                "oneOf" : [
+                                    {"type": "string"},
+                                    {"type": "number"},
+                                    {"type": "array", "items": {"type": "string"}},
+                                    {
+                                        "type": "object",
+                                        "properties": {
+                                            "foo": {"type": "string", "format": "date"},
+                                            "bar": {"type": "object"}
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+            """.data(using: .utf8)!
+        ).dereferenced()!
+
+        let polyAttrSwiftGen = try ResourceObjectSwiftGen(structure: openAPIStructure)
+
+        XCTAssertEqual(polyAttrSwiftGen.resourceTypeName, "PolyThing")
+
+        print(polyAttrSwiftGen.swiftCode)
     }
 }
 

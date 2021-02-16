@@ -9,6 +9,14 @@ import Foundation
 import OpenAPIKit
 import JSONAPI
 
+/// A relatively ad-hoc list of names that if used for generated types in the
+/// wrong context could result in code ambiguity.
+internal let reservedTypeNames = [
+    "Metadata",
+    "Attributes",
+    "Relationships"
+]
+
 public protocol SwiftGenerator: SwiftCodeRepresentable {
     var decls: [Decl] { get }
 }

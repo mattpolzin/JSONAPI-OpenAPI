@@ -390,6 +390,7 @@ public struct Import: Decl {
     public static let JSONAPI: Import = .init(module: "JSONAPI")
     public static let JSONAPITesting: Import = .init(module: "JSONAPITesting")
     public static let OpenAPIKit: Import = .init(module: "OpenAPIKit")
+    public static let Poly: Import = .init(module: "Poly")
 
     public static let FoundationNetworking: Decl = """
 #if canImport(FoundationNetworking)
