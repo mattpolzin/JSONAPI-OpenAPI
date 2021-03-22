@@ -33,8 +33,8 @@
         "repositoryURL": "https://github.com/mattpolzin/JSONAPI.git",
         "state": {
           "branch": null,
-          "revision": "c645c73f51808b85a881e8af6f286086ee65cc35",
-          "version": "5.0.0"
+          "revision": "717f3d610e87705adca2bb91a03fd4e92c433845",
+          "version": "5.0.1"
         }
       },
       {
@@ -69,8 +69,8 @@
         "repositoryURL": "https://github.com/mattpolzin/Poly.git",
         "state": {
           "branch": null,
-          "revision": "36ba3f624bffa34f5f9b9c7648eab3cfdcab4748",
-          "version": "2.5.0"
+          "revision": "7dd2d0d3e6c0625f36f1b8306a90db12719240c8",
+          "version": "2.5.2"
         }
       },
       {
@@ -96,8 +96,8 @@
         "repositoryURL": "https://github.com/apple/swift-argument-parser.git",
         "state": {
           "branch": null,
-          "revision": "92646c0cdbaca076c8d3d0207891785b3379cbff",
-          "version": "0.3.1"
+          "revision": "9564d61b08a5335ae0a36f789a7d71493eacadfc",
+          "version": "0.3.2"
         }
       },
       {
@@ -141,8 +141,8 @@
         "repositoryURL": "https://github.com/jpsim/Yams.git",
         "state": {
           "branch": null,
-          "revision": "1bce5b89a11912fb8a8c48bd404bd24979472f27",
-          "version": "4.0.3"
+          "revision": "9003d51672e516cc59297b7e96bff1dfdedcb4ea",
+          "version": "4.0.4"
         }
       }
     ]
