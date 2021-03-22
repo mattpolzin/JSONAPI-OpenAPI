@@ -12,6 +12,9 @@ import JSONAPI
 /// A Generator that produces Swift code defining an OpenAPI example
 /// request/response body as a constant `Data`.
 public struct ExampleSwiftGen: SwiftGenerator {
+    /// The name of the property generated and stored as decl(s)
+    /// by this generator.
+    public let propertyName: String
     public let decls: [Decl]
 
     private let exampleAsDataSwiftString: String
@@ -29,6 +32,7 @@ public struct ExampleSwiftGen: SwiftGenerator {
     ///     - propertyName: The name of the constant the generated Swift code should
     ///         produce.
     public init(openAPIExample: AnyCodable, propertyName: String) throws {
+        self.propertyName = propertyName
         let encoder = JSONEncoder()
         let exampleData = try encoder.encode(openAPIExample)
         guard let exampleString = String(data: exampleData, encoding: .utf8) else {
@@ -41,9 +45,13 @@ public struct ExampleSwiftGen: SwiftGenerator {
 
         exampleAsDataSwiftString = "###\"\(exampleString)\"###.data(using: .utf8)!"
 
-        let decl = StaticDecl(PropDecl.var(propName: propertyName,
-                                swiftType: .rep(Data.self),
-                                DynamicValue(value: exampleAsDataSwiftString)))
+        let decl = StaticDecl(
+            PropDecl.var(
+                propName: propertyName,
+                swiftType: .rep(Data.self),
+                DynamicValue(value: exampleAsDataSwiftString)
+            )
+        )
 
         decls = [decl]
     }

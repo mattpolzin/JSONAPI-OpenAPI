@@ -7,7 +7,7 @@
 
 public protocol DocumentSwiftGenerator: JSONSchemaSwiftGenerator {
     var swiftTypeName: String { get }
-    var exampleGenerator: ExampleSwiftGen? { get }
+    var exampleGenerators: [ExampleSwiftGen] { get }
     var testExampleFuncs: [TestFunctionGenerator] { get }
 
     var swiftCodeDependencies: [SwiftGenerator] { get }
