@@ -18,7 +18,7 @@ public struct JSONAPIDocumentSwiftGen: DocumentSwiftGenerator {
     public let decls: [Decl]
     public let swiftTypeName: String
     public let resourceObjectGenerators: Set<ResourceObjectSwiftGen>
-    public let exampleGenerator: ExampleSwiftGen?
+    public let exampleGenerators: [ExampleSwiftGen]
     public let testExampleFuncs: [TestFunctionGenerator]
 
     public var swiftCodeDependencies: [SwiftGenerator] {
@@ -29,12 +29,12 @@ public struct JSONAPIDocumentSwiftGen: DocumentSwiftGenerator {
         swiftTypeName: String,
         structure: DereferencedJSONSchema,
         allowPlaceholders: Bool = true,
-        example: ExampleSwiftGen? = nil,
+        examples: [ExampleSwiftGen] = [],
         testExampleFuncs: [TestFunctionGenerator] = []
     ) throws {
         self.swiftTypeName = swiftTypeName
         self.structure = structure
-        self.exampleGenerator = example
+        self.exampleGenerators = examples
         self.testExampleFuncs = testExampleFuncs
 
         (decls, resourceObjectGenerators) = try JSONAPIDocumentSwiftGen.swiftDecls(

@@ -62,63 +62,98 @@ func documents(
         }
 
         let responseBodyTypeName = "Document_\(statusCode.rawValue)"
-        let examplePropName = "example_\(statusCode.rawValue)"
 
-        let example: ExampleSwiftGen?
-        do {
-            example = try jsonResponse.example.map { try ExampleSwiftGen.init(openAPIExample: $0, propertyName: examplePropName) }
-        } catch let err {
-            print("===")
-            print("-> " + String(describing: err))
-            print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
-            print("===")
-            example = nil
-        }
+        var exampleGens = [ExampleSwiftGen]()
+        var testExampleFuncs = [TestFunctionGenerator]()
 
-        let testExampleFuncs: [TestFunctionGenerator]
-        do {
-            let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
-            if let testPropertiesDict = jsonResponse.vendorExtensions["x-tests"]?.value as? [String: Any] {
+        let responseBodyType = SwiftTypeRep(.init(name: responseBodyTypeName))
 
-                testExampleFuncs = try OpenAPIExampleRequestTestSwiftGen.TestProperties
-                    .properties(for: testPropertiesDict, server: server)
-                    .map { testProps in
-                        try OpenAPIExampleRequestTestSwiftGen(
-                            method: httpVerb,
-                            server: server,
-                            pathComponents: path,
-                            parameters: params,
-                            testSuiteConfiguration: testSuiteConfiguration,
-                            testProperties: testProps,
-                            exampleResponseDataPropName: examplePropName,
-                            responseBodyType: responseBodyType,
-                            expectedHttpStatus: statusCode
-                        )
-                }
-            } else if example != nil {
-                testExampleFuncs = try [
-                    OpenAPIExampleParseTestSwiftGen(
-                        exampleDataPropName: examplePropName,
-                        bodyType: responseBodyType,
-                        exampleHttpStatusCode: statusCode
-                    )
-                ]
-            } else {
-                testExampleFuncs = []
+        // if there is 1 example, we also see about creating test cases from x-tests (which
+        // don't yet support named examples, though that would be great).
+        if let example = jsonResponse.example {
+            let examplePropName = "example_\(statusCode.rawValue)"
+            do {
+                exampleGens.append(try ExampleSwiftGen.init(openAPIExample: example, propertyName: examplePropName))
+            } catch let err {
+                print("===")
+                print("-> " + String(describing: err))
+                print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+                print("===")
             }
-        } catch let err {
-            print("===")
-            print("-> " + String(describing: err))
-            print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
-            print("===")
-            testExampleFuncs = []
+            do {
+                if let testPropertiesDict = jsonResponse.vendorExtensions["x-tests"]?.value as? [String: Any] {
+
+                    testExampleFuncs = try OpenAPIExampleRequestTestSwiftGen.TestProperties
+                        .properties(for: testPropertiesDict, server: server)
+                        .map { testProps in
+                            try OpenAPIExampleRequestTestSwiftGen(
+                                method: httpVerb,
+                                server: server,
+                                pathComponents: path,
+                                parameters: params,
+                                testSuiteConfiguration: testSuiteConfiguration,
+                                testProperties: testProps,
+                                exampleResponseDataPropName: examplePropName,
+                                responseBodyType: responseBodyType,
+                                expectedHttpStatus: statusCode
+                            )
+                        }
+                } else if !(exampleGens.isEmpty) {
+                    testExampleFuncs.append(
+                        try OpenAPIExampleParseTestSwiftGen(
+                            exampleDataPropName: examplePropName,
+                            bodyType: responseBodyType,
+                            exampleHttpStatusCode: statusCode
+                        )
+                    )
+                }
+            } catch let err {
+                print("===")
+                print("-> " + String(describing: err))
+                print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+                print("===")
+            }
+        } else if let examples = jsonResponse.examples?.mapValues({ $0.value.b }) {
+            // if there are multiple examples, we simply generate tests for each named example
+            // because we don't yet support request-based testing for named examples.
+
+            func exampleProp(named name: String) -> String {
+                "example_\(statusCode.rawValue)_\(propertyCased(name))"
+            }
+
+            for (name, maybeExample) in examples {
+                guard let example = maybeExample else { continue }
+                let examplePropName = exampleProp(named: name)
+                do {
+                    exampleGens.append(try ExampleSwiftGen.init(openAPIExample: example, propertyName: examplePropName))
+                } catch let err {
+                    print("===")
+                    print("-> " + String(describing: err))
+                    print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+                    print("===")
+                }
+                do {
+                    testExampleFuncs.append(
+                        try OpenAPIExampleParseTestSwiftGen(
+                            exampleDataPropName: examplePropName,
+                            bodyType: responseBodyType,
+                            exampleHttpStatusCode: statusCode
+                        )
+                    )
+                } catch let err {
+                    print("===")
+                    print("-> " + String(describing: err))
+                    print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
+                    print("===")
+                }
+            }
         }
 
         do {
             responseDocuments[statusCode] = try JSONAPIDocumentSwiftGen(
                 swiftTypeName: responseBodyTypeName,
                 structure: responseSchema,
-                example: example,
+                examples: exampleGens,
                 testExampleFuncs: testExampleFuncs
             )
         } catch let err {

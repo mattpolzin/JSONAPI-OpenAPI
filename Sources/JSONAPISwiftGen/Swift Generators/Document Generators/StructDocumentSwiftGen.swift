@@ -18,7 +18,7 @@ public struct StructDocumentSwiftGen: DocumentSwiftGenerator {
     public let decls: [Decl]
     public let swiftTypeName: String
     public let structGenerator: StructureSwiftGen
-    public let exampleGenerator: ExampleSwiftGen?
+    public let exampleGenerators: [ExampleSwiftGen]
     public let testExampleFuncs: [TestFunctionGenerator]
 
     public let swiftCodeDependencies: [SwiftGenerator] = []
@@ -27,12 +27,12 @@ public struct StructDocumentSwiftGen: DocumentSwiftGenerator {
         swiftTypeName: String,
         structure: DereferencedJSONSchema,
         allowPlaceholders: Bool = true,
-        example: ExampleSwiftGen? = nil,
+        examples: [ExampleSwiftGen] = [],
         testExampleFuncs: [TestFunctionGenerator] = []
     ) throws {
         self.swiftTypeName = swiftTypeName
         self.structure = structure
-        self.exampleGenerator = example
+        self.exampleGenerators = examples
         self.testExampleFuncs = testExampleFuncs
 
         let structGenerator = try StructureSwiftGen(
