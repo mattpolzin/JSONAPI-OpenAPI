@@ -32,7 +32,8 @@ public struct OpenAPIExampleParseTestSwiftGen: TestFunctionGenerator {
     public init(
         exampleDataPropName: String,
         bodyType: SwiftTypeRep,
-        exampleHttpStatusCode: OpenAPI.Response.StatusCode?
+        exampleHttpStatusCode: OpenAPI.Response.StatusCode?,
+        exampleName: String
     ) throws {
 
         let responseBodyDecl = PropDecl.let(
@@ -43,7 +44,7 @@ public struct OpenAPIExampleParseTestSwiftGen: TestFunctionGenerator {
 
         let context = TestFunctionLocalContext(
             contextPrefix: "test_example_parse",
-            slug: nil,
+            slug: exampleName,
             statusCode: exampleHttpStatusCode
         )
         testFunctionContext = context

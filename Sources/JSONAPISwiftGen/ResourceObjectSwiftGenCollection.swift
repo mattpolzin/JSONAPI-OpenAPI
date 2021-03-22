@@ -103,7 +103,8 @@ func documents(
                         try OpenAPIExampleParseTestSwiftGen(
                             exampleDataPropName: examplePropName,
                             bodyType: responseBodyType,
-                            exampleHttpStatusCode: statusCode
+                            exampleHttpStatusCode: statusCode,
+                            exampleName: "default"
                         )
                     )
                 }
@@ -137,7 +138,8 @@ func documents(
                         try OpenAPIExampleParseTestSwiftGen(
                             exampleDataPropName: examplePropName,
                             bodyType: responseBodyType,
-                            exampleHttpStatusCode: statusCode
+                            exampleHttpStatusCode: statusCode,
+                            exampleName: propertyCased(name)
                         )
                     )
                 } catch let err {
