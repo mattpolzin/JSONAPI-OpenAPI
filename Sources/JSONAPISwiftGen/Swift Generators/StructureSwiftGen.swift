@@ -58,7 +58,7 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
         //       success cases -- even then, you may end up with a Poly that
         //       successfully parses fewer than all of an encoded resource because
         //       of two applicable "anyOf" branches the less inclusive one came first.
-        case .one(of: let schemas, core: _), .any(of: schemas, core: _):
+        case .one(of: let schemas, core: _), .any(of: let schemas, core: _):
             let poly = try StructureSwiftGen.structure(
                 named: typeName,
                 forOneOf: schemas,
