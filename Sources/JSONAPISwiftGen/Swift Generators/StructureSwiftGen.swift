@@ -51,7 +51,14 @@ public struct StructureSwiftGen: JSONSchemaSwiftGenerator {
                     rootConformances: rootConformances
                 )
             ]
-        case .one(of: let schemas, core: _):
+        // NOTE: This is not a great place to treat "anyOf" the same way as
+        //       "oneOf" but doing so might successfully parse a specific
+        //       subset of "anyOf"s: those where you can expect one of the
+        //       cases to succeed completely but just happen to have overlapping
+        //       success cases -- even then, you may end up with a Poly that
+        //       successfully parses fewer than all of an encoded resource because
+        //       of two applicable "anyOf" branches the less inclusive one came first.
+        case .one(of: let schemas, core: _), .any(of: schemas, core: _):
             let poly = try StructureSwiftGen.structure(
                 named: typeName,
                 forOneOf: schemas,
