@@ -286,7 +286,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         let dependencies: [Decl]
 
         switch schema {
-        case .object, .one:
+        case .object, .one, .any:
             let structureGen = try StructureSwiftGen(
                 swiftTypeName: typeCased(name),
                 structure: schema,
