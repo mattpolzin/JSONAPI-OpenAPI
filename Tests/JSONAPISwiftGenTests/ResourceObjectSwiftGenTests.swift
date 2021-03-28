@@ -109,6 +109,73 @@ class ResourceObjectSwiftGenTests: XCTestCase {
 
         print(polyAttrSwiftGen.swiftCode)
     }
+
+    func test_polyAttribute2() throws {
+        let openAPIStructure = try testDecoder.decode(
+            JSONSchema.self,
+            from: """
+            {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["poly_thing"]},
+                    "id": {"type": "string"},
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "poly_property": {
+                                "type": "object",
+                                "nullable": true,
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "title": "Widget",
+                                        "additionalProperties": false,
+                                        "nullable": true,
+                                        "required": [
+                                            "prop"
+                                        ],
+                                        "properties": {
+                                            "prop": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "yes",
+                                                    "no"
+                                                ]
+                                            },
+                                            "reasoning": {
+                                                "type": "string",
+                                                "nullable": true
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "object",
+                                        "title": "Cog",
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "built"
+                                        ],
+                                        "properties": {
+                                            "built": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+            """.data(using: .utf8)!
+        ).dereferenced()!
+
+        let polyAttrSwiftGen = try ResourceObjectSwiftGen(structure: openAPIStructure)
+
+        XCTAssertEqual(polyAttrSwiftGen.resourceTypeName, "PolyThing")
+
+        print(polyAttrSwiftGen.swiftCode)
+    }
 }
 
 enum TestPersonDescription: JSONAPI.ResourceObjectDescription {
