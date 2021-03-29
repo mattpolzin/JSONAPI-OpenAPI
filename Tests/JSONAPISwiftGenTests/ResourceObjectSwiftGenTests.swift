@@ -71,6 +71,7 @@ class ResourceObjectSwiftGenTests: XCTestCase {
     }
 
     func test_polyAttribute() throws {
+        // test oneOf in simplest case
         let openAPIStructure = try testDecoder.decode(
             JSONSchema.self,
             from: """
@@ -92,6 +93,133 @@ class ResourceObjectSwiftGenTests: XCTestCase {
                                         "properties": {
                                             "foo": {"type": "string", "format": "date"},
                                             "bar": {"type": "object"}
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+            """.data(using: .utf8)!
+        ).dereferenced()!
+
+        let polyAttrSwiftGen = try ResourceObjectSwiftGen(structure: openAPIStructure)
+
+        XCTAssertEqual(polyAttrSwiftGen.resourceTypeName, "PolyThing")
+
+        print(polyAttrSwiftGen.swiftCode)
+    }
+
+    func test_polyAttribute2() throws {
+        // test oneOf with type & nullable at root
+        let openAPIStructure = try testDecoder.decode(
+            JSONSchema.self,
+            from: """
+            {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["poly_thing"]},
+                    "id": {"type": "string"},
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "poly_property": {
+                                "type": "object",
+                                "nullable": true,
+                                "oneOf": [
+                                    {
+                                        "type": "object",
+                                        "title": "Widget",
+                                        "additionalProperties": false,
+                                        "nullable": true,
+                                        "required": [
+                                            "prop"
+                                        ],
+                                        "properties": {
+                                            "prop": {
+                                                "type": "string",
+                                                "enum": [
+                                                    "yes",
+                                                    "no"
+                                                ]
+                                            },
+                                            "reasoning": {
+                                                "type": "string",
+                                                "nullable": true
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "object",
+                                        "title": "Cog",
+                                        "additionalProperties": false,
+                                        "required": [
+                                            "built"
+                                        ],
+                                        "properties": {
+                                            "built": {
+                                                "type": "boolean"
+                                            }
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    }
+                }
+            }
+            """.data(using: .utf8)!
+        ).dereferenced()!
+
+        let polyAttrSwiftGen = try ResourceObjectSwiftGen(structure: openAPIStructure)
+
+        XCTAssertEqual(polyAttrSwiftGen.resourceTypeName, "PolyThing")
+
+        print(polyAttrSwiftGen.swiftCode)
+    }
+
+    func test_polyAttribute3() throws {
+        // test anyOf as Poly
+        let openAPIStructure = try testDecoder.decode(
+            JSONSchema.self,
+            from: """
+            {
+                "type": "object",
+                "properties": {
+                    "type": {"type": "string", "enum": ["poly_thing"]},
+                    "id": {"type": "string"},
+                    "attributes": {
+                        "type": "object",
+                        "properties": {
+                            "poly_property": {
+                                "type": "object",
+                                "nullable": true,
+                                "anyOf": [
+                                    {
+                                        "type": "object",
+                                        "title": "Metadata 1",
+                                        "additionalProperties": true,
+                                        "nullable": true,
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "description": "title"
+                                            }
+                                        }
+                                    },
+                                    {
+                                        "type": "object",
+                                        "title": "Metadata 2",
+                                        "additionalProperties": true,
+                                        "properties": {
+                                            "title": {
+                                                "type": "string",
+                                                "description": "title"
+                                            },
+                                            "is_starred": {
+                                                "type": "boolean"
+                                            }
                                         }
                                     }
                                 ]
