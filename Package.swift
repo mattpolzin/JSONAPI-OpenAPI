@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "JSONAPI-OpenAPI",
+    platforms: [
+        .macOS(.v10_11),
+    ],
     products: [
         .library(
             name: "JSONAPIOpenAPI",
