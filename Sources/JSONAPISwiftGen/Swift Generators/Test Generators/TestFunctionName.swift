@@ -139,12 +139,15 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             .replacingOccurrences(of: "\(Self.spaceReplacementCharacter)", with: " ")
     }
 
-    /// For swift names, we remove braces and convert spaces to underscores.
+    /// For swift names, we remove braces, escape reserved words, and convert spaces to underscores.
     internal static func swiftName(from string: String) -> String {
         return string
             .replacingOccurrences(of: "{", with: "")
             .replacingOccurrences(of: "}", with: "")
             .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: "do", with: "`do`")
+            .replacingOccurrences(of: "try", with: "`try`")
+            .replacingOccurrences(of: "continue", with: "`continue`")
     }
 
     public static var testPrefix = "test__"
