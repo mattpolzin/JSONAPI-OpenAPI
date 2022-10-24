@@ -112,7 +112,7 @@ final class TestFunctionNameTests: XCTestCase {
             direction: .request,
             context: TestFunctionLocalContext(functionName: "_hello_world➎")!
         )
-        XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains("go.domain"))
+        XCTAssertTrue(t1.fullyQualifiedTestFunctionName.contains("domain"))
     }
 
     func test_statusCodeExtraction() {
