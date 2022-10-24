@@ -140,7 +140,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     }
 
     /// For swift names, we remove braces, escape reserved words, and convert spaces to underscores.
-    internal static func swiftName(from string: String) -> String {
+    public static func swiftName(from string: String) -> String {
         let name = string
             .replacingOccurrences(of: "{", with: "")
             .replacingOccurrences(of: "}", with: "")
