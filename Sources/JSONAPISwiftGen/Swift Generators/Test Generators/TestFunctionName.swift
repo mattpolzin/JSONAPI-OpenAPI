@@ -147,6 +147,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             .replacingOccurrences(of: " ", with: "_")
             .replacingOccurrences(of: "do", with: "`do`")
             .replacingOccurrences(of: "try", with: "`try`")
+            .replacingOccurrences(of: "continue", with: "`continue`")
     }
 
     public static var testPrefix = "test__"
