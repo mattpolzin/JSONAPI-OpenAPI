@@ -28,8 +28,9 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected JSON Document to be an Object Node")
 			return
 		}
@@ -43,7 +44,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["data"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["data"]))
 
-		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"] else {
+		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected Data field of JSON Document to be an Object Node")
 			return
 		}
@@ -78,8 +79,9 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected JSON Document to be an Object Node")
 			return
 		}
@@ -93,7 +95,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["data"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["data"]))
 
-		guard case let .array(contextB, arrayContext)? = objectContext1.properties["data"] else {
+		guard case let .array(contextB, arrayContext)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected Data field of JSON Document to be an Array Node")
 			return
 		}
@@ -105,7 +107,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertFalse(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .object(contextC, objectContext2)? = arrayContext.items else {
+		guard case let .object(contextC, objectContext2)? = arrayContext.items?.value else {
 			XCTFail("Expected Items of Array under Data to be an Object Node")
 			return
 		}
@@ -139,8 +141,9 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected JSON Document to be an Object Node")
 			return
 		}
@@ -154,7 +157,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["data", "included"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["data", "included"]))
 
-		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"] else {
+		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected Data field of JSON Document to be an Object Node")
 			return
 		}
@@ -173,7 +176,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 											 allowedValues: [.init("test")]),
 									   .init()))
 
-		guard case let .array(contextC, arrayContext)? = objectContext1.properties["included"] else {
+		guard case let .array(contextC, arrayContext)? = objectContext1.properties["included"]?.value else {
 			XCTFail("Expected Includes field of JSON Document to be an Array Node")
 			return
 		}
@@ -185,7 +188,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertTrue(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-        guard case let .object(contextD, objectContext3)? = arrayContext.items else {
+        guard case let .object(contextD, objectContext3)? = arrayContext.items?.value else {
 			XCTFail("Expected Items of Array under Data to be an Object Node")
 			return
 		}
@@ -219,8 +222,9 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected JSON Document to be an Object Node")
 			return
 		}
@@ -234,7 +238,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertEqual(Set(objectContext1.requiredProperties), Set(["data", "included"]))
 		XCTAssertEqual(Set(objectContext1.properties.keys), Set(["data", "included"]))
 
-		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"] else {
+		guard case let .object(contextB, objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected Data field of JSON Document to be an Object Node")
 			return
 		}
@@ -253,7 +257,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 											 allowedValues: [.init("test")]),
 									   .init()))
 
-		guard case let .array(contextC, arrayContext)? = objectContext1.properties["included"] else {
+		guard case let .array(contextC, arrayContext)? = objectContext1.properties["included"]?.value else {
 			XCTFail("Expected Includes field of JSON Document to be an Array Node")
 			return
 		}
@@ -265,14 +269,14 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 		XCTAssertTrue(arrayContext.uniqueItems)
 		XCTAssertEqual(arrayContext.minItems, 0)
 
-		guard case let .one(of: includeNodes, _)? = arrayContext.items else {
+		guard case let .one(of: includeNodes, _)? = arrayContext.items?.value else {
 			XCTFail("Expected Included to contain multiple types of items.")
 			return
 		}
 
 		XCTAssertEqual(includeNodes.count, 2)
 
-		guard case let .object(contextD, objectContext3) = includeNodes[0] else {
+		guard case let .object(contextD, objectContext3) = includeNodes[0].value else {
 			XCTFail("Expected Items of OneOf under Array under Data to be an Object Node")
 			return
 		}
@@ -291,7 +295,7 @@ class JSONAPIDocumentOpenAPITests: XCTestCase {
 											 allowedValues: [.init("test")]),
 									   .init()))
 
-		guard case let .object(contextE, objectContext4) = includeNodes[1] else {
+		guard case let .object(contextE, objectContext4) = includeNodes[1].value else {
 			XCTFail("Expected Items of OneOf under Array under Data to be an Object Node")
 			return
 		}

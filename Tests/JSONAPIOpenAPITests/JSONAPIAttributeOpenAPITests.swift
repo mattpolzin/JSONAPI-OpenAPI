@@ -22,8 +22,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
+    let schema = node.value
 
-		guard case .boolean(let contextA) = node else {
+		guard case .boolean(let contextA) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -43,8 +44,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
+    let schema = node.value
 
-		guard case .boolean(let contextA) = node else {
+		guard case .boolean(let contextA) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -65,8 +67,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
+    let schema = node.value
 
-		guard case .boolean(let contextA) = node else {
+		guard case .boolean(let contextA) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -86,8 +89,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .boolean(.generic))
+    let schema = node.value
 
-		guard case .boolean(let contextA) = node else {
+		guard case .boolean(let contextA) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -111,8 +115,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
+    let schema = node.value
 
-		guard case .array(let contextA, let arrayContext) = node else {
+		guard case .array(let contextA, let arrayContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -141,8 +146,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
+    let schema = node.value
 
-		guard case .array(let contextA, let arrayContext) = node else {
+		guard case .array(let contextA, let arrayContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -172,8 +178,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
+    let schema = node.value
 
-		guard case .array(let contextA, let arrayContext) = node else {
+		guard case .array(let contextA, let arrayContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -202,8 +209,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .array(.generic))
+    let schema = node.value
 
-		guard case .array(let contextA, let arrayContext) = node else {
+		guard case .array(let contextA, let arrayContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -235,8 +243,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -258,8 +267,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -282,8 +292,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -305,8 +316,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -338,8 +350,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
+    let schema = node.value
 
-		guard case .integer(let contextA, let intContext) = node else {
+		guard case .integer(let contextA, let intContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -361,8 +374,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
+    let schema = node.value
 
-		guard case .integer(let contextA, let intContext) = node else {
+		guard case .integer(let contextA, let intContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -385,8 +399,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
+    let schema = node.value
 
-		guard case .integer(let contextA, let intContext) = node else {
+		guard case .integer(let contextA, let intContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -408,8 +423,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .integer(.generic))
+    let schema = node.value
 
-		guard case .integer(let contextA, let intContext) = node else {
+		guard case .integer(let contextA, let intContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -435,8 +451,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -458,8 +475,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -482,8 +500,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -505,8 +524,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -535,8 +555,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -558,8 +579,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -582,8 +604,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -605,8 +628,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.generic))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -648,8 +672,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node?.required ?? false)
 		XCTAssertEqual(node?.jsonTypeFormat, .string(.date))
+    let schema = node?.value
 
-		guard case .string(let contextA, let stringContext)? = node else {
+		guard case .string(let contextA, let stringContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -684,8 +709,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.date))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -723,8 +749,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node?.required ?? false)
 		XCTAssertEqual(node?.jsonTypeFormat, .string(.dateTime))
+    let schema = node?.value
 
-		guard case .string(let contextA, let stringContext)? = node else {
+		guard case .string(let contextA, let stringContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -760,8 +787,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
+    let schema = node.value
 
-		guard case .string(let contextA, let stringContext) = node else {
+		guard case .string(let contextA, let stringContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -794,8 +822,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 			XCTAssertTrue(node?.required ?? false)
 			XCTAssertEqual(node?.jsonTypeFormat, .string(.dateTime))
+    let schema = node?.value
 
-			guard case .string(let contextA, let stringContext)? = node else {
+			guard case .string(let contextA, let stringContext)? = schema else {
 				XCTFail("Expected string Node")
 				return
 			}
@@ -827,8 +856,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 			XCTAssertTrue(node.required)
 			XCTAssertEqual(node.jsonTypeFormat, .string(.dateTime))
+    let schema = node.value
 
-			guard case .string(let contextA, let stringContext) = node else {
+			guard case .string(let contextA, let stringContext) = schema else {
 				XCTFail("Expected string Node")
 				return
 			}
@@ -862,8 +892,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node?.required ?? false)
 		XCTAssertEqual(node?.jsonTypeFormat, .number(.double))
+    let schema = node?.value
 
-		guard case .number(let contextA, let numberContext)? = node else {
+		guard case .number(let contextA, let numberContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -894,8 +925,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -939,8 +971,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .number(.double))
+    let schema = node.value
 
-		guard case .number(let contextA, let numberContext) = node else {
+		guard case .number(let contextA, let numberContext) = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -968,8 +1001,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertTrue(node?.required ?? false)
 		XCTAssertEqual(node?.jsonTypeFormat, .number(.double))
+    let schema = node?.value
 
-		guard case .number(let contextA, let numberContext)? = node else {
+		guard case .number(let contextA, let numberContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -998,8 +1032,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node?.required ?? true)
 		XCTAssertEqual(node?.jsonTypeFormat, .number(.double))
+    let schema = node?.value
 
-		guard case .number(let contextA, let numberContext)? = node else {
+		guard case .number(let contextA, let numberContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
@@ -1027,8 +1062,9 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertFalse(node?.required ?? true)
 		XCTAssertEqual(node?.jsonTypeFormat, .number(.double))
+    let schema = node?.value
 
-		guard case .number(let contextA, let numberContext)? = node else {
+		guard case .number(let contextA, let numberContext)? = schema else {
 			XCTFail("Expected string Node")
 			return
 		}
