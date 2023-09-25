@@ -451,6 +451,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
                     name: oneOrManyName,
                     specializationReps: [
                         relationshipTypeRep,
+                        .init(NoIdMetadata.self),
                         .init(NoMetadata.self),
                         .init(NoLinks.self)
                     ], optional: isOmittable

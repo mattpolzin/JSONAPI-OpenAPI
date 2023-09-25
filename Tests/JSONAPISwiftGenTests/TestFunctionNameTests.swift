@@ -82,6 +82,37 @@ final class TestFunctionNameTests: XCTestCase {
                 context: TestFunctionLocalContext(functionName: "_hello_world➎")!
             )
         )
+
+        assertReflexiveRawValue(
+            TestFunctionName(
+                path: .init(["go", "continue", "do", "accept"]),
+                endpoint: .post,
+                direction: .request,
+                context: TestFunctionLocalContext(functionName: "_hello_world➎")!
+            )
+        )
+    }
+
+    func test_reservedWordsInPath() {
+        let t1 = TestFunctionName(
+            path: .init(["go", "continue", "do", "try", "accept"]),
+            endpoint: .post,
+            direction: .request,
+            context: TestFunctionLocalContext(functionName: "_hello_world➎")!
+        )
+        XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".do."))
+        XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".continue."))
+        XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".try."))
+    }
+
+    func test_onlyEscapeKeywords() {
+        let t1 = TestFunctionName(
+            path: .init(["go", "domain"]),
+            endpoint: .post,
+            direction: .request,
+            context: TestFunctionLocalContext(functionName: "_hello_world➎")!
+        )
+        XCTAssertTrue(t1.fullyQualifiedTestFunctionName.contains("domain"))
     }
 
     func test_statusCodeExtraction() {
