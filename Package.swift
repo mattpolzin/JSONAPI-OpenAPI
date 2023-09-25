@@ -1,11 +1,11 @@
-// swift-tools-version:5.2
+// swift-tools-version:5.5
 
 import PackageDescription
 
 let package = Package(
     name: "JSONAPI-OpenAPI",
     platforms: [
-        .macOS(.v10_11),
+        .macOS(.v12),
     ],
     products: [
         .library(
@@ -21,9 +21,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "5.0.0"),
-//        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "2.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .commit("64568bf1599cefc275952d2b29c780d52a13b4f2")),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "1.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .branch("release/3_0")),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", .branch("openapikit-3")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/apple/swift-format.git", from: "0.50300.0"),
         .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
@@ -34,8 +33,8 @@ let package = Package(
             name: "JSONAPIOpenAPI",
             dependencies: [
                 "JSONAPI",
-                "OpenAPIKit",
-                "OpenAPIReflection",
+                .product(name: "OpenAPIKit30", package: "OpenAPIKit"),
+                .product(name: "OpenAPIReflection30", package: "OpenAPIReflection"),
                 "Sampleable"
             ]
         ),
@@ -52,7 +51,7 @@ let package = Package(
             name: "JSONAPISwiftGen",
             dependencies: [
                 "JSONAPI",
-                "OpenAPIKit",
+                .product(name: "OpenAPIKit30", package: "OpenAPIKit"),
                 .product(name: "SwiftFormat", package: "swift-format"),
                 .product(name: "SwiftFormatConfiguration", package: "swift-format"),
                 .product(name: "NonEmpty", package: "NonEmpty")
