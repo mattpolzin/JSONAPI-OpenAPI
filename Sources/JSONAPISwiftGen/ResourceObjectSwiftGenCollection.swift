@@ -5,7 +5,7 @@
 //  Created by Mathew Polzin on 1/7/20.
 //
 
-import OpenAPIKit
+import OpenAPIKit30
 
 public struct ResourceObjectSwiftGenCollection {
     public let resourceObjectGenerators: [ResourceObjectSwiftGen]

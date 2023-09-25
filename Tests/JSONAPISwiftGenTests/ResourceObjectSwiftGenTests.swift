@@ -3,7 +3,7 @@ import XCTest
 import JSONAPISwiftGen
 import JSONAPI
 import Sampleable
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPIOpenAPI
 
 let testEncoder = JSONEncoder()

@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-import OpenAPIKit
+import OpenAPIKit30
 @testable import JSONAPISwiftGen
 
 class StructureSwiftGenTests: XCTestCase {

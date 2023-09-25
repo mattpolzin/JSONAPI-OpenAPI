@@ -6,7 +6,7 @@
 //
 
 import JSONAPISwiftGen
-import OpenAPIKit
+import OpenAPIKit30
 import XCTest
 
 final class TestFunctionNameTests: XCTestCase {

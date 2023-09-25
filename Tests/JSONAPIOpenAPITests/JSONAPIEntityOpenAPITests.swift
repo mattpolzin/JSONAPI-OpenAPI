@@ -7,7 +7,7 @@
 
 import XCTest
 import JSONAPI
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPIOpenAPI
 import Sampleable
 

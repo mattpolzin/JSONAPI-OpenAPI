@@ -7,6 +7,7 @@
 
 import JSONAPI
 import Sampleable
+import Poly
 
 extension Includes: Sampleable, AbstractSampleable where I: Sampleable {
 	public static var sample: Includes<I> {

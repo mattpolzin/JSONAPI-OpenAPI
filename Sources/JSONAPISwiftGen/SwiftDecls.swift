@@ -1,5 +1,5 @@
 
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 public protocol DefValue: SwiftCodeRepresentable {

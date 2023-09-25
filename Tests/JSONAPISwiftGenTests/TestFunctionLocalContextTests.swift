@@ -7,7 +7,7 @@
 
 import Foundation
 import XCTest
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPISwiftGen
 
 final class TestFunctionLocalContextTests: XCTestCase {

@@ -7,7 +7,7 @@
 
 import JSONAPIVizGen
 import JSONAPISwiftGen
-import OpenAPIKit
+import OpenAPIKit30
 import XCTest
 
 final class JSONAPIVizGenTests: XCTestCase {
