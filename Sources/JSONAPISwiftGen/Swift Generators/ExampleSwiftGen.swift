@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import struct OpenAPIKit.AnyCodable
+import struct OpenAPIKit30.AnyCodable
 import JSONAPI
 
 /// A Generator that produces Swift code defining an OpenAPI example

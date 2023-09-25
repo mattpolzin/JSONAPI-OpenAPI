@@ -24,7 +24,7 @@ let package = Package(
         .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .branch("release/3_0")),
         .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", .branch("openapikit-3")),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
-        .package(url: "https://github.com/apple/swift-format.git", from: "0.50300.0"),
+        .package(url: "https://github.com/apple/swift-format.git", from: "508.0.1"),
         .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", .exact("0.0.6"))
     ],

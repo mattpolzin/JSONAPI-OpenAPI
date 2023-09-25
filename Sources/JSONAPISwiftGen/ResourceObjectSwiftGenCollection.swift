@@ -114,7 +114,7 @@ func documents(
                 print("-- While parsing the HTTP \(statusCode.rawValue) response document for \(httpVerb.rawValue) at \(path.rawValue)")
                 print("===")
             }
-        } else if let examples = jsonResponse.examples?.mapValues({ $0.value.b }) {
+        } else if let examples = jsonResponse.examples?.mapValues({ $0.value?.b }) {
             // if there are multiple examples, we simply generate tests for each named example
             // because we don't yet support request-based testing for named examples.
 

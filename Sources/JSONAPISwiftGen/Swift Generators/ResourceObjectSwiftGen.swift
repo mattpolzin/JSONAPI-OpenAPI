@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 public protocol ResourceTypeSwiftGenerator: SwiftTypeGenerator {
@@ -334,7 +334,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             return (relatives: [], relationshipsDecl: Typealias(alias: .init(relationshipTypeName), existingType: .init(NoRelationships.self)))
         }
 
-        let relationshipDecls: [(relative: Relative, decl: Decl)] = try relationshipsContextB
+        let relationshipDecls: [(relative: Relative, typeNameDeclCode: Decl)] = try relationshipsContextB
             .properties
             .sorted { $0.key < $1.key }
             .map { keyValue in
@@ -361,7 +361,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
         )
 
         let relationshipsAndCodingKeys = relationshipDecls
-            .map { $0.decl }
+            .map { $0.typeNameDeclCode }
             + (hasRelationships ? [codingKeyDecl] : []) // only include CodingKeys if non-zero count of relationships
 
         let relatives = relationshipDecls.map { $0.relative }

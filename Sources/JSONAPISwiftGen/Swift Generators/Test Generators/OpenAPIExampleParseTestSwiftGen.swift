@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 
 /// A Generator that produces Swift code defining a test function
 /// based on a provided OpenAPI example. It will verify the example
