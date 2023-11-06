@@ -1,4 +1,4 @@
-// swift-tools-version:5.5
+// swift-tools-version:5.8
 
 import PackageDescription
 
@@ -21,12 +21,12 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "5.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", .branch("release/3_0")),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", .branch("openapikit-3")),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "3.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "2.0.0"),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
-        .package(url: "https://github.com/apple/swift-format.git", from: "508.0.1"),
-        .package(name: "NonEmpty", url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
-        .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", .exact("0.0.6"))
+        .package(url: "https://github.com/apple/swift-format.git", from: "509.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", exact: "0.0.6")
     ],
     targets: [
         .target(
@@ -54,7 +54,7 @@ let package = Package(
                 .product(name: "OpenAPIKit30", package: "OpenAPIKit"),
                 .product(name: "SwiftFormat", package: "swift-format"),
                 .product(name: "SwiftFormatConfiguration", package: "swift-format"),
-                .product(name: "NonEmpty", package: "NonEmpty")
+                .product(name: "NonEmpty", package: "swift-nonempty")
             ]
         ),
         .testTarget(
