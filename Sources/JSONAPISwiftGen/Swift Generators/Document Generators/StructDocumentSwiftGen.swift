@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 /// Creates a request or response document (no difference encoded in this

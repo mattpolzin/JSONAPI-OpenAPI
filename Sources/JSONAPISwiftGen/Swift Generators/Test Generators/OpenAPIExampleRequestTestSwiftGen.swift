@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 
 public extension OpenAPI.Parameter {
     /// Map from a Parameter's name to that Parameter's string-encoded value

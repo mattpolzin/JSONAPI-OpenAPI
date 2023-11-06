@@ -1,5 +1,5 @@
 # JSONAPI+OpenAPI
-[![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT) [![Swift 5.3](http://img.shields.io/badge/Swift-5.3-blue.svg)](https://swift.org) [![Build Status](https://app.bitrise.io/app/2ae0b5578e1905b8/status.svg?token=T8UAUN08e1_GnYk1z3P98g&branch=main)](https://app.bitrise.io/app/2ae0b5578e1905b8)
+[![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT) [![Swift 5.9](http://img.shields.io/badge/Swift-5.9-blue.svg)](https://swift.org) [![Build Status](https://app.bitrise.io/app/2ae0b5578e1905b8/status.svg?token=T8UAUN08e1_GnYk1z3P98g&branch=main)](https://app.bitrise.io/app/2ae0b5578e1905b8)
 
 See parent project: https://github.com/mattpolzin/JSONAPI
 
@@ -7,7 +7,7 @@ The `JSONAPIOpenAPI` framework adds the ability to generate OpenAPI compliant JS
 
 There is experimental support for generating `JSONAPI` Swift code from OpenAPI documentation in the JSONAPISwiftGen module. There is no formal documentation for this functionality, but it is an area of interest of mine. Reach out to me directly if you would like to know more.
 
-See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.2.md
+See the Open API Spec here: https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md
 
 *This library has many loose ends and very little documentation. The documentation will grow as the framework becomes more complete.*
 

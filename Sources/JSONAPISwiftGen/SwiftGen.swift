@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 /// A relatively ad-hoc list of names that if used for generated types in the

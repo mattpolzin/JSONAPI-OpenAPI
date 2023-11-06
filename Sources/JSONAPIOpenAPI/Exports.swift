@@ -6,5 +6,5 @@
 //
 
 @_exported import JSONAPI
-@_exported import OpenAPIKit
-@_exported import OpenAPIReflection
+@_exported import OpenAPIKit30
+@_exported import OpenAPIReflection30

@@ -8,7 +8,7 @@
 import XCTest
 import JSONAPI
 import JSONAPITesting
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPISwiftGen
 
 import Foundation

@@ -6,8 +6,8 @@
 //
 
 import JSONAPI
-import OpenAPIKit
-import OpenAPIReflection
+import OpenAPIKit30
+import OpenAPIReflection30
 import Foundation
 
 extension Includes: OpenAPIEncodedSchemaType where I: OpenAPIEncodedSchemaType {

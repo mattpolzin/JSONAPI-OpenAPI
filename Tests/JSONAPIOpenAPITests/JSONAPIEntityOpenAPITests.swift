@@ -7,7 +7,7 @@
 
 import XCTest
 import JSONAPI
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPIOpenAPI
 import Sampleable
 
@@ -17,8 +17,9 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected Object node")
 			return
 		}
@@ -61,8 +62,9 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected Object node")
 			return
 		}
@@ -105,8 +107,9 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected Object node")
 			return
 		}
@@ -150,7 +153,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 		XCTAssertTrue(attributesNode?.required ?? false)
 		XCTAssertEqual(attributesNode?.jsonTypeFormat, .object(.generic))
 
-		guard case let .object(contextB, attributesContext)? = attributesNode else {
+		guard case let .object(contextB, attributesContext)? = attributesNode?.value else {
 			XCTFail("Expected Object node for attributes")
 			return
 		}
@@ -248,8 +251,9 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case let .object(contextA, objectContext1) = node else {
+		guard case let .object(contextA, objectContext1) = schema else {
 			XCTFail("Expected Object node")
 			return
 		}
@@ -295,7 +299,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
 		XCTAssertTrue(relationshipsNode?.required ?? false)
 		XCTAssertEqual(relationshipsNode?.jsonTypeFormat, .object(.generic))
 
-		guard case let .object(contextB, relationshipsContext)? = relationshipsNode else {
+		guard case let .object(contextB, relationshipsContext)? = relationshipsNode?.value else {
 			XCTFail("Expected Object node for relationships")
 			return
 		}
@@ -316,28 +320,28 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
             Set(["toOne", "optionalTooOne", "nullableToOne", "nullableOptionalToOne", "toMany", "optionalToMany"])
         )
 
-        let pointerDataProperties: [String: JSONSchema] = [
+        let pointerDataProperties: OrderedDictionary<String, JSONSchema> = [
             "id": .string,
             "type": .string(
                 allowedValues: [.init(TestType1.jsonType)]
             )
         ]
 
-        let pointerProperties: [String: JSONSchema] = [
+        let pointerProperties: OrderedDictionary<String, JSONSchema> = [
             "data": .object(
                 nullable: false,
                 properties: pointerDataProperties
             )
         ]
 
-        let nullablePointerProperties: [String: JSONSchema] = [
+        let nullablePointerProperties: OrderedDictionary<String, JSONSchema> = [
             "data": .object(
                 nullable: true,
                 properties: pointerDataProperties
             )
         ]
 
-        let manyPointerProperties: [String: JSONSchema] = [
+        let manyPointerProperties: OrderedDictionary<String, JSONSchema> = [
             "data": .array(
                 items: .object(
                     nullable: false,

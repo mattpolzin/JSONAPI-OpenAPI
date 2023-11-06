@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 
 /// Given some JSON Schema, attempt to generate Swift code for
 /// a `struct` that is capable of parsing data adhering to the schema.

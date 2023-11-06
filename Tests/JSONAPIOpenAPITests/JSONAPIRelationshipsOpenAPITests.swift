@@ -8,7 +8,7 @@
 import Foundation
 import XCTest
 import JSONAPI
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPITesting
 import JSONAPIOpenAPI
 
@@ -19,8 +19,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -37,7 +38,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"] else {
+		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected object node within properties")
 			return
 		}
@@ -56,8 +57,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -74,7 +76,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"] else {
+		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected object node within properties")
 			return
 		}
@@ -98,8 +100,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -116,7 +119,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"] else {
+		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected object node within properties")
 			return
 		}
@@ -140,8 +143,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -158,7 +162,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"] else {
+		guard case .object(let contextB, let objectContext2)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected object node within properties")
 			return
 		}
@@ -182,8 +186,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertTrue(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -200,7 +205,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .array(let contextB, let arrayContext)? = objectContext1.properties["data"] else {
+		guard case .array(let contextB, let arrayContext)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected array node within properties")
 			return
 		}
@@ -214,7 +219,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
             )
         )
 
-		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
+		guard case .object(let contextC, let objectContext2)? = arrayContext.items?.value else {
 			XCTFail("Expected object node within items")
 			return
 		}
@@ -238,8 +243,9 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 
 		XCTAssertFalse(node.required)
 		XCTAssertEqual(node.jsonTypeFormat, .object(.generic))
+    let schema = node.value
 
-		guard case .object(let contextA, let objectContext1) = node else {
+		guard case .object(let contextA, let objectContext1) = schema else {
 			XCTFail("Expected object Node")
 			return
 		}
@@ -256,7 +262,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
 		XCTAssertNil(objectContext1.additionalProperties)
 		XCTAssertEqual(Array(objectContext1.properties.keys), ["data"])
 
-		guard case .array(let contextB, let arrayContext)? = objectContext1.properties["data"] else {
+		guard case .array(let contextB, let arrayContext)? = objectContext1.properties["data"]?.value else {
 			XCTFail("Expected array node within properties")
 			return
 		}
@@ -270,7 +276,7 @@ class JSONAPIRelationshipsOpenAPITests: XCTestCase {
             )
         )
 
-		guard case .object(let contextC, let objectContext2)? = arrayContext.items else {
+		guard case .object(let contextC, let objectContext2)? = arrayContext.items?.value else {
 			XCTFail("Expected object node within items")
 			return
 		}

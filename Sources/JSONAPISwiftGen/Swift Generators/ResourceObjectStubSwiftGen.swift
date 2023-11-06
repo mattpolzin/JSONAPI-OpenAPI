@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 public struct ResourceObjectStubSwiftGen: ResourceTypeSwiftGenerator {

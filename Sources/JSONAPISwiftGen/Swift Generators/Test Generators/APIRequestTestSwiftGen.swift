@@ -6,7 +6,7 @@
 //
 
 import Foundation
-import OpenAPIKit
+import OpenAPIKit30
 import JSONAPI
 
 /// A Generator that produces Swift code defining a function that

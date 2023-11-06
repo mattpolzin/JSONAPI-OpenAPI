@@ -6,8 +6,8 @@
 //
 
 import JSONAPI
-import OpenAPIKit
-import OpenAPIReflection
+import OpenAPIKit30
+import OpenAPIReflection30
 import Foundation
 import Sampleable
 
@@ -21,7 +21,7 @@ extension Optional: Wrapper {}
 
 extension RelationshipType {
 	static func relationshipNode(nullable: Bool, jsonType: String) -> JSONSchema {
-		let propertiesDict: [String: JSONSchema] = [
+		let propertiesDict: OrderedDictionary<String, JSONSchema> = [
 			"id": .string,
 			"type": .string(
                 allowedValues: [.init(jsonType)]
@@ -95,7 +95,7 @@ extension ResourceObject: OpenAPIEncodedSchemaType where Description.Attributes:
 
 		let relationshipsProperty = relationshipsNode.map { ("relationships", $0) }
 
-		let propertiesDict = Dictionary([
+		let propertiesDict = OrderedDictionary([
 			idProperty,
 			typeProperty,
 			attributesProperty,
@@ -194,7 +194,7 @@ extension Document.SuccessDocument: OpenAPIEncodedSchemaType where PrimaryResour
 
         let includeProperty = includeNode.map { ("included", $0) }
 
-        let propertiesDict = Dictionary([
+        let propertiesDict = OrderedDictionary([
             primaryDataProperty,
             includeProperty
             ].compactMap { $0 }) { _, value in value }
