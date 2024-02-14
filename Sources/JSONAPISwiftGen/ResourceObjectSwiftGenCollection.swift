@@ -10,7 +10,11 @@ import OpenAPIKit30
 public struct ResourceObjectSwiftGenCollection {
     public let resourceObjectGenerators: [ResourceObjectSwiftGen]
 
-    public init(_ doc: DereferencedDocument, testSuiteConfiguration: TestSuiteConfiguration) throws {
+    public init(
+      _ doc: DereferencedDocument,
+      testSuiteConfiguration: TestSuiteConfiguration,
+      allowPlaceholders: Bool = true
+    ) throws {
         let pathItems = doc.paths
 
         resourceObjectGenerators = OpenAPI.HttpMethod.allCases
@@ -31,7 +35,8 @@ public struct ResourceObjectSwiftGenCollection {
                         at: path,
                         on: doc.servers.first!,
                         given: parameters,
-                        testSuiteConfiguration: testSuiteConfiguration
+                        testSuiteConfiguration: testSuiteConfiguration,
+                        allowPlaceholders: allowPlaceholders
                     ).values.flatMap { Array($0.resourceObjectGenerators) }
                 }
         }
@@ -46,7 +51,8 @@ func documents(
     at path: OpenAPI.Path,
     on server: OpenAPI.Server,
     given params: [DereferencedParameter],
-    testSuiteConfiguration: TestSuiteConfiguration
+    testSuiteConfiguration: TestSuiteConfiguration,
+    allowPlaceholders: Bool
 ) -> [OpenAPI.Response.StatusCode: JSONAPIDocumentSwiftGen] {
     var responseDocuments = [OpenAPI.Response.StatusCode: JSONAPIDocumentSwiftGen]()
     for (statusCode, response) in responses {
@@ -155,6 +161,7 @@ func documents(
             responseDocuments[statusCode] = try JSONAPIDocumentSwiftGen(
                 swiftTypeName: responseBodyTypeName,
                 structure: responseSchema,
+                allowPlaceholders: allowPlaceholders,
                 examples: exampleGens,
                 testExampleFuncs: testExampleFuncs
             )
