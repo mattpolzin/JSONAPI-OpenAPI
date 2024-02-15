@@ -25,6 +25,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     public let structure: DereferencedJSONSchema
     public let decls: [Decl]
     public let resourceTypeName: String
+    public let jsonTypeName: String
     public let exportedSwiftTypeNames: Set<String>
     public let relatives: Set<Relative>
     public let relationshipStubGenerators: Set<ResourceObjectStubSwiftGen>
@@ -41,7 +42,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     ) throws {
         self.structure = structure
 
-        (decls, relatives, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(
+        (decls, jsonTypeName, relatives, relationshipStubGenerators) = try ResourceObjectSwiftGen.swiftDecls(
             from: structure,
             allowPlaceholders: allowPlaceholders
         )
@@ -56,12 +57,12 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     static func swiftDecls(
         from structure: DereferencedJSONSchema,
         allowPlaceholders: Bool
-    )  throws -> (decls: [Decl], relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
+    )  throws -> (decls: [Decl], jsonTypeName: String, relatives: Set<Relative>, relationshipStubs: Set<ResourceObjectStubSwiftGen>) {
         guard case let .object(_, resourceObjectContextB) = structure else {
             throw Error.rootNotJSONObject
         }
 
-        let (typeName, typeNameDecl) = try jsonAPITypeNameSnippet(
+        let (jsonTypeName, typeName, typeNameDecl) = try jsonAPITypeNameSnippet(
             contextB: resourceObjectContextB,
             allowPlaceholders: allowPlaceholders
         )
@@ -130,7 +131,7 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
             }
         )
 
-        return (decls: decls, relatives: Set(relationships.relatives), relationshipStubs: relationshipStubs)
+        return (decls: decls, jsonTypeName: jsonTypeName, relatives: Set(relationships.relatives), relationshipStubs: relationshipStubs)
     }
 
     /// Creates a snippet of code that declares the static Swift property
@@ -140,13 +141,14 @@ public struct ResourceObjectSwiftGen: JSONSchemaSwiftGenerator, ResourceTypeSwif
     private static func jsonAPITypeNameSnippet(
         contextB: DereferencedJSONSchema.ObjectContext,
         allowPlaceholders: Bool
-    ) throws -> (typeName: String, typeNameDeclCode: Decl) {
+    ) throws -> (jsonTypeName: String, typeName: String, typeNameDeclCode: Decl) {
         let typeNameString = try jsonAPITypeName(
             from: contextB,
             allowPlaceholders: allowPlaceholders
         )
 
         return (
+            jsonTypeName: typeNameString,
             typeName: typeCased(typeNameString),
             typeNameDeclCode: StaticDecl(.let(propName: "jsonType", swiftType: .init(String.self), .init(value: "\"\(typeNameString)\"")))
         )
