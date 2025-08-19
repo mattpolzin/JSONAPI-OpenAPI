@@ -95,11 +95,14 @@ final class TestFunctionNameTests: XCTestCase {
 
     func test_reservedWordsInPath() {
         let t1 = TestFunctionName(
-            path: .init(["go", "continue", "do", "try", "accept"]),
+            path: .init(["go", "_", "continue", "do", "try", "accept"]),
             endpoint: .post,
             direction: .request,
             context: TestFunctionLocalContext(functionName: "_hello_world➎")!
         )
+        XCTAssertTrue(t1.fullyQualifiedTestFunctionName.contains("go."))
+
+        XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains("._."))
         XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".do."))
         XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".continue."))
         XCTAssertFalse(t1.fullyQualifiedTestFunctionName.contains(".try."))
