@@ -152,6 +152,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
         if string == "do" { return "`do`" }
         if string == "try" { return "`try`" }
         if string == "continue" { return "`continue`" }
+        if string == "_" { return "`_`" }
         return string
     }
 
