@@ -5,7 +5,8 @@ import PackageDescription
 let package = Package(
     name: "JSONAPI-OpenAPI",
     platforms: [
-        .macOS(.v12),
+        .macOS(.v10_15),
+        .iOS(.v13),
     ],
     products: [
         .library(
@@ -21,8 +22,8 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "5.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "3.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "2.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "4.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "3.0.0"),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
         .package(url: "https://github.com/apple/swift-format.git", from: "509.0.0"),
         .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),

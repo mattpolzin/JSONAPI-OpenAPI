@@ -23,8 +23,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/JSONAPI.git",
       "state" : {
-        "revision" : "661dfc3ffec1ba3a201fd067877da2f3c553f236",
-        "version" : "5.1.0"
+        "revision" : "58ebdc9b104383288cde3028ce0efd552e08c47a",
+        "version" : "5.3.1"
       }
     },
     {
@@ -41,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIKit.git",
       "state" : {
-        "revision" : "ae98338a8e660ae547b058ebb69c010e70b64e31",
-        "version" : "3.0.0"
+        "revision" : "eae73235dd6a8fb9177a75da929e8bbd637c1285",
+        "version" : "4.0.1"
       }
     },
     {
@@ -50,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIReflection.git",
       "state" : {
-        "revision" : "aa9d56c75b913818c513a3b0a2cd716b8443e81e",
-        "version" : "2.0.0"
+        "revision" : "d5981296867215f62363d6c88cf05c8d71cf8d48",
+        "version" : "3.0.0"
       }
     },
     {
@@ -59,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/Poly.git",
       "state" : {
-        "revision" : "c108e9e0a2904134719b082f6c18d64406afc6db",
-        "version" : "2.6.0"
+        "revision" : "99e2e8b575620369be52fe348c0dd72028e3674c",
+        "version" : "2.8.0"
       }
     },
     {
@@ -77,17 +77,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser.git",
       "state" : {
-        "revision" : "8f4d2753f0e4778c76d5f05ad16c74f707390531",
-        "version" : "1.2.3"
+        "revision" : "309a47b2b1d9b5e991f36961c983ecec72275be3",
+        "version" : "1.6.1"
       }
     },
     {
       "identity" : "swift-cmark",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-cmark.git",
+      "location" : "https://github.com/swiftlang/swift-cmark.git",
       "state" : {
-        "revision" : "f218e5d7691f78b55bfa39b367763f4612486c35",
-        "version" : "0.3.0"
+        "revision" : "b022b08312decdc46585e0b3440d97f6f22ef703",
+        "version" : "0.6.0"
       }
     },
     {
@@ -104,8 +104,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-markdown.git",
       "state" : {
-        "revision" : "e4f95e2dc23097a1a9a1dfdfe3fe3ee44de77378",
-        "version" : "0.3.0"
+        "revision" : "ea79e83c8744d2b50b0dc2d5bbd1e857e1253bf9",
+        "version" : "0.6.0"
       }
     },
     {
@@ -120,10 +120,10 @@
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax",
+      "location" : "https://github.com/apple/swift-syntax.git",
       "state" : {
-        "revision" : "6ad4ea24b01559dde0773e3d091f1b9e36175036",
-        "version" : "509.0.2"
+        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
+        "version" : "509.1.1"
       }
     },
     {
@@ -133,15 +133,6 @@
       "state" : {
         "revision" : "077c096c3ddfc38db223ac8e525ad16ffb987138",
         "version" : "0.12.0"
-      }
-    },
-    {
-      "identity" : "yams",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/jpsim/Yams.git",
-      "state" : {
-        "revision" : "0d9ee7ea8c4ebd4a489ad7a73d5c6cad55d6fed3",
-        "version" : "5.0.6"
       }
     }
   ],
