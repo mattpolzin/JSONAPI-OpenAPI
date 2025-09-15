@@ -657,6 +657,7 @@ extension JSONAPITransformedAttributeOpenAPITests {
 
 // MARK: - Date
 extension JSONAPITransformedAttributeOpenAPITests {
+#if os(macOS) || os(iOS)
 	func test_DateStringAttribute() {
 		// TEST:
 		// Encoder is set to use
@@ -711,7 +712,6 @@ extension JSONAPITransformedAttributeOpenAPITests {
 		let encoder = JSONEncoder()
 		encoder.outputFormatting = .prettyPrinted
 		encoder.dateEncodingStrategy = .formatted(dateFormatter)
-
 		let node = IdentityAttribute<Date>.dateOpenAPISchemaGuess(using: encoder)!
 
 		XCTAssertTrue(node.required)
@@ -812,6 +812,7 @@ extension JSONAPITransformedAttributeOpenAPITests {
 
 		XCTAssertEqual(stringContext, .init())
 	}
+#endif
 
 	func test_8601DateStringAttribute() {
 		if #available(OSX 10.12, *) {
