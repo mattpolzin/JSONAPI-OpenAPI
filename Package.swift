@@ -82,5 +82,5 @@ let package = Package(
             ]
         )
     ],
-    swiftLanguageModes: [.v5,.v6]
+    swiftLanguageModes: [.v5]
 )
