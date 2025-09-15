@@ -85,12 +85,35 @@ final class TestFunctionNameTests: XCTestCase {
 
         assertReflexiveRawValue(
             TestFunctionName(
-                path: .init(["go", "continue", "do", "accept"]),
+                path: .init(["go", "_", "continue", "do", "try", "accept"]),
                 endpoint: .post,
                 direction: .request,
                 context: TestFunctionLocalContext(functionName: "_hello_world➎")!
             )
         )
+
+        assertReflexiveRawValue(
+            TestFunctionName(
+                path: .init(["hello.world", "hi"]),
+                endpoint: .post,
+                direction: .request,
+                context: TestFunctionLocalContext(functionName: "_hello_world➎")!
+            )
+        )
+    }
+
+    func test_periodInPath() {
+        let t1 = TestFunctionName(
+            path: .init(["hello.world", "hi"]),
+            endpoint: .post,
+            direction: .request,
+            context: TestFunctionLocalContext(functionName: "_hello_world➎")!
+        )
+        XCTAssertEqual(t1.fullyQualifiedTestFunctionName, "hello_world.hi.POST.Request._hello_world➎")
+        XCTAssertEqual(t1.rawValue, "test__hello❺world➍hi➍POST➍Request➍_hello_world➎")
+        XCTAssertEqual(t1.testName, "_hello_world➎")
+
+        XCTAssertEqual(TestFunctionName(rawValue: t1.rawValue)?.path, .init(["hello.world", "hi"]))
     }
 
     func test_reservedWordsInPath() {
