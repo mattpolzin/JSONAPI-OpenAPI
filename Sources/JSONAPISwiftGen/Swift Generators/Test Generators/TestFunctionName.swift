@@ -52,7 +52,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     public var rawValue: String {
         return Self.testPrefix +
             nameApplying(pathComponentTransform: Self.functionEncodedName)
-                .replacingOccurrences(of: ".", with: "\(Self.periodReplacementCharacter)")
+                .replacingOccurrences(of: ".", with: "\(Self.moduleSeparatorPeriodReplacementCharacter)")
     }
 
     /// The fully qualified test function name is the name of the test
@@ -83,7 +83,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
 
         let value = rawValue[rangeOfPrefix.upperBound...]
 
-        var components = value.split(separator: Self.periodReplacementCharacter)
+        var components = value.split(separator: Self.moduleSeparatorPeriodReplacementCharacter)
 
         guard components.count > 2 else {
             return nil
@@ -130,6 +130,7 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             .replacingOccurrences(of: "{", with: "\(Self.openBraceReplacementCharacter)")
             .replacingOccurrences(of: "}", with: "\(Self.closeBraceReplacementCharacter)")
             .replacingOccurrences(of: " ", with: "\(Self.spaceReplacementCharacter)")
+            .replacingOccurrences(of: ".", with: "\(Self.namePeriodReplacementCharacter)")
     }
 
     internal static func functionDecodedName(from string: String) -> String {
@@ -137,14 +138,17 @@ public struct TestFunctionName: Equatable, RawRepresentable {
             .replacingOccurrences(of: "\(Self.openBraceReplacementCharacter)", with: "{")
             .replacingOccurrences(of: "\(Self.closeBraceReplacementCharacter)", with: "}")
             .replacingOccurrences(of: "\(Self.spaceReplacementCharacter)", with: " ")
+            .replacingOccurrences(of: "\(Self.namePeriodReplacementCharacter)", with: ".")
     }
 
-    /// For swift names, we remove braces, escape reserved words, and convert spaces to underscores.
+    /// For swift names, we remove braces, escape reserved words, and convert
+    /// spaces and periods to underscores.
     public static func swiftName(from string: String) -> String {
         let name = string
             .replacingOccurrences(of: "{", with: "")
             .replacingOccurrences(of: "}", with: "")
             .replacingOccurrences(of: " ", with: "_")
+            .replacingOccurrences(of: ".", with: "_")
         return Self.escapedKeyword(name)
     }
 
@@ -160,7 +164,8 @@ public struct TestFunctionName: Equatable, RawRepresentable {
     private static var openBraceReplacementCharacter: Character = "➊"
     private static var closeBraceReplacementCharacter: Character = "➋"
     private static var spaceReplacementCharacter: Character = "➌"
-    private static var periodReplacementCharacter: Character = "➍"
+    private static var moduleSeparatorPeriodReplacementCharacter: Character = "➍"
+    private static var namePeriodReplacementCharacter: Character = "❺"
     // ➎ taken by `TestFunctionLocalContext.prefixSeparatorCharacter`.
 }
 
