@@ -198,6 +198,7 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
             )
         )
 
+#if os(macOS) || os(iOS)
 		XCTAssertEqual(
             attributesContext.properties["dateProperty"],
             .string(
@@ -209,6 +210,19 @@ class JSONAPIEntityOpenAPITests: XCTestCase {
                 .init()
             )
         )
+#else
+		XCTAssertEqual(
+            attributesContext.properties["dateProperty"],
+            .string(
+                .init(
+                    format: .generic,
+                    required: true,
+                    allowedValues: nil
+                ),
+                .init()
+            )
+        )
+#endif
 
 		XCTAssertEqual(
             attributesContext.properties["optionalProperty"],
