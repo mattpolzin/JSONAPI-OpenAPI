@@ -651,6 +651,7 @@ extension JSONAPIAttributeOpenAPITests {
 
 // MARK: - Date
 extension JSONAPIAttributeOpenAPITests {
+#if os(macOS) || os(iOS)
 	func test_DateStringAttribute() {
 		// TEST:
 		// Encoder is set to use
@@ -805,6 +806,7 @@ extension JSONAPIAttributeOpenAPITests {
 
 		XCTAssertEqual(stringContext, .init())
 	}
+#endif
 
 	func test_8601DateStringAttribute() {
 		if #available(OSX 10.12, *) {
