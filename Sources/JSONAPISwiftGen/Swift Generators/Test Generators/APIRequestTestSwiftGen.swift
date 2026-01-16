@@ -138,21 +138,25 @@ public struct APIRequestTestSwiftGen: SwiftGenerator {
     static func methodSnippet(from method: OpenAPI.HttpMethod) -> Decl {
         let methodString: String = {
             switch method {
-            case .get:
+            case .other(let name):
+                return ".\(name.lowercased())"
+            case .builtin(.get):
                 return ".get"
-            case .put:
+            case .builtin(.put):
                 return ".put"
-            case .delete:
+            case .builtin(.delete):
                 return ".delete"
-            case .options:
+            case .builtin(.options):
                 return ".options"
-            case .patch:
+            case .builtin(.patch):
                 return ".patch"
-            case .head:
+            case .builtin(.head):
                 return ".head"
-            case .post:
+            case .builtin(.post):
                 return ".post"
-            case .trace:
+            case .builtin(.query):
+                return ".query"
+            case .builtin(.trace):
                 return ".trace"
             }
         }()
