@@ -17,8 +17,8 @@ jobs:
           - swift:6.0-jammy
           - swift:6.1-focal
           - swift:6.1-jammy
-          - swift:6.2-focal
           - swift:6.2-jammy
+          - swift:6.2-bookworm
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
