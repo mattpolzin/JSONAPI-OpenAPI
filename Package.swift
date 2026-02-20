@@ -5,7 +5,7 @@ import PackageDescription
 let package = Package(
     name: "JSONAPI-OpenAPI",
     platforms: [
-        .macOS(.v10_15),
+        .macOS(.v13),
         .iOS(.v13),
     ],
     products: [
@@ -22,11 +22,11 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/mattpolzin/Sampleable.git", from: "2.0.0"),
         .package(url: "https://github.com/mattpolzin/JSONAPI.git", from: "6.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "4.0.0"),
-        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "3.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIKit.git", from: "5.0.0"),
+        .package(url: "https://github.com/mattpolzin/OpenAPIReflection.git", from: "4.0.0"),
         .package(url: "https://github.com/typelift/SwiftCheck.git", .upToNextMinor(from: "0.12.0")),
-        .package(url: "https://github.com/apple/swift-format.git", from: "509.0.0"),
-        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.2.0")),
+        .package(url: "https://github.com/swiftlang/swift-format.git", from: "602.0.0"),
+        .package(url: "https://github.com/pointfreeco/swift-nonempty.git", .upToNextMinor(from: "0.5.0")),
         .package(url: "https://github.com/mattpolzin/JSONAPIViz.git", exact: "0.0.7")
     ],
     targets: [
@@ -54,7 +54,6 @@ let package = Package(
                 "JSONAPI",
                 .product(name: "OpenAPIKit30", package: "OpenAPIKit"),
                 .product(name: "SwiftFormat", package: "swift-format"),
-                .product(name: "SwiftFormatConfiguration", package: "swift-format"),
                 .product(name: "NonEmpty", package: "swift-nonempty")
             ]
         ),

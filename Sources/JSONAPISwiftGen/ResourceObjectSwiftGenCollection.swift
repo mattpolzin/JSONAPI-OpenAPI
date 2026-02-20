@@ -17,7 +17,7 @@ public struct ResourceObjectSwiftGenCollection {
     ) throws {
         let pathItems = doc.paths
 
-        resourceObjectGenerators = OpenAPI.HttpMethod.allCases
+        resourceObjectGenerators = OpenAPI.BuiltinHttpMethod.allCases
             .flatMap { httpVerb in
                 return pathItems.flatMap { (path, pathItem) -> [ResourceObjectSwiftGen] in
                     guard let operation = pathItem.for(httpVerb) else {
@@ -31,7 +31,7 @@ public struct ResourceObjectSwiftGenCollection {
                     // TODO: this is a mess. Set -> Array for no good reason.
                     return documents(
                         from: responses,
-                        for: httpVerb,
+                        for: .builtin(httpVerb),
                         at: path,
                         on: doc.servers.first!,
                         given: parameters,

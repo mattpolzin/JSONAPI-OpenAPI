@@ -1,5 +1,5 @@
 # JSONAPI+OpenAPI
-[![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT) [![Swift 6.0+](http://img.shields.io/badge/Swift-6.x-blue.svg)](https://swift.org) [![Build Status](https://app.bitrise.io/app/2ae0b5578e1905b8/status.svg?token=T8UAUN08e1_GnYk1z3P98g&branch=main)](https://app.bitrise.io/app/2ae0b5578e1905b8)
+[![MIT license](http://img.shields.io/badge/license-MIT-lightgrey.svg)](http://opensource.org/licenses/MIT) [![Swift 6.0+](http://img.shields.io/badge/Swift-6.x-blue.svg)](https://swift.org)
 
 See parent project: https://github.com/mattpolzin/JSONAPI
 

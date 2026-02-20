@@ -7,7 +7,6 @@
 
 import Foundation
 import SwiftFormat
-import SwiftFormatConfiguration
 
 public protocol SwiftCodeRepresentable {
     var swiftCode: String { get }
@@ -29,7 +28,7 @@ public extension SwiftCodeRepresentable {
     }
 }
 
-fileprivate let configuration: SwiftFormatConfiguration.Configuration = {
+fileprivate let configuration: Configuration = {
     var configuration = Configuration()
     configuration.tabWidth = 4
     configuration.indentation = .spaces(4)
