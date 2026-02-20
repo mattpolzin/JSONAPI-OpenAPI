@@ -1,5 +1,5 @@
 {
-  "originHash" : "b3617ebc75550e799ab38ed9899c1751a5d661b4f5072a5d8068b124c335d72a",
+  "originHash" : "7a5931be9eb571cf2d3e4b8947abc6a73e7a16d9c9e8bb104be1f22708577593",
   "pins" : [
     {
       "identity" : "chalk",
@@ -94,7 +94,7 @@
     {
       "identity" : "swift-format",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-format.git",
+      "location" : "https://github.com/swiftlang/swift-format.git",
       "state" : {
         "revision" : "62eaad2822b865407b8cde56c36386c00800f7ec",
         "version" : "602.0.0"
