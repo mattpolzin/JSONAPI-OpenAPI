@@ -1,5 +1,5 @@
 {
-  "originHash" : "7ee519fb7c7c5b7dbd19bd337b7b8137127e3ffd9398dcdae4cf94bd15b3fc7b",
+  "originHash" : "b3617ebc75550e799ab38ed9899c1751a5d661b4f5072a5d8068b124c335d72a",
   "pins" : [
     {
       "identity" : "chalk",
@@ -42,8 +42,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIKit.git",
       "state" : {
-        "revision" : "d267e29373b3d2ff395d3b46d8bf2085a9263f67",
-        "version" : "5.0.0-rc.2"
+        "revision" : "f23fdf4223fcd780588e19c7ad823749c08bd2bf",
+        "version" : "5.0.0"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/mattpolzin/OpenAPIReflection.git",
       "state" : {
-        "branch" : "feature/openapikit-5",
-        "revision" : "68a444acd548605ddf8a0c32e5fddb97fc73b6dd"
+        "revision" : "fb431a62a9b83ad228510014c475c047911581da",
+        "version" : "4.0.0"
       }
     },
     {
@@ -96,8 +96,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-format.git",
       "state" : {
-        "revision" : "83248b4fa37919f78ffbd4650946759bcc54c2b5",
-        "version" : "509.0.0"
+        "revision" : "62eaad2822b865407b8cde56c36386c00800f7ec",
+        "version" : "602.0.0"
       }
     },
     {
@@ -114,17 +114,17 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/pointfreeco/swift-nonempty.git",
       "state" : {
-        "revision" : "9ef8c4aea57b8da7fedd5303d29470ea2a00c08d",
-        "version" : "0.2.2"
+        "revision" : "1fd3f067ebc3900d200aa7e977fdb614cc5533bc",
+        "version" : "0.5.0"
       }
     },
     {
       "identity" : "swift-syntax",
       "kind" : "remoteSourceControl",
-      "location" : "https://github.com/apple/swift-syntax.git",
+      "location" : "https://github.com/swiftlang/swift-syntax.git",
       "state" : {
-        "revision" : "64889f0c732f210a935a0ad7cda38f77f876262d",
-        "version" : "509.1.1"
+        "revision" : "4799286537280063c85a32f09884cfbca301b1a1",
+        "version" : "602.0.0"
       }
     },
     {
