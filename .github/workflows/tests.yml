@@ -17,6 +17,8 @@ jobs:
           - swift:6.0-jammy
           - swift:6.1-focal
           - swift:6.1-jammy
+          - swift:6.2-focal
+          - swift:6.2-jammy
     container: ${{ matrix.image }}
     steps:
     - name: Checkout code
@@ -24,7 +26,7 @@ jobs:
     - name: Run tests
       run: swift test
   osx:
-    runs-on: macOS-15
+    runs-on: macOS-latest
     steps:
       - name: Select latest available Xcode
         uses: maxim-lobanov/setup-xcode@v1
